@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: lingmo-comp
+Upstream-Contact: Lingmo OS Team <team@lingmo.org>
+Source: https://github.com/Matrinsoft/lingmo-comp
+Files: *
+Copyright: System76 <info@system76.com>
+           2026 Lingmo OS Team <team@lingmo.org>
+License: GPL-3.0-only

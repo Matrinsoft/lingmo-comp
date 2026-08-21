@@ -1,0 +1,11 @@
+lingmo-comp (5.0.0+lingmo5u1) unstable; urgency=medium
+
+  * New Release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Fri, 21 Aug 2026 17:31:00 +0800
+
+cosmic-comp (0.1) jammy; urgency=medium
+
+  * Initial pre-release.
+
+ -- Victoria Brekenfeld <github@drakulix.de>  Wed, 09 Feb 2022 14:20:23 +0100
