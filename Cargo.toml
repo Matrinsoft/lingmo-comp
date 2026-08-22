@@ -21,7 +21,7 @@ cosmic-config = { git = "https://github.com/Matrinsoft/liblingmo", features = [
     "calloop",
     "macro",
 ] }
-cosmic-protocols = { git = "https://github.com/Matrinsoft/lingmo-protocols", rev = "160b086", default-features = false, features = [
+cosmic-protocols = { git = "https://github.com/Matrinsoft/lingmo-protocols", rev = "bc41a9a7", default-features = false, features = [
     "server",
 ] }
 cosmic-settings-config = { git = "https://github.com/Matrinsoft/lingmo-settings-daemon" }
