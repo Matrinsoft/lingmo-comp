@@ -1,4 +1,4 @@
-use lingmo::{
+use cosmic::{
     Apply,
     font::Font,
     iced::{
@@ -145,7 +145,7 @@ impl<Message: TabMessage + 'static> Tab<Message> {
             id,
             app_icon: from_name(app_id.into()).size(16).icon(),
             title: title.into(),
-            font: lingmo::font::default(),
+            font: cosmic::font::default(),
             close_message: None,
             press_message: None,
             right_click_message: None,
@@ -258,12 +258,12 @@ pub(super) struct TabInternal<'a, Message: TabMessage> {
     idx: usize,
     active: bool,
     background: theme::Container<'a>,
-    elements: Vec<lingmo::Element<'a, Message>>,
+    elements: Vec<cosmic::Element<'a, Message>>,
     press_message: Option<Message>,
     right_click_message: Option<Message>,
 }
 
-impl<Message> Widget<Message, lingmo::Theme, lingmo::Renderer> for TabInternal<'_, Message>
+impl<Message> Widget<Message, cosmic::Theme, cosmic::Renderer> for TabInternal<'_, Message>
 where
     Message: TabMessage,
 {
@@ -287,7 +287,7 @@ where
         Size::new(Length::Fill, Length::Fill)
     }
 
-    fn layout(&mut self, tree: &mut Tree, renderer: &lingmo::Renderer, limits: &Limits) -> Node {
+    fn layout(&mut self, tree: &mut Tree, renderer: &cosmic::Renderer, limits: &Limits) -> Node {
         let min_size = Size {
             height: TAB_HEIGHT as f32,
             width: if self.active {
@@ -310,15 +310,15 @@ where
             .min_height(size.height)
             .width(size.width)
             .height(size.height);
-        lingmo::iced::core::layout::flex::resolve(
-            lingmo::iced::core::layout::flex::Axis::Horizontal,
+        cosmic::iced::core::layout::flex::resolve(
+            cosmic::iced::core::layout::flex::Axis::Horizontal,
             renderer,
             &limits,
             Length::Fill,
             Length::Fill,
             0.into(),
             8.,
-            lingmo::iced::Alignment::Center,
+            cosmic::iced::Alignment::Center,
             if size.width >= CLOSE_BREAKPOINT as f32 {
                 &mut self.elements
             } else if size.width >= TEXT_BREAKPOINT as f32 {
@@ -334,7 +334,7 @@ where
         &mut self,
         tree: &mut Tree,
         layout: Layout<'_>,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
         operation: &mut dyn Operation<()>,
     ) {
         operation.container(None, layout.bounds());
@@ -357,7 +357,7 @@ where
         event: &event::Event,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
         clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
@@ -408,7 +408,7 @@ where
         layout: Layout<'_>,
         cursor: mouse::Cursor,
         viewport: &Rectangle,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
     ) -> mouse::Interaction {
         self.elements
             .iter()
@@ -426,14 +426,14 @@ where
     fn draw(
         &self,
         tree: &Tree,
-        renderer: &mut lingmo::Renderer,
-        theme: &lingmo::Theme,
+        renderer: &mut cosmic::Renderer,
+        theme: &cosmic::Theme,
         renderer_style: &renderer::Style,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
-        use lingmo::widget::container::Catalog;
+        use cosmic::widget::container::Catalog;
         let style = theme.style(&self.background);
 
         draw_background(renderer, &style, layout.bounds());
@@ -464,10 +464,10 @@ where
         &'b mut self,
         tree: &'b mut Tree,
         layout: Layout<'b>,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
         viewport: &Rectangle,
-        translation: lingmo::iced::Vector,
-    ) -> Option<overlay::Element<'b, Message, lingmo::Theme, lingmo::Renderer>> {
+        translation: cosmic::iced::Vector,
+    ) -> Option<overlay::Element<'b, Message, cosmic::Theme, cosmic::Renderer>> {
         overlay::from_children(
             &mut self.elements,
             tree,

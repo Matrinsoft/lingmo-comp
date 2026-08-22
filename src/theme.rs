@@ -3,7 +3,7 @@
 // update a Arc<Mutex<Theme>> in the state on change of the theme and mark all interfaces for a redraw.
 
 use calloop::LoopHandle;
-use lingmo::cosmic_theme::{Theme, ThemeMode, palette};
+use cosmic::cosmic_theme::{Theme, ThemeMode, palette};
 
 use crate::state::State;
 
@@ -27,7 +27,7 @@ pub fn watch_theme(handle: LoopHandle<'_, State>) -> Result<(), cosmic_config::E
     let config_light_helper = Theme::light_config()?;
 
     if let Err(e) = handle.insert_source(ping_rx, move |_, _, state| {
-        let new_theme = lingmo::theme::system_preference();
+        let new_theme = cosmic::theme::system_preference();
         let theme = &mut state.common.theme;
 
         if theme.theme_type != new_theme.theme_type {

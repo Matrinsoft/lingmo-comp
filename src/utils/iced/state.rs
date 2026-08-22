@@ -1,5 +1,5 @@
 use super::IcedProgram as Program;
-use lingmo::iced::{
+use cosmic::iced::{
     core::{
         self as iced_core, Clipboard, Size,
         event::{self, Event},
@@ -36,7 +36,7 @@ where
         id: iced_core::id::Id,
         mut program: P,
         bounds: Size,
-        renderer: &mut lingmo::Renderer,
+        renderer: &mut cosmic::Renderer,
     ) -> Self {
         let user_interface = build_user_interface(
             id,
@@ -97,8 +97,8 @@ where
         id: iced_core::id::Id,
         bounds: Size,
         cursor: mouse::Cursor,
-        renderer: &mut lingmo::Renderer,
-        theme: &lingmo::Theme,
+        renderer: &mut cosmic::Renderer,
+        theme: &cosmic::Theme,
         style: &renderer::Style,
         clipboard: &mut dyn Clipboard,
     ) -> (Vec<Event>, Option<Task<P::Message>>) {
@@ -132,7 +132,7 @@ where
         messages.append(&mut self.queued_messages);
 
         let task = if messages.is_empty() {
-            if let lingmo::iced::runtime::user_interface::State::Updated {
+            if let cosmic::iced::runtime::user_interface::State::Updated {
                 mouse_interaction, ..
             } = state
             {
@@ -158,7 +158,7 @@ where
             let mut user_interface =
                 build_user_interface(id, &mut self.program, temp_cache, renderer, bounds);
 
-            if let lingmo::iced::runtime::user_interface::State::Updated {
+            if let cosmic::iced::runtime::user_interface::State::Updated {
                 mouse_interaction, ..
             } = state
             {
@@ -179,7 +179,7 @@ where
     pub fn operate(
         &mut self,
         id: iced_core::id::Id,
-        renderer: &mut lingmo::Renderer,
+        renderer: &mut cosmic::Renderer,
         operations: impl Iterator<Item = Box<dyn Operation>>,
         bounds: Size,
     ) {
@@ -215,9 +215,9 @@ fn build_user_interface<'a, P: Program>(
     _id: iced_core::id::Id,
     program: &'a mut P,
     cache: user_interface::Cache,
-    renderer: &mut lingmo::Renderer,
+    renderer: &mut cosmic::Renderer,
     size: Size,
-) -> UserInterface<'a, P::Message, lingmo::Theme, lingmo::Renderer> {
+) -> UserInterface<'a, P::Message, cosmic::Theme, cosmic::Renderer> {
     let view = program.view();
 
     UserInterface::build(view, size, cache, renderer)

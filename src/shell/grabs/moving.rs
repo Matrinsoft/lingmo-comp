@@ -15,7 +15,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use lingmo::theme::CosmicTheme;
+use cosmic::theme::CosmicTheme;
 use smallvec::SmallVec;
 use smithay::{
     backend::{

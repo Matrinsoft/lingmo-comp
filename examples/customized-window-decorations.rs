@@ -1,6 +1,6 @@
-use lingmo::iced::{Color, Rectangle, Size};
-use lingmo::widget;
-use lingmo::widget::canvas;
+use cosmic::iced::{Color, Rectangle, Size};
+use cosmic::widget;
+use cosmic::widget::canvas;
 use cosmic_comp::hooks::{Decorations, Hooks};
 use cosmic_comp::shell::element::stack::{
     DefaultDecorations as DefaultStackDecorations, TAB_HEIGHT,
@@ -34,7 +34,7 @@ impl<Message, Theme, Renderer: iced_graphics::geometry::Renderer>
         renderer: &Renderer,
         _theme: &Theme,
         bounds: Rectangle,
-        _cursor: lingmo::iced::mouse::Cursor,
+        _cursor: cosmic::iced::mouse::Cursor,
     ) -> Vec<Renderer::Geometry> {
         let bounds = bounds.size();
         let min = bounds.height.min(bounds.width);
@@ -48,7 +48,7 @@ impl<Message, Theme, Renderer: iced_graphics::geometry::Renderer>
 impl<Internal, Message: std::clone::Clone + 'static, Lower: Decorations<Internal, Message>>
     Decorations<Internal, Message> for AddIndicator<Lower>
 {
-    fn view(&self, window: &Internal) -> lingmo::Element<'_, Message> {
+    fn view(&self, window: &Internal) -> cosmic::Element<'_, Message> {
         let orig = self.lower.view(window);
         widget::row([
             widget::column([canvas(Circle {

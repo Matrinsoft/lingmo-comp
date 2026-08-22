@@ -1,4 +1,4 @@
-use lingmo::{
+use cosmic::{
     iced::{
         Alignment, Element,
         core::{
@@ -12,13 +12,13 @@ use lingmo::{
 };
 
 pub struct SubmenuItem<'a, Message> {
-    elem: lingmo::Element<'a, Message>,
+    elem: cosmic::Element<'a, Message>,
     idx: usize,
-    styling: <lingmo::Theme as Catalog>::Class,
+    styling: <cosmic::Theme as Catalog>::Class,
 }
 
 impl<'a, Message> SubmenuItem<'a, Message> {
-    pub fn new(elem: impl Into<lingmo::Element<'a, Message>>, idx: usize) -> Self {
+    pub fn new(elem: impl Into<cosmic::Element<'a, Message>>, idx: usize) -> Self {
         Self {
             elem: elem.into(),
             idx,
@@ -26,7 +26,7 @@ impl<'a, Message> SubmenuItem<'a, Message> {
         }
     }
 
-    pub fn style(mut self, style: <lingmo::Theme as Catalog>::Class) -> Self {
+    pub fn style(mut self, style: <cosmic::Theme as Catalog>::Class) -> Self {
         self.styling = style;
         self
     }
@@ -41,7 +41,7 @@ struct State {
     cursor_over: bool,
 }
 
-impl<Message> Widget<Message, lingmo::Theme, lingmo::Renderer> for SubmenuItem<'_, Message>
+impl<Message> Widget<Message, cosmic::Theme, cosmic::Renderer> for SubmenuItem<'_, Message>
 where
     Message: CursorEvents,
 {
@@ -56,7 +56,7 @@ where
     fn layout(
         &mut self,
         state: &mut Tree,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
         let state = &mut state.children[0];
@@ -67,8 +67,8 @@ where
     fn draw(
         &self,
         state: &Tree,
-        renderer: &mut lingmo::Renderer,
-        theme: &lingmo::Theme,
+        renderer: &mut cosmic::Renderer,
+        theme: &cosmic::Theme,
         style: &Style,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
@@ -80,7 +80,7 @@ where
         } else {
             theme.active(true, false, &self.styling)
         };
-        if matches!(self.styling, lingmo::theme::Button::MenuItem) {
+        if matches!(self.styling, cosmic::theme::Button::MenuItem) {
             match theme.list_item_position {
                 Some((Alignment::Start, _)) => {
                     styling.border_radius =
@@ -149,8 +149,8 @@ where
         &mut self,
         state: &mut Tree,
         layout: Layout<'_>,
-        renderer: &lingmo::Renderer,
-        operation: &mut dyn lingmo::widget::Operation<()>,
+        renderer: &cosmic::Renderer,
+        operation: &mut dyn cosmic::widget::Operation<()>,
     ) {
         let state = &mut state.children[0];
         let layout = layout.children().next().unwrap();
@@ -165,7 +165,7 @@ where
         event: &Event,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
         clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
@@ -209,7 +209,7 @@ where
         layout: Layout<'_>,
         cursor: mouse::Cursor,
         viewport: &Rectangle,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
     ) -> mouse::Interaction {
         let state = &state.children[0];
         let layout = layout.children().next().unwrap();
@@ -222,10 +222,10 @@ where
         &'b mut self,
         state: &'b mut Tree,
         layout: Layout<'b>,
-        renderer: &lingmo::Renderer,
+        renderer: &cosmic::Renderer,
         viewport: &Rectangle,
-        translation: lingmo::iced::Vector,
-    ) -> Option<overlay::Element<'b, Message, lingmo::Theme, lingmo::Renderer>> {
+        translation: cosmic::iced::Vector,
+    ) -> Option<overlay::Element<'b, Message, cosmic::Theme, cosmic::Renderer>> {
         let state = &mut state.children[0];
         let layout = layout.children().next().unwrap();
         self.elem
@@ -234,7 +234,7 @@ where
     }
 }
 
-impl<'a, Message> From<SubmenuItem<'a, Message>> for lingmo::Element<'a, Message>
+impl<'a, Message> From<SubmenuItem<'a, Message>> for cosmic::Element<'a, Message>
 where
     Message: CursorEvents + 'a,
 {

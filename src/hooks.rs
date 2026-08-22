@@ -21,13 +21,13 @@ pub struct Hooks {
 pub static HOOKS: OnceLock<Hooks> = OnceLock::new();
 
 pub trait Decorations<Internal, Message>: std::fmt::Debug {
-    fn view(&self, state: &Internal) -> lingmo::Element<'_, Message>;
+    fn view(&self, state: &Internal) -> cosmic::Element<'_, Message>;
 }
 
 impl Decorations<CosmicWindowInternal, WindowMessage>
     for Option<Arc<dyn Decorations<CosmicWindowInternal, WindowMessage> + Send + Sync>>
 {
-    fn view(&self, window: &CosmicWindowInternal) -> lingmo::Element<'_, WindowMessage> {
+    fn view(&self, window: &CosmicWindowInternal) -> cosmic::Element<'_, WindowMessage> {
         match self {
             None => DefaultWindowDecorations.view(window),
             Some(deco) => deco.view(window),
@@ -38,7 +38,7 @@ impl Decorations<CosmicWindowInternal, WindowMessage>
 impl Decorations<CosmicStackInternal, StackMessage>
     for Option<Arc<dyn Decorations<CosmicStackInternal, StackMessage> + Send + Sync>>
 {
-    fn view(&self, window: &CosmicStackInternal) -> lingmo::Element<'_, StackMessage> {
+    fn view(&self, window: &CosmicStackInternal) -> cosmic::Element<'_, StackMessage> {
         match self {
             None => DefaultStackDecorations.view(window),
             Some(deco) => deco.view(window),

@@ -7,7 +7,7 @@ use std::{
     sync::{Arc, LazyLock, Mutex, mpsc::Receiver},
 };
 
-use lingmo::{
+use cosmic::{
     Theme,
     iced::{
         Limits, Point as IcedPoint, Size as IcedSize, Task,
@@ -111,7 +111,7 @@ pub trait IcedProgram {
     fn update(&mut self, _message: Self::Message) -> Task<Self::Message> {
         Task::none()
     }
-    fn view(&self) -> lingmo::Element<'_, Self::Message>;
+    fn view(&self) -> cosmic::Element<'_, Self::Message>;
 
     fn background_color(&self) -> Color {
         Color::TRANSPARENT
@@ -137,9 +137,9 @@ pub trait Program {
         let _ = (message, loop_handle, last_seat);
         Task::none()
     }
-    fn view(&self) -> lingmo::Element<'_, Self::Message>;
+    fn view(&self) -> cosmic::Element<'_, Self::Message>;
 
-    fn background_color(&self, _theme: &lingmo::Theme) -> Color {
+    fn background_color(&self, _theme: &cosmic::Theme) -> Color {
         Color::TRANSPARENT
     }
 
@@ -148,7 +148,7 @@ pub trait Program {
         pixels: &mut tiny_skia::PixmapMut<'_>,
         damage: &[Rectangle<i32, BufferCoords>],
         scale: f32,
-        theme: &lingmo::Theme,
+        theme: &cosmic::Theme,
     ) {
         let _ = (pixels, damage, scale, theme);
     }
@@ -169,7 +169,7 @@ impl<P: Program> IcedProgram for ProgramWrapper<P> {
         self.program.update(message, &self.evlh, last_seat.as_ref())
     }
 
-    fn view(&self) -> lingmo::Element<'_, Self::Message> {
+    fn view(&self) -> cosmic::Element<'_, Self::Message> {
         self.program.view()
     }
 }
@@ -192,7 +192,7 @@ pub(crate) struct IcedElementInternal<P: Program + Send + 'static> {
 
     // iced
     theme: Theme,
-    renderer: lingmo::Renderer,
+    renderer: cosmic::Renderer,
     state: State<ProgramWrapper<P>>,
 
     // futures
@@ -216,7 +216,7 @@ impl<P: Program + Send + Clone + 'static> Clone for IcedElementInternal<P> {
         if !self.state.is_queue_empty() {
             tracing::warn!("Missing force_update call");
         }
-        let mut renderer = lingmo::Renderer::new(lingmo::font::default(), Pixels(16.0));
+        let mut renderer = cosmic::Renderer::new(cosmic::font::default(), Pixels(16.0));
         let state = State::new(
             ID.clone(),
             ProgramWrapper {
@@ -289,11 +289,11 @@ impl<P: Program + Send + 'static> IcedElement<P> {
         program: P,
         size: impl Into<Size<i32, Logical>>,
         handle: LoopHandle<'static, crate::state::State>,
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
     ) -> IcedElement<P> {
         let size = size.into();
         let last_seat = Arc::new(Mutex::new(None));
-        let mut renderer = lingmo::Renderer::new(lingmo::font::default(), Pixels(16.0));
+        let mut renderer = cosmic::Renderer::new(cosmic::font::default(), Pixels(16.0));
 
         let state = State::new(
             ID.clone(),
@@ -400,7 +400,7 @@ impl<P: Program + Send + 'static> IcedElement<P> {
         f(&guard.theme)
     }
 
-    pub fn set_theme(&self, theme: lingmo::Theme) {
+    pub fn set_theme(&self, theme: cosmic::Theme) {
         let mut guard = self.0.lock().unwrap();
         guard.theme = theme.clone();
     }
@@ -983,8 +983,8 @@ impl<P: Program + Send + 'static> IcedElement<P> {
                                     last_primitives,
                                     current_layers,
                                     |_| {
-                                        vec![lingmo::iced::Rectangle::new(
-                                            lingmo::iced::Point::default(),
+                                        vec![cosmic::iced::Rectangle::new(
+                                            cosmic::iced::Point::default(),
                                             viewport.logical_size(),
                                         )]
                                     },
@@ -1001,11 +1001,11 @@ impl<P: Program + Send + 'static> IcedElement<P> {
                             })
                         })
                         .unwrap_or_else(|| {
-                            vec![lingmo::iced::Rectangle::with_size(viewport.logical_size())]
+                            vec![cosmic::iced::Rectangle::with_size(viewport.logical_size())]
                         });
                     damage = damage::group(
                         damage,
-                        lingmo::iced::Rectangle::with_size(viewport.logical_size()),
+                        cosmic::iced::Rectangle::with_size(viewport.logical_size()),
                     );
 
                     if !damage.is_empty() {

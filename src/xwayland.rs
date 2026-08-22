@@ -709,7 +709,7 @@ impl Common {
             if xwayland
                 .xrdb_thread
                 .send((
-                    lingmo::icon_theme::default(),
+                    cosmic::icon_theme::default(),
                     (new_scale * cursor_size as f64).round() as u32,
                 ))
                 .is_err()

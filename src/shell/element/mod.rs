@@ -535,7 +535,7 @@ impl CosmicMapped {
     pub fn convert_to_stack(
         &mut self,
         (output, overlap): (&Output, Rectangle<i32, Logical>),
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
         appearance: AppearanceConfig,
     ) {
         if let CosmicMappedInternal::Window(window) = &self.element {
@@ -560,7 +560,7 @@ impl CosmicMapped {
         &mut self,
         surface: CosmicSurface,
         (output, overlap): (&Output, Rectangle<i32, Logical>),
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
         appearance: AppearanceConfig,
     ) {
         let handle = self.loop_handle();
@@ -890,7 +890,7 @@ impl CosmicMapped {
         }
     }
 
-    pub(crate) fn update_theme(&self, theme: lingmo::Theme) {
+    pub(crate) fn update_theme(&self, theme: cosmic::Theme) {
         match &self.element {
             CosmicMappedInternal::Window(w) => w.set_theme(theme),
             CosmicMappedInternal::Stack(s) => s.set_theme(theme),

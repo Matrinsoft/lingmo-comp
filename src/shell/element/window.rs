@@ -16,7 +16,7 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use lingmo::iced::{Color, Task};
+use cosmic::iced::{Color, Task};
 use cosmic_comp_config::AppearanceConfig;
 use smithay::{
     backend::{
@@ -88,7 +88,7 @@ pub struct CosmicWindowInternal {
     pointer_entered: AtomicU8,
     last_title: Mutex<String>,
     tiled: AtomicBool,
-    theme: Mutex<lingmo::Theme>,
+    theme: Mutex<cosmic::Theme>,
     appearance_conf: Mutex<AppearanceConfig>,
 }
 
@@ -190,7 +190,7 @@ impl CosmicWindow {
     pub fn new(
         window: impl Into<CosmicSurface>,
         handle: LoopHandle<'static, crate::state::State>,
-        mut theme: lingmo::Theme,
+        mut theme: cosmic::Theme,
         appearance: AppearanceConfig,
     ) -> CosmicWindow {
         let window = window.into();
@@ -594,7 +594,7 @@ impl CosmicWindow {
         }
     }
 
-    pub(crate) fn set_theme(&self, mut theme: lingmo::Theme) {
+    pub(crate) fn set_theme(&self, mut theme: cosmic::Theme) {
         theme.transparent = theme.cosmic().frosted_windows;
         self.0.with_program(|p| {
             *p.theme.lock().unwrap() = theme.clone();
@@ -829,7 +829,7 @@ impl Program for CosmicWindowInternal {
         Task::none()
     }
 
-    fn background_color(&self, theme: &lingmo::Theme) -> Color {
+    fn background_color(&self, theme: &cosmic::Theme) -> Color {
         if self.window.is_maximized(false) {
             theme
                 .cosmic()
@@ -841,7 +841,7 @@ impl Program for CosmicWindowInternal {
         }
     }
 
-    fn view(&self) -> lingmo::Element<'_, Self::Message> {
+    fn view(&self) -> cosmic::Element<'_, Self::Message> {
         HOOKS.get().unwrap().window_decorations.view(self)
     }
 }
@@ -850,11 +850,11 @@ impl Program for CosmicWindowInternal {
 pub struct DefaultDecorations;
 
 impl Decorations<CosmicWindowInternal, Message> for DefaultDecorations {
-    fn view(&self, win: &CosmicWindowInternal) -> lingmo::Element<'_, Message> {
+    fn view(&self, win: &CosmicWindowInternal) -> cosmic::Element<'_, Message> {
         let sharp_corners = win.window.is_maximized(false)
             || (win.is_tiled() && !win.appearance_conf.lock().unwrap().clip_tiled_windows);
 
-        let mut header = lingmo::widget::header_bar()
+        let mut header = cosmic::widget::header_bar()
             .title(win.last_title.lock().unwrap().clone())
             .on_drag(Message::DragStart)
             .on_close(Message::Close)
@@ -864,10 +864,10 @@ impl Decorations<CosmicWindowInternal, Message> for DefaultDecorations {
             .is_ssd(true)
             .sharp_corners(sharp_corners);
 
-        if lingmo::config::show_minimize() {
+        if cosmic::config::show_minimize() {
             header = header.on_minimize(Message::Minimize)
         }
-        if lingmo::config::show_maximize() {
+        if cosmic::config::show_maximize() {
             header = header.on_maximize(Message::Maximize)
         }
 

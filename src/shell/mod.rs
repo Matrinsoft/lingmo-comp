@@ -279,7 +279,7 @@ pub struct Shell {
     pub previous_workspace_idx: Option<(Serial, WeakOutput, usize)>,
     pub xwayland_keyboard_grab: Option<XWaylandKeyboardGrab<State>>,
 
-    theme: lingmo::Theme,
+    theme: cosmic::Theme,
     pub active_hint: bool,
     overview_mode: OverviewMode,
     swap_indicator: Option<SwapIndicator>,
@@ -364,7 +364,7 @@ pub struct WorkspaceSet {
     pub group: WorkspaceGroupHandle,
     tiling_enabled: bool,
     output: Output,
-    theme: lingmo::Theme,
+    theme: cosmic::Theme,
     appearance: AppearanceConfig,
     pub sticky_layer: FloatingLayout,
     pub minimized_windows: Vec<MinimizedWindow>,
@@ -377,7 +377,7 @@ fn create_workspace(
     group_handle: &WorkspaceGroupHandle,
     active: bool,
     tiling: bool,
-    theme: lingmo::Theme,
+    theme: cosmic::Theme,
     appearance: AppearanceConfig,
 ) -> Workspace {
     let workspace_handle = state
@@ -417,7 +417,7 @@ fn create_workspace_from_pinned(
     output: &Output,
     group_handle: &WorkspaceGroupHandle,
     active: bool,
-    theme: lingmo::Theme,
+    theme: cosmic::Theme,
     appearance: AppearanceConfig,
 ) -> Workspace {
     let workspace_handle = state
@@ -487,7 +487,7 @@ impl WorkspaceSet {
         state: &mut WorkspaceUpdateGuard<'_, State>,
         output: &Output,
         tiling_enabled: bool,
-        theme: &lingmo::Theme,
+        theme: &cosmic::Theme,
         appearance: AppearanceConfig,
     ) -> WorkspaceSet {
         let group_handle = state.create_workspace_group();
@@ -827,14 +827,14 @@ pub struct Workspaces {
     mode: WorkspaceMode,
     autotile: bool,
     autotile_behavior: TileBehavior,
-    theme: lingmo::Theme,
+    theme: cosmic::Theme,
     appearance: AppearanceConfig,
     // Persisted workspace to add on first `output_add`
     persisted_workspaces: Vec<PinnedWorkspace>,
 }
 
 impl Workspaces {
-    pub fn new(config: &Config, theme: lingmo::Theme) -> Workspaces {
+    pub fn new(config: &Config, theme: cosmic::Theme) -> Workspaces {
         Workspaces {
             sets: IndexMap::new(),
             backup_set: None,
@@ -1408,7 +1408,7 @@ impl Workspaces {
         )
     }
 
-    pub fn set_theme(&mut self, theme: lingmo::Theme) {
+    pub fn set_theme(&mut self, theme: cosmic::Theme) {
         for (_, s) in &mut self.sets {
             s.theme = theme.clone();
 
@@ -1687,7 +1687,7 @@ impl Common {
 
 impl Shell {
     pub fn new(config: &Config) -> Self {
-        let theme = lingmo::theme::system_preference();
+        let theme = cosmic::theme::system_preference();
 
         let tiling_exceptions = layout::TilingExceptions::new(config.tiling_exceptions.iter());
 
@@ -4981,11 +4981,11 @@ impl Shell {
 
     pub fn update_toolkit(
         &mut self,
-        toolkit: lingmo::config::CosmicTk,
+        toolkit: cosmic::config::CosmicTk,
         xdg_activation_state: &XdgActivationState,
         workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
     ) {
-        let mut container = lingmo::config::COSMIC_TK.write().unwrap();
+        let mut container = cosmic::config::COSMIC_TK.write().unwrap();
         if *container != toolkit {
             *container = toolkit;
             drop(container);
@@ -4996,7 +4996,7 @@ impl Shell {
 
     pub fn set_theme(
         &mut self,
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
         xdg_activation_state: &XdgActivationState,
         workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
     ) {
@@ -5005,7 +5005,7 @@ impl Shell {
         self.workspaces.set_theme(theme.clone());
     }
 
-    pub fn theme(&self) -> &lingmo::Theme {
+    pub fn theme(&self) -> &cosmic::Theme {
         &self.theme
     }
 

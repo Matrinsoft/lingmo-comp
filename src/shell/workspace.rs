@@ -24,7 +24,7 @@ use crate::{
 use cosmic_comp_config::AppearanceConfig;
 use cosmic_comp_config::workspace::{OutputMatch, PinnedWorkspace};
 
-use lingmo::theme::CosmicTheme;
+use cosmic::theme::CosmicTheme;
 use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
 use id_tree::Tree;
 use indexmap::IndexSet;
@@ -385,7 +385,7 @@ impl Workspace {
         handle: WorkspaceHandle,
         output: Output,
         tiling_enabled: bool,
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
         appearance: AppearanceConfig,
     ) -> Workspace {
         let tiling_layer = TilingLayout::new(theme.clone(), appearance, &output);
@@ -419,7 +419,7 @@ impl Workspace {
         pinned: &PinnedWorkspace,
         handle: WorkspaceHandle,
         output: Output,
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
         appearance: AppearanceConfig,
     ) -> Self {
         let tiling_layer = TilingLayout::new(theme.clone(), appearance, &output);

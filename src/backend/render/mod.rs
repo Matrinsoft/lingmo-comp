@@ -49,7 +49,7 @@ use crate::{
     },
 };
 
-use lingmo::Theme;
+use cosmic::Theme;
 use smithay::{
     backend::{
         allocator::Fourcc,

@@ -136,7 +136,7 @@ pub struct TilingLayout {
     backdrop_id: Id,
     swapping_stack_surface_id: Id,
     last_overview_hover: Option<(Option<Instant>, TargetZone)>,
-    pub theme: lingmo::Theme,
+    pub theme: cosmic::Theme,
     pub appearance: AppearanceConfig,
 }
 
@@ -350,7 +350,7 @@ pub struct RestoreTilingState {
 
 impl TilingLayout {
     pub fn new(
-        theme: lingmo::Theme,
+        theme: cosmic::Theme,
         appearance: AppearanceConfig,
         output: &Output,
     ) -> TilingLayout {
@@ -4018,7 +4018,7 @@ impl TilingLayout {
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
         resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
-        theme: &lingmo::theme::CosmicTheme,
+        theme: &cosmic::theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
@@ -4181,7 +4181,7 @@ impl TilingLayout {
         seat: Option<&Seat<State>>,
         non_exclusive_zone: Rectangle<i32, Local>,
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
-        theme: &lingmo::theme::CosmicTheme,
+        theme: &cosmic::theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
@@ -4353,7 +4353,7 @@ fn geometries_for_groupview<'a, R>(
     mouse_tiling: Option<Option<&TargetZone>>,
     swap_desc: Option<NodeDesc>,
     swap_tree: Option<&Tree<Data>>,
-    _theme: &lingmo::theme::CosmicTheme,
+    _theme: &cosmic::theme::CosmicTheme,
     push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
 ) -> HashMap<NodeId, Rectangle<i32, Local>>
 where
@@ -5028,7 +5028,7 @@ fn render_old_tree_windows<R>(
     percentage: f32,
     indicator_thickness: u8,
     is_swap_mode: bool,
-    theme: &lingmo::theme::CosmicTheme,
+    theme: &cosmic::theme::CosmicTheme,
     scanout_node: Option<DrmNode>,
     push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
 ) where
@@ -5288,7 +5288,7 @@ fn render_new_tree_windows<R>(
     swap_desc: Option<NodeDesc>,
     swapping_stack_surface_id: &Id,
     backdrop_id: &Id,
-    theme: &lingmo::theme::CosmicTheme,
+    theme: &cosmic::theme::CosmicTheme,
     scanout_node: Option<DrmNode>,
     push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
 ) where
