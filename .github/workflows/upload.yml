@@ -29,24 +29,6 @@ jobs:
       - name: Fix permissions
         run: chmod +x debian/rules
 
-      - name: Vendor dependencies
-        run: |
-          mkdir -p .cargo
-          cargo vendor --locked 2>/dev/null | awk '/^\[/{p=1} p' > .cargo/config
-          if ! grep -q 'vendored-sources' .cargo/config 2>/dev/null; then
-            echo '[source.crates-io]' >> .cargo/config
-            echo 'replace-with = "vendored-sources"' >> .cargo/config
-            echo '' >> .cargo/config
-            echo '[source.vendored-sources]' >> .cargo/config
-            echo 'directory = "vendor"' >> .cargo/config
-          fi
-          grep '^source = "git+" Cargo.lock | sed 's/source = "//;s/"$//' | sort -u | while read src; do
-            printf '[source "%s"]\n' "$src" >> .cargo/config
-            echo 'replace-with = "vendored-sources"' >> .cargo/config
-            echo ""
-          done >> .cargo/config
-          tar pcf vendor.tar vendor .cargo/config
-          rm -rf vendor
 
       - name: Build source package
         run: |
