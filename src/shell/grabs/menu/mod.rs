@@ -7,7 +7,7 @@ use std::{
 };
 
 use calloop::LoopHandle;
-use cosmic::{
+use lingmo::{
     Apply as _, Task,
     iced::{
         Alignment, Background,
@@ -97,7 +97,7 @@ impl MenuGrabState {
         self.screen_space_relative.is_some()
     }
 
-    pub fn set_theme(&self, theme: cosmic::Theme) {
+    pub fn set_theme(&self, theme: lingmo::Theme) {
         for element in &*self.elements.lock().unwrap() {
             element.iced.set_theme(theme.clone())
         }
@@ -379,7 +379,7 @@ impl Program for ContextMenu {
         Task::none()
     }
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> lingmo::Element<'_, Self::Message> {
         let width = self
             .row_width
             .lock()
@@ -1009,7 +1009,7 @@ impl MenuGrab {
         alignment: MenuAlignment,
         screen_space_relative: Option<f64>,
         handle: LoopHandle<'static, crate::state::State>,
-        theme: cosmic::Theme,
+        theme: lingmo::Theme,
     ) -> MenuGrab {
         let items = items.collect::<Vec<_>>();
         let element = IcedElement::new(ContextMenu::new(items), Size::default(), handle, theme);

@@ -5,7 +5,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use cosmic::{
+use lingmo::{
     Apply,
     iced::{
         core::{Alignment, Background, Border, Color, Length},
@@ -30,7 +30,7 @@ pub struct SwapIndicator {
 impl SwapIndicator {
     pub fn new(
         evlh: LoopHandle<'static, crate::state::State>,
-        mut theme: cosmic::Theme,
+        mut theme: lingmo::Theme,
     ) -> SwapIndicator {
         theme.transparent = theme.cosmic().frosted_system_interface;
         SwapIndicator {
@@ -90,7 +90,7 @@ pub struct SwapIndicatorInternal;
 impl Program for SwapIndicatorInternal {
     type Message = ();
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> lingmo::Element<'_, Self::Message> {
         row(vec![
             from_name("window-swap-symbolic")
                 .size(32)

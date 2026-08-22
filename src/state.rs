@@ -271,7 +271,7 @@ pub struct Common {
     >,
 
     pub kiosk_child: Option<Child>,
-    pub theme: cosmic::Theme,
+    pub theme: lingmo::Theme,
 
     // wayland state
     pub compositor_state: CompositorState,
@@ -784,7 +784,7 @@ impl State {
                 ei_pointer_buttons: std::collections::HashMap::new(),
 
                 kiosk_child: None,
-                theme: cosmic::theme::system_preference(),
+                theme: lingmo::theme::system_preference(),
 
                 compositor_state,
                 corner_radius_state,

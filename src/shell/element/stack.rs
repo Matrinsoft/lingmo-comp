@@ -21,7 +21,7 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use cosmic::{
+use lingmo::{
     Apply, Element as CosmicElement, Theme,
     iced::{
         Alignment,
@@ -118,7 +118,7 @@ pub struct CosmicStackInternal {
     geometry: Mutex<Option<Rectangle<i32, Global>>>,
     mask: Mutex<Option<tiny_skia::Mask>>,
     tiled: AtomicBool,
-    theme: Mutex<cosmic::Theme>,
+    theme: Mutex<lingmo::Theme>,
     appearance_conf: Mutex<AppearanceConfig>,
 }
 
@@ -146,7 +146,7 @@ impl CosmicStack {
     pub fn new<I: Into<CosmicSurface>>(
         windows: impl Iterator<Item = I>,
         handle: LoopHandle<'static, crate::state::State>,
-        mut theme: cosmic::Theme,
+        mut theme: lingmo::Theme,
         appearance: AppearanceConfig,
     ) -> CosmicStack {
         theme.transparent = theme.cosmic().frosted_windows;
@@ -858,7 +858,7 @@ impl CosmicStack {
         );
     }
 
-    pub(crate) fn set_theme(&self, mut theme: cosmic::Theme) {
+    pub(crate) fn set_theme(&self, mut theme: lingmo::Theme) {
         theme.transparent = theme.cosmic().frosted_windows;
         self.0.with_program(|p| {
             *p.theme.lock().unwrap() = theme.clone();
@@ -1274,7 +1274,7 @@ impl Program for CosmicStackInternal {
 pub struct DefaultDecorations;
 
 impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
-    fn view(&self, stack: &CosmicStackInternal) -> cosmic::Element<'_, Message> {
+    fn view(&self, stack: &CosmicStackInternal) -> lingmo::Element<'_, Message> {
         let windows = stack.windows.lock().unwrap();
         if stack.geometry.lock().unwrap().is_none() {
             return iced_widget::row(Vec::new()).into();

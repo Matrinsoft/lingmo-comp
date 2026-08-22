@@ -5,7 +5,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use cosmic::{
+use lingmo::{
     Apply,
     iced::{
         Alignment,
@@ -32,7 +32,7 @@ impl StackHover {
     pub fn new(
         evlh: LoopHandle<'static, crate::state::State>,
         size: Size<i32, Logical>,
-        mut theme: cosmic::Theme,
+        mut theme: lingmo::Theme,
     ) -> StackHover {
         theme.transparent = theme.cosmic().frosted_system_interface;
 
@@ -88,7 +88,7 @@ pub struct StackHoverInternal;
 impl Program for StackHoverInternal {
     type Message = ();
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> lingmo::Element<'_, Self::Message> {
         row(vec![
             from_name("window-stack-symbolic")
                 .size(32)

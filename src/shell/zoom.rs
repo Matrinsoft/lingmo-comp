@@ -1,7 +1,7 @@
 use std::{sync::Mutex, time::Instant};
 
 use calloop::LoopHandle;
-use cosmic::{
+use lingmo::{
     Apply,
     iced::{Alignment, Background, Border, Length, alignment::Vertical, widget as iced_widget},
     theme,
@@ -72,7 +72,7 @@ impl OutputZoomState {
         increment: u32,
         movement: ZoomMovement,
         loop_handle: LoopHandle<'static, State>,
-        mut theme: cosmic::Theme,
+        mut theme: lingmo::Theme,
     ) -> OutputZoomState {
         theme.transparent = theme.cosmic().frosted_system_interface;
         let cursor_position = seat.get_pointer().unwrap().current_location().as_global();
@@ -466,7 +466,7 @@ impl ZoomProgram {
 impl Program for ZoomProgram {
     type Message = ZoomMessage;
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> lingmo::Element<'_, Self::Message> {
         widget::row::with_children(vec![
             widget::button::icon(Named::new("list-remove-symbolic").size(16).prefer_svg(true))
                 .on_press(ZoomMessage::Decrease)
@@ -526,7 +526,7 @@ impl Program for ZoomProgram {
         message: Self::Message,
         loop_handle: &LoopHandle<'static, State>,
         last_seat: Option<&(Seat<State>, Serial)>,
-    ) -> cosmic::Task<Self::Message> {
+    ) -> lingmo::Task<Self::Message> {
         match message {
             ZoomMessage::Decrease => {
                 let _ = loop_handle.insert_idle(|state| {
@@ -839,7 +839,7 @@ impl Program for ZoomProgram {
                 }
             }
         }
-        cosmic::Task::none()
+        lingmo::Task::none()
     }
 }
 

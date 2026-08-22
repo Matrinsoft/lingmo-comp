@@ -60,7 +60,7 @@ pub struct FloatingLayout {
     animations: HashMap<CosmicMapped, Animation>,
     hovered_stack: Option<(CosmicMapped, Rectangle<i32, Local>)>,
     dirty: AtomicBool,
-    pub theme: cosmic::Theme,
+    pub theme: lingmo::Theme,
     pub appearance: AppearanceConfig,
 }
 
@@ -267,7 +267,7 @@ impl TiledCorners {
 
 impl FloatingLayout {
     pub fn new(
-        theme: cosmic::Theme,
+        theme: lingmo::Theme,
         appearance: AppearanceConfig,
         output: &Output,
     ) -> FloatingLayout {
@@ -1127,7 +1127,7 @@ impl FloatingLayout {
         direction: Direction,
         seat: &Seat<State>,
         layer: ManagedLayer,
-        theme: &cosmic::Theme,
+        theme: &lingmo::Theme,
         element: &CosmicMapped,
     ) -> MoveResult {
         match element.handle_move(direction) {
@@ -1295,7 +1295,7 @@ impl FloatingLayout {
         direction: Direction,
         seat: &Seat<State>,
         layer: ManagedLayer,
-        theme: cosmic::Theme,
+        theme: lingmo::Theme,
     ) -> MoveResult {
         let Some(target) = seat.get_keyboard().unwrap().current_focus() else {
             return MoveResult::None;
@@ -1490,7 +1490,7 @@ impl FloatingLayout {
         mut resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
         alpha: f32,
-        theme: &cosmic::theme::CosmicTheme,
+        theme: &lingmo::theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where

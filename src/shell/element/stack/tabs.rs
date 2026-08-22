@@ -1,5 +1,5 @@
 use super::tab::{MIN_ACTIVE_TAB_WIDTH, Tab, TabBackgroundTheme, TabMessage, TabRuleTheme};
-use cosmic::{
+use lingmo::{
     Apply,
     iced::{
         Element,
@@ -36,7 +36,7 @@ use std::{
 };
 
 pub struct Tabs<'a, Message> {
-    elements: Vec<cosmic::Element<'a, Message>>,
+    elements: Vec<lingmo::Element<'a, Message>>,
     id: Option<Id>,
     height: Length,
     width: Length,
@@ -154,7 +154,7 @@ where
                     } else {
                         TabBackgroundTheme::ActiveDeactivated
                     })
-                    .font(cosmic::font::semibold())
+                    .font(lingmo::font::semibold())
                     .active()
             } else if i.checked_sub(1) == Some(active) {
                 tab.rule_style(rule).non_active()
@@ -313,7 +313,7 @@ impl State {
     }
 }
 
-impl<Message> Widget<Message, cosmic::Theme, cosmic::Renderer> for Tabs<'_, Message>
+impl<Message> Widget<Message, lingmo::Theme, lingmo::Renderer> for Tabs<'_, Message>
 where
     Message: TabMessage,
 {
@@ -346,7 +346,7 @@ where
     }
 
     #[allow(clippy::too_many_lines)]
-    fn layout(&mut self, tree: &mut Tree, renderer: &cosmic::Renderer, limits: &Limits) -> Node {
+    fn layout(&mut self, tree: &mut Tree, renderer: &lingmo::Renderer, limits: &Limits) -> Node {
         let limits = limits.width(self.width).height(self.height);
         let element_count = self.elements.len();
         // calculate the smallest possible size
@@ -385,15 +385,15 @@ where
                 >= MIN_ACTIVE_TAB_WIDTH
             {
                 // just use a flex layout
-                cosmic::iced::core::layout::flex::resolve(
-                    cosmic::iced::core::layout::flex::Axis::Horizontal,
+                lingmo::iced::core::layout::flex::resolve(
+                    lingmo::iced::core::layout::flex::Axis::Horizontal,
                     renderer,
                     &limits,
                     self.width,
                     self.height,
                     0.into(),
                     0.,
-                    cosmic::iced::Alignment::Center,
+                    lingmo::iced::Alignment::Center,
                     &mut self.elements[2..element_count - 2],
                     &mut tree.children[2..element_count - 2],
                 )
@@ -498,8 +498,8 @@ where
     fn draw(
         &self,
         tree: &Tree,
-        renderer: &mut cosmic::Renderer,
-        theme: &cosmic::Theme,
+        renderer: &mut lingmo::Renderer,
+        theme: &lingmo::Theme,
         style: &renderer::Style,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
@@ -694,7 +694,7 @@ where
         &mut self,
         tree: &mut Tree,
         layout: Layout<'_>,
-        renderer: &cosmic::Renderer,
+        renderer: &lingmo::Renderer,
         operation: &mut dyn Operation<()>,
     ) {
         let state = tree.state.downcast_mut::<State>();
@@ -732,7 +732,7 @@ where
         event: &event::Event,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
-        renderer: &cosmic::Renderer,
+        renderer: &lingmo::Renderer,
         clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
@@ -945,7 +945,7 @@ where
         layout: Layout<'_>,
         cursor: mouse::Cursor,
         viewport: &Rectangle,
-        renderer: &cosmic::Renderer,
+        renderer: &lingmo::Renderer,
     ) -> mouse::Interaction {
         let state = tree.state.downcast_ref::<State>();
 
@@ -1024,10 +1024,10 @@ where
         &'b mut self,
         tree: &'b mut Tree,
         layout: Layout<'b>,
-        renderer: &cosmic::Renderer,
+        renderer: &lingmo::Renderer,
         viewport: &Rectangle,
-        translation: cosmic::iced::Vector,
-    ) -> Option<overlay::Element<'b, Message, cosmic::Theme, cosmic::Renderer>> {
+        translation: lingmo::iced::Vector,
+    ) -> Option<overlay::Element<'b, Message, lingmo::Theme, lingmo::Renderer>> {
         overlay::from_children(
             &mut self.elements,
             tree,

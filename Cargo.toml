@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 authors = ["Victoria Brekenfeld"]
 edition = "2024"
 license = "GPL-3.0-only"
@@ -17,7 +17,7 @@ cosmic-comp-config = { path = "cosmic-comp-config", features = [
     "libdisplay-info",
     "output",
 ] }
-cosmic-config = { git = "https://github.com/Matrinsoft/libcosmic", features = [
+cosmic-config = { git = "https://github.com/Matrinsoft/liblingmo", features = [
     "calloop",
     "macro",
 ] }
@@ -39,11 +39,11 @@ i18n-embed = { version = "0.16", features = [
     "desktop-requester",
 ] }
 i18n-embed-fl = "0.10"
-iced_tiny_skia = { git = "https://github.com/Matrinsoft/libcosmic" }
-iced_graphics = { git = "https://github.com/Matrinsoft/libcosmic/", features = ["geometry"] }
+iced_tiny_skia = { git = "https://github.com/Matrinsoft/liblingmo" }
+iced_graphics = { git = "https://github.com/Matrinsoft/liblingmo/", features = ["geometry"] }
 indexmap = "2.13"
 keyframe = "1.1.1"
-libcosmic = { git = "https://github.com/Matrinsoft/libcosmic", default-features = false }
+liblingmo = { git = "https://github.com/Matrinsoft/liblingmo", default-features = false }
 libsystemd = { version = "0.7", optional = true }
 log-panics = { version = "2", features = ["with-backtrace"] }
 ordered-float = "5.1"
