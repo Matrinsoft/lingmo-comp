@@ -28,18 +28,16 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
+      - name: Install build dependencies
+        run: apt build-dep -y ./
+
       - name: Fix permissions
         run: chmod +x debian/rules
 
-      - name: Vendor dependencies
-        run: |
-          cargo vendor
-          mkdir -p .cargo
-          cargo vendor --sync Cargo.toml 2>/dev/null | awk '/^\[/{p=1} p' > .cargo/config
-          echo 'directory = "vendor"' >> .cargo/config
-
       - name: Build binary packages
-        run: dpkg-buildpackage -b -us -uc
+        run: |
+          sed -i 's/build-vendored/build-release/g' debian/rules
+          CLEAN=0 VENDOR=0 dpkg-buildpackage -b -us -uc
 
       - name: Collect .deb files
         run: |
