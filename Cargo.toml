@@ -40,7 +40,7 @@ i18n-embed = { version = "0.16", features = [
 ] }
 i18n-embed-fl = "0.10"
 iced_tiny_skia = { git = "https://github.com/Matrinsoft/liblingmo" }
-iced_graphics = { git = "https://github.com/Matrinsoft/libcosmic/", features = ["geometry"] }
+iced_graphics = { git = "https://github.com/Matrinsoft/liblingmo/", features = ["geometry"] }
 indexmap = "2.13"
 keyframe = "1.1.1"
 libcosmic = { git = "https://github.com/Matrinsoft/liblingmo", default-features = false }
