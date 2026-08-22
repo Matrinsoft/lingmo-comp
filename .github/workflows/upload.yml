@@ -1,4 +1,5 @@
-name: Upload to OBS
+name: Build and Release
+
 permissions: write-all
 
 on:
@@ -8,10 +9,11 @@ on:
       - "v*.*.*"
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  debian:
-    name: Debian Testing
+  build:
+    name: Build
     runs-on: ubuntu-latest
     container: docker.io/library/debian:testing
     steps:
@@ -22,30 +24,35 @@ jobs:
           apt-get install -y equivs git devscripts debhelper lintian build-essential automake autotools-dev cmake g++ just
           curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-      
+
       - name: Checkout Source
         uses: actions/checkout@v4
 
       - name: Fix permissions
         run: chmod +x debian/rules
 
-
-      - name: Build source package
+      - name: Vendor dependencies
         run: |
-          CLEAN=0 VENDOR=0 dpkg-buildpackage -S -us -uc -d
-      
-      - name: Collect files
-        run: |
-          mkdir -p src-tar-output
-          mv ../*.dsc ../*.tar.* src-tar-output/
+          cargo vendor
+          mkdir -p .cargo
+          cargo vendor --sync Cargo.toml 2>/dev/null | awk '/^\[/{p=1} p' > .cargo/config
+          echo 'directory = "vendor"' >> .cargo/config
 
-      - name: Upload
-        uses: LingmoOS/action-upload-to-obs@0.0.4
-        with:
-          remove-old-sources: true
-          obs-package-name: 'lingmo-comp'
-          obs-project-name: 'home:LingmoOS:Lithium'
-          obs-user-name: ${{ secrets.OBS_USERNAME }}
-          obs-password: ${{ secrets.OBS_TOKEN }}
-          obs-instance-url: 'https://api.opensuse.org'
-          local-package-dir: './src-tar-output'
+      - name: Build binary packages
+        run: dpkg-buildpackage -b -us -uc
+
+      - name: Collect .deb files
+        run: |
+          mkdir -p dist
+          mv ../*.deb dist/
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="build+$(date -u +%y%m%d+%H%M)"
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" dist/*.deb \
+            --title "$TAG" \
+            --generate-notes
