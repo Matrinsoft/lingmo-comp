@@ -901,7 +901,7 @@ dependencies = [
 [[package]]
 name = "cosmic-protocols"
 version = "0.2.0"
-source = "git+https://github.com/Matrinsoft/lingmo-protocols?branch=main#bc41a9a7ee55043ee90689d47ce110292996072e"
+source = "git+https://github.com/Matrinsoft/lingmo-protocols?branch=main#14ee91da144fafa0af3943f0dbbe397a0ce72659"
 dependencies = [
  "bitflags 2.11.0",
  "wayland-backend",
