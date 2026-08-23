@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 authors = ["Victoria Brekenfeld"]
 edition = "2024"
 license = "GPL-3.0-only"
@@ -21,7 +21,7 @@ cosmic-config = { git = "https://github.com/Matrinsoft/liblingmo", features = [
     "calloop",
     "macro",
 ] }
-cosmic-protocols = { git = "https://github.com/Matrinsoft/lingmo-protocols", rev = "14ee91d", default-features = false, features = [
+cosmic-protocols = { git = "https://github.com/Matrinsoft/lingmo-protocols", rev = "26b46f1", default-features = false, features = [
     "server",
 ] }
 cosmic-settings-config = { git = "https://github.com/Matrinsoft/lingmo-settings-daemon" }
