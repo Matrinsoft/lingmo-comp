@@ -20,8 +20,8 @@ jobs:
       - name: Install Dependencies
         run: |
           apt-get update
-          curl -sLO http://ftp.debian.org/debian/pool/main/g/gh/gh_2.46.0-4_amd64.deb
           apt-get install -y sudo git ca-certificates curl
+          curl -sLO http://ftp.debian.org/debian/pool/main/g/gh/gh_2.46.0-4_amd64.deb
           apt install -y ./gh_2.46.0-4_amd64.deb
           apt-get install -y equivs git devscripts debhelper lintian build-essential automake autotools-dev cmake g++ just
           curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
