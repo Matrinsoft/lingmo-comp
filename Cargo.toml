@@ -141,8 +141,5 @@ inherits = "release"
 [profile.release]
 lto = "fat"
 
-[patch."https://github.com/Matrinsoft/lingmo-protocols"]
-cosmic-protocols = { git = "https://github.com/Matrinsoft/lingmo-protocols", branch = "main" }
-
 [patch.crates-io]
 smithay = { git = "https://github.com/smithay/smithay.git", rev = "5fb12b8" }
