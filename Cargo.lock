@@ -937,7 +937,7 @@ dependencies = [
 [[package]]
 name = "cosmic-settings-daemon"
 version = "0.1.0"
-source = "git+https://github.com/Matrinsoft/dbus-settings-bindings#eed01dd3609e90e3c8cd043656734c500956c793"
+source = "git+https://github.com/Matrinsoft/dbus-settings-bindings#35e566c133e110554b6bb89ad1323753c7ab4c52"
 dependencies = [
  "zbus",
 ]
