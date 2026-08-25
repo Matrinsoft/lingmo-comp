@@ -19,7 +19,7 @@ use crate::{
 
 use anyhow::{Context, Result};
 use calloop::channel::Channel;
-use cosmic_comp_config::output::comp::AdaptiveSync;
+use lingmo_comp_config::output::comp::AdaptiveSync;
 use smithay::{
     backend::{
         allocator::{

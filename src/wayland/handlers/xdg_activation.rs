@@ -5,7 +5,7 @@ use crate::{
     state::State,
     wayland::protocols::workspace::{State as WState, WorkspaceHandle},
 };
-use cosmic_comp_config::ActivationPolicy;
+use lingmo_comp_config::ActivationPolicy;
 use smithay::{
     input::Seat,
     reexports::wayland_server::protocol::wl_surface::WlSurface,

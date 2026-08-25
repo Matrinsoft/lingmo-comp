@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use cosmic_comp_config::AppearanceConfig;
+use lingmo_comp_config::AppearanceConfig;
 use id_tree::NodeId;
 use smithay::{
     backend::{

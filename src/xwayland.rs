@@ -15,7 +15,7 @@ use crate::{
     utils::prelude::*,
     wayland::handlers::xdg_activation::ActivationContext,
 };
-use cosmic_comp_config::{EavesdroppingKeyboardMode, XwaylandDescaling};
+use lingmo_comp_config::{EavesdroppingKeyboardMode, XwaylandDescaling};
 use smithay::{
     backend::{
         allocator::Fourcc,

@@ -17,7 +17,7 @@ use crate::{
 };
 use calloop::LoopHandle;
 use cosmic::iced::{Color, Task};
-use cosmic_comp_config::AppearanceConfig;
+use lingmo_comp_config::AppearanceConfig;
 use smithay::{
     backend::{
         drm::DrmNode,

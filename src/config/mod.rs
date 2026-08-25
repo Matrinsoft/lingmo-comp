@@ -44,8 +44,8 @@ pub mod key_bindings;
 mod types;
 
 use cosmic::config::CosmicTk;
-pub use cosmic_comp_config::EdidProduct;
-use cosmic_comp_config::{
+pub use lingmo_comp_config::EdidProduct;
+use lingmo_comp_config::{
     ActivationPolicy, AppearanceConfig, CosmicCompConfig, KeyboardConfig, TileBehavior, XkbConfig,
     XwaylandDescaling, XwaylandEavesdropping, ZoomConfig,
     input::{DeviceState as InputDeviceState, InputConfig, TouchpadOverride},
@@ -179,7 +179,7 @@ impl Config {
             .expect("Failed to add cosmic-config to the event loop");
         let xdg = xdg::BaseDirectories::new();
 
-        let cosmic_comp_config =
+        let lingmo_comp_config =
             CosmicCompConfig::get_entry(&config).unwrap_or_else(|(errs, c)| {
                 if cfg!(debug_assertions) {
                     for err in errs {
@@ -326,7 +326,7 @@ impl Config {
 
         Config {
             dynamic_conf: Self::load_dynamic(&xdg),
-            cosmic_conf: cosmic_comp_config,
+            cosmic_conf: lingmo_comp_config,
             cosmic_helper: config,
             settings_context,
             shortcuts,

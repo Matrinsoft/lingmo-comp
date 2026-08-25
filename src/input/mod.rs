@@ -33,7 +33,7 @@ use calloop::{
     RegistrationToken,
     timer::{TimeoutAction, Timer},
 };
-use cosmic_comp_config::{NumlockState, workspace::WorkspaceLayout};
+use lingmo_comp_config::{NumlockState, workspace::WorkspaceLayout};
 use cosmic_settings_config::shortcuts;
 use cosmic_settings_config::shortcuts::action::{Direction, ResizeDirection};
 #[cfg(feature = "logind")]
@@ -1812,7 +1812,7 @@ impl State {
                         if !closed {
                             tracing::warn!(?err, "Failed to re-enable internal connector");
                             if let Some(output) = output {
-                                use cosmic_comp_config::output::comp::OutputState;
+                                use lingmo_comp_config::output::comp::OutputState;
 
                                 output.config_mut().enabled = OutputState::Disabled;
                                 if let Err(err) = self.refresh_output_config() {

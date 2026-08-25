@@ -21,8 +21,8 @@ use crate::{
         },
     },
 };
-use cosmic_comp_config::AppearanceConfig;
-use cosmic_comp_config::workspace::{OutputMatch, PinnedWorkspace};
+use lingmo_comp_config::AppearanceConfig;
+use lingmo_comp_config::workspace::{OutputMatch, PinnedWorkspace};
 
 use cosmic::theme::CosmicTheme;
 use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
@@ -457,7 +457,7 @@ impl Workspace {
         if self.pinned {
             debug_assert!(self.id.is_some());
             Some(PinnedWorkspace {
-                output: cosmic_comp_config::workspace::OutputMatch {
+                output: lingmo_comp_config::workspace::OutputMatch {
                     name: output.name,
                     edid: output.edid,
                 },

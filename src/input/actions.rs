@@ -13,7 +13,7 @@ use crate::{
         handlers::xdg_activation::ActivationContext, protocols::workspace::WorkspaceUpdateGuard,
     },
 };
-use cosmic_comp_config::{TileBehavior, workspace::WorkspaceLayout};
+use lingmo_comp_config::{TileBehavior, workspace::WorkspaceLayout};
 use cosmic_config::ConfigSet;
 use cosmic_settings_config::shortcuts;
 use cosmic_settings_config::shortcuts::action::{Direction, FocusDirection};

@@ -1,6 +1,6 @@
 use std::{ops::ControlFlow, time::Instant};
 
-use cosmic_comp_config::workspace::WorkspaceLayout;
+use lingmo_comp_config::workspace::WorkspaceLayout;
 use keyframe::{ease, functions::EaseInOutCubic};
 use smithay::{
     desktop::{LayerSurface, PopupKind, PopupManager, layer_map_for_output},

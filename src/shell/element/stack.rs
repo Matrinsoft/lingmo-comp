@@ -32,7 +32,7 @@ use cosmic::{
     },
     theme, widget as cosmic_widget,
 };
-use cosmic_comp_config::AppearanceConfig;
+use lingmo_comp_config::AppearanceConfig;
 use cosmic_settings_config::shortcuts;
 use shortcuts::action::{Direction, FocusDirection};
 use smithay::{

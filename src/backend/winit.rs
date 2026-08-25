@@ -9,7 +9,7 @@ use crate::{
     wayland::protocols::drm::WlDrmState,
 };
 use anyhow::{Context, Result, anyhow};
-use cosmic_comp_config::output::comp::{OutputConfig, TransformDef};
+use lingmo_comp_config::output::comp::{OutputConfig, TransformDef};
 use smithay::{
     backend::{
         drm::NodeType,

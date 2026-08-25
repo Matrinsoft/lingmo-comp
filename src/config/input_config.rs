@@ -3,7 +3,7 @@ use smithay::reexports::input::{
 };
 use tracing::warn;
 
-use cosmic_comp_config::input::*;
+use lingmo_comp_config::input::*;
 
 #[allow(dead_code)]
 pub fn for_device(device: &InputDevice) -> InputConfig {

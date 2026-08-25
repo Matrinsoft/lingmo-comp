@@ -37,7 +37,7 @@ use crate::{
     },
 };
 
-use cosmic_comp_config::AppearanceConfig;
+use lingmo_comp_config::AppearanceConfig;
 use cosmic_settings_config::shortcuts::action::{FocusDirection, ResizeDirection};
 use id_tree::{InsertBehavior, MoveBehavior, Node, NodeId, NodeIdError, RemoveBehavior, Tree};
 use keyframe::{

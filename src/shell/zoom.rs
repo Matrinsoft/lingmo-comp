@@ -7,7 +7,7 @@ use cosmic::{
     theme,
     widget::{self, icon::Named},
 };
-use cosmic_comp_config::{ZoomConfig, ZoomMovement};
+use lingmo_comp_config::{ZoomConfig, ZoomMovement};
 use cosmic_config::ConfigSet;
 use keyframe::{ease, functions::Linear};
 use smithay::{

@@ -13,7 +13,7 @@ use calloop::{
     LoopSignal,
     timer::{TimeoutAction, Timer},
 };
-use cosmic_comp_config::output::comp::{AdaptiveSync, OutputState};
+use lingmo_comp_config::output::comp::{AdaptiveSync, OutputState};
 use indexmap::IndexMap;
 use render::gles::GbmGlowBackend;
 use smithay::{

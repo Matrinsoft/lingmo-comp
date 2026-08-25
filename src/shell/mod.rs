@@ -22,7 +22,7 @@ use crate::{
         protocols::workspace::{State as WState, WorkspaceCapabilities},
     },
 };
-use cosmic_comp_config::{
+use lingmo_comp_config::{
     AppearanceConfig, TileBehavior, ZoomConfig, ZoomMovement,
     workspace::{PinnedWorkspace, WorkspaceLayout, WorkspaceMode},
 };

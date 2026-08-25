@@ -6,7 +6,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use cosmic_comp_config::AppearanceConfig;
+use lingmo_comp_config::AppearanceConfig;
 use cosmic_settings_config::shortcuts::action::ResizeDirection;
 use keyframe::{ease, functions::EaseInOutCubic};
 use smallvec::SmallVec;
