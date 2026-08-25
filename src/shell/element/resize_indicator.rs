@@ -9,7 +9,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use cosmic::{
+use Lingmo::{
     Apply,
     iced::{
         Alignment,
@@ -19,7 +19,7 @@ use cosmic::{
     theme,
     widget::{icon::from_name, text},
 };
-use cosmic_settings_config::shortcuts::action::{Action, ResizeDirection};
+use Lingmo_settings_config::shortcuts::action::{Action, ResizeDirection};
 use smithay::{
     backend::renderer::ImportMem,
     desktop::space::SpaceElement,
@@ -47,9 +47,9 @@ impl ResizeIndicator {
         direction: ResizeDirection,
         config: &Config,
         evlh: LoopHandle<'static, crate::state::State>,
-        mut theme: cosmic::Theme,
+        mut theme: Lingmo::Theme,
     ) -> ResizeIndicator {
-        theme.transparent = theme.cosmic().frosted_system_interface;
+        theme.transparent = theme.Lingmo().frosted_system_interface;
         let direction = Arc::new(Mutex::new(direction));
 
         ResizeIndicator {
@@ -160,7 +160,7 @@ impl ResizeIndicator {
         );
         let radii = self
             .center_elem
-            .with_theme(|theme| theme.cosmic().radius_s())
+            .with_theme(|theme| theme.Lingmo().radius_s())
             .map(|x| x.round() as u8);
 
         self.center_elem.push_render_elements(
@@ -252,7 +252,7 @@ pub struct ResizeIndicatorInternal {
 impl Program for ResizeIndicatorInternal {
     type Message = ();
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
         row(vec![
             text::heading(&self.shortcut1).into(),
             text::body(fl!("grow-window")).into(),
@@ -266,21 +266,21 @@ impl Program for ResizeIndicatorInternal {
         .padding(16)
         .apply(container)
         .class(theme::Container::custom(|theme| {
-            let mut background = theme.cosmic().accent_color();
+            let mut background = theme.Lingmo().accent_color();
             if theme.transparent {
                 background.alpha = theme
-                    .cosmic()
+                    .Lingmo()
                     .alpha_map
-                    .blurred_alpha(theme.cosmic().frosted);
+                    .blurred_alpha(theme.Lingmo().frosted);
             }
 
             container::Style {
                 snap: true,
-                icon_color: Some(Color::from(theme.cosmic().accent.on)),
-                text_color: Some(Color::from(theme.cosmic().accent.on)),
+                icon_color: Some(Color::from(theme.Lingmo().accent.on)),
+                text_color: Some(Color::from(theme.Lingmo().accent.on)),
                 background: Some(Background::Color(background.into())),
                 border: Border {
-                    radius: theme.cosmic().radius_s().into(),
+                    radius: theme.Lingmo().radius_s().into(),
                     width: 0.0,
                     color: Color::TRANSPARENT,
                 },
@@ -302,7 +302,7 @@ pub struct ResizeIndicatorArrow {
 impl Program for ResizeIndicatorArrow {
     type Message = ();
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
         from_name(
             if *self.direction.lock().unwrap() == ResizeDirection::Outwards {
                 self.icon_outwards
@@ -315,21 +315,21 @@ impl Program for ResizeIndicatorArrow {
         .apply(container)
         .padding(8)
         .class(theme::Container::custom(|theme| {
-            let mut background = theme.cosmic().accent_color();
+            let mut background = theme.Lingmo().accent_color();
             if theme.transparent {
                 background.alpha = theme
-                    .cosmic()
+                    .Lingmo()
                     .alpha_map
-                    .blurred_alpha(theme.cosmic().frosted);
+                    .blurred_alpha(theme.Lingmo().frosted);
             }
 
             container::Style {
                 snap: true,
-                icon_color: Some(Color::from(theme.cosmic().accent.on)),
-                text_color: Some(Color::from(theme.cosmic().accent.on)),
+                icon_color: Some(Color::from(theme.Lingmo().accent.on)),
+                text_color: Some(Color::from(theme.Lingmo().accent.on)),
                 background: Some(Background::Color(background.into())),
                 border: Border {
-                    radius: theme.cosmic().radius_s().into(),
+                    radius: theme.Lingmo().radius_s().into(),
                     width: 0.0,
                     color: Color::TRANSPARENT,
                 },
@@ -340,3 +340,4 @@ impl Program for ResizeIndicatorArrow {
         .into()
     }
 }
+

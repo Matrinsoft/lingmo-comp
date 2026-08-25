@@ -15,12 +15,12 @@ use tracing::warn;
 
 use crate::{
     backend::render::{RendererRef, element::AsGlowRenderer},
-    shell::element::CosmicSurface,
+    shell::element::LingmoSurface,
     state::{State, advertised_node_for_surface},
 };
 
-pub fn screenshot_window(state: &mut State, surface: &CosmicSurface) {
-    fn render_window<R>(renderer: &mut R, window: &CosmicSurface) -> anyhow::Result<()>
+pub fn screenshot_window(state: &mut State, surface: &LingmoSurface) {
+    fn render_window<R>(renderer: &mut R, window: &LingmoSurface) -> anyhow::Result<()>
     where
         R: Renderer + ImportAll + Offscreen<GlesRenderbuffer> + ExportMem + AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
@@ -113,3 +113,4 @@ pub fn screenshot_window(state: &mut State, surface: &CosmicSurface) {
         }
     }
 }
+

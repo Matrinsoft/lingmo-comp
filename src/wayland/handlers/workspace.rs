@@ -7,7 +7,7 @@ use crate::{
         Request, State as WState, WorkspaceHandler, WorkspaceState, delegate_workspace,
     },
 };
-use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
+use Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::TilingState;
 use smithay::reexports::wayland_server::DisplayHandle;
 
 impl WorkspaceHandler for State {
@@ -115,3 +115,4 @@ impl WorkspaceHandler for State {
 }
 
 delegate_workspace!(State);
+

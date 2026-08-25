@@ -1,9 +1,9 @@
-use cosmic_protocols::corner_radius::v1::server::cosmic_corner_radius_layer_v1::{
-    self, CosmicCornerRadiusLayerV1,
+use Lingmo_protocols::corner_radius::v1::server::Lingmo_corner_radius_layer_v1::{
+    self, LingmoCornerRadiusLayerV1,
 };
-use cosmic_protocols::corner_radius::v1::server::cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1;
-use cosmic_protocols::corner_radius::v1::server::{
-    cosmic_corner_radius_manager_v1, cosmic_corner_radius_toplevel_v1,
+use Lingmo_protocols::corner_radius::v1::server::Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1;
+use Lingmo_protocols::corner_radius::v1::server::{
+    Lingmo_corner_radius_manager_v1, Lingmo_corner_radius_toplevel_v1,
 };
 use smithay::desktop::utils::bbox_from_surface_tree;
 use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_popup::XdgPopup;
@@ -26,29 +26,29 @@ use smithay::{
 use std::sync::Mutex;
 use wayland_backend::server::GlobalId;
 
-type ToplevelHookId = Mutex<Option<(HookId, Weak<CosmicCornerRadiusToplevelV1>)>>;
-type LayerHookId = Mutex<Option<(HookId, Weak<CosmicCornerRadiusLayerV1>)>>;
+type ToplevelHookId = Mutex<Option<(HookId, Weak<LingmoCornerRadiusToplevelV1>)>>;
+type LayerHookId = Mutex<Option<(HookId, Weak<LingmoCornerRadiusLayerV1>)>>;
 
 #[derive(Debug)]
 pub struct CornerRadiusState {
-    instances: Vec<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1>,
+    instances: Vec<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1>,
     global: GlobalId,
 }
 
 impl CornerRadiusState {
     pub fn new<D>(dh: &DisplayHandle) -> CornerRadiusState
     where
-        D: GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-            + Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
+        D: GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+            + Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
             + Dispatch<
-                cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1,
+                Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1,
                 CornerRadiusData,
-            > + Dispatch<cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1, CornerRadiusData>
+            > + Dispatch<Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1, CornerRadiusData>
             + CornerRadiusHandler
             + 'static,
     {
         let global = dh
-            .create_global::<D, cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, _>(
+            .create_global::<D, Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, _>(
                 2,
                 (),
             );
@@ -71,13 +71,13 @@ pub trait CornerRadiusHandler: XdgShellHandler + WlrLayerShellHandler {
     fn unset_padding(&mut self, data: &CornerRadiusData);
 }
 
-impl<D> GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, (), D>
+impl<D> GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, (), D>
     for CornerRadiusState
 where
-    D: GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1, CornerRadiusData>
-        + Dispatch<cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1, CornerRadiusData>
+    D: GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1, CornerRadiusData>
+        + Dispatch<Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1, CornerRadiusData>
         + CornerRadiusHandler
         + 'static,
 {
@@ -86,7 +86,7 @@ where
         _handle: &DisplayHandle,
         _client: &Client,
         resource: smithay::reexports::wayland_server::New<
-            cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1,
+            Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1,
         >,
         _global_data: &(),
         data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
@@ -96,31 +96,31 @@ where
     }
 }
 
-impl<D> Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, (), D>
+impl<D> Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, (), D>
     for CornerRadiusState
 where
-    D: GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1, CornerRadiusData>
-        + Dispatch<cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1, CornerRadiusData>
+    D: GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1, CornerRadiusData>
+        + Dispatch<Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1, CornerRadiusData>
         + CornerRadiusHandler
         + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        resource: &cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1,
-        request: <cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1 as smithay::reexports::wayland_server::Resource>::Request,
+        resource: &Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1,
+        request: <Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1 as smithay::reexports::wayland_server::Resource>::Request,
         _data: &(),
         _dhandle: &DisplayHandle,
         data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
     ) {
         match request {
-            cosmic_corner_radius_manager_v1::Request::Destroy => {
+            Lingmo_corner_radius_manager_v1::Request::Destroy => {
                 let corner_radius_state = state.corner_radius_state();
                 corner_radius_state.instances.retain(|i| i != resource);
             }
-            cosmic_corner_radius_manager_v1::Request::GetCornerRadius { id, toplevel } => {
+            Lingmo_corner_radius_manager_v1::Request::GetCornerRadius { id, toplevel } => {
                 if let Some(surface) = state.xdg_shell_state().get_toplevel(&toplevel) {
                     new_xdg(
                         surface.wl_surface(),
@@ -131,7 +131,7 @@ where
                     )
                 } // TODO: can this fail?
             }
-            cosmic_corner_radius_manager_v1::Request::GetCornerRadiusSurface { id, surface } => {
+            Lingmo_corner_radius_manager_v1::Request::GetCornerRadiusSurface { id, surface } => {
                 if let Some(toplevel) =
                     state
                         .xdg_shell_state()
@@ -176,12 +176,12 @@ where
                     )
                 } else {
                     resource.post_error(
-                        cosmic_corner_radius_manager_v1::Error::NoRole as u32,
+                        Lingmo_corner_radius_manager_v1::Error::NoRole as u32,
                         "xdg_surface has no known role object".to_string(),
                     );
                 }
             }
-            cosmic_corner_radius_manager_v1::Request::GetCornerRadiusLayer { id, layer } => {
+            Lingmo_corner_radius_manager_v1::Request::GetCornerRadiusLayer { id, layer } => {
                 if let Some(surface) = state
                     .shell_state()
                     .layer_surfaces()
@@ -196,9 +196,9 @@ where
                     });
                     if radius_exists.unwrap_or_default() {
                         resource.post_error(
-                                cosmic_corner_radius_manager_v1::Error::CornerRadiusExists as u32,
+                                Lingmo_corner_radius_manager_v1::Error::CornerRadiusExists as u32,
                                 format!(
-                                    "{resource:?} CosmicCornerRadiusToplevelV1 object already exists for the surface"
+                                    "{resource:?} LingmoCornerRadiusToplevelV1 object already exists for the surface"
                                 ),
                             );
                     }
@@ -231,7 +231,7 @@ where
     fn destroyed(
         state: &mut D,
         _client: wayland_backend::server::ClientId,
-        resource: &cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1,
+        resource: &Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1,
         _data: &(),
     ) {
         let corner_radius_state = state.corner_radius_state();
@@ -242,13 +242,13 @@ where
 fn new_xdg<D>(
     wl_surface: &WlSurface,
     surface: CornerRadiusSurface,
-    resource: &cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1,
+    resource: &Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1,
     data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
-    id: New<cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1>,
+    id: New<Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1>,
 ) where
-    D: GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1, CornerRadiusData>
+    D: GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1, CornerRadiusData>
         + CornerRadiusHandler
         + 'static,
 {
@@ -261,9 +261,9 @@ fn new_xdg<D>(
     });
     if radius_exists.unwrap_or_default() {
         resource.post_error(
-            cosmic_corner_radius_manager_v1::Error::CornerRadiusExists as u32,
+            Lingmo_corner_radius_manager_v1::Error::CornerRadiusExists as u32,
             format!(
-                "{resource:?} CosmicCornerRadiusToplevelV1 object already exists for the surface"
+                "{resource:?} LingmoCornerRadiusToplevelV1 object already exists for the surface"
             ),
         );
     }
@@ -289,26 +289,26 @@ fn new_xdg<D>(
 }
 
 impl<D>
-    Dispatch<cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1, CornerRadiusData, D>
+    Dispatch<Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1, CornerRadiusData, D>
     for CornerRadiusState
 where
-    D: GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1, CornerRadiusData>
+    D: GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1, CornerRadiusData>
         + CornerRadiusHandler
         + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        resource: &cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1,
-        request: <cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1 as Resource>::Request,
+        resource: &Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1,
+        request: <Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1 as Resource>::Request,
         data: &CornerRadiusData,
         _dhandle: &DisplayHandle,
         _data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
     ) {
         match request {
-            cosmic_corner_radius_toplevel_v1::Request::Destroy => {
+            Lingmo_corner_radius_toplevel_v1::Request::Destroy => {
                 let mut guard = data.lock().unwrap();
                 guard.corners = None;
 
@@ -342,7 +342,7 @@ where
 
                 state.unset_corner_radius(data);
             }
-            cosmic_corner_radius_toplevel_v1::Request::SetRadius {
+            Lingmo_corner_radius_toplevel_v1::Request::SetRadius {
                 top_left,
                 top_right,
                 bottom_right,
@@ -365,7 +365,7 @@ where
                     CornerRadiusSurface::Layer(_) => unreachable!(),
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_toplevel_v1::Error::ToplevelDestroyed as u32,
+                        Lingmo_corner_radius_toplevel_v1::Error::ToplevelDestroyed as u32,
                         format!("{:?} No toplevel found", resource),
                     );
                     return;
@@ -379,7 +379,7 @@ where
 
                 state.set_corner_radius(data);
             }
-            cosmic_corner_radius_toplevel_v1::Request::UnsetRadius => {
+            Lingmo_corner_radius_toplevel_v1::Request::UnsetRadius => {
                 let mut guard = data.lock().unwrap();
                 guard.corners = None;
 
@@ -397,7 +397,7 @@ where
                     CornerRadiusSurface::Layer(_) => unreachable!(),
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_toplevel_v1::Error::ToplevelDestroyed as u32,
+                        Lingmo_corner_radius_toplevel_v1::Error::ToplevelDestroyed as u32,
                         format!("{:?} No toplevel found", resource),
                     );
 
@@ -418,26 +418,26 @@ where
     }
 }
 
-impl<D> Dispatch<cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1, CornerRadiusData, D>
+impl<D> Dispatch<Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1, CornerRadiusData, D>
     for CornerRadiusState
 where
-    D: GlobalDispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1, ()>
-        + Dispatch<cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1, CornerRadiusData>
+    D: GlobalDispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1, ()>
+        + Dispatch<Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1, CornerRadiusData>
         + CornerRadiusHandler
         + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        resource: &cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1,
-        request: <cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1 as Resource>::Request,
+        resource: &Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1,
+        request: <Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1 as Resource>::Request,
         data: &CornerRadiusData,
         _dhandle: &DisplayHandle,
         _data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
     ) {
         match request {
-            cosmic_corner_radius_layer_v1::Request::Destroy => {
+            Lingmo_corner_radius_layer_v1::Request::Destroy => {
                 let mut guard = data.lock().unwrap();
                 guard.corners = None;
 
@@ -451,7 +451,7 @@ where
                         .find(|s| s.shell_surface() == &layer)
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_layer_v1::Error::LayerDestroyed as u32,
+                        Lingmo_corner_radius_layer_v1::Error::LayerDestroyed as u32,
                         format!("{:?} No layer found", resource),
                     );
                     return;
@@ -476,7 +476,7 @@ where
                 state.unset_corner_radius(data);
                 state.unset_padding(data);
             }
-            cosmic_corner_radius_layer_v1::Request::SetRadius {
+            Lingmo_corner_radius_layer_v1::Request::SetRadius {
                 top_left,
                 top_right,
                 bottom_right,
@@ -495,7 +495,7 @@ where
                         .find(|s| s.shell_surface() == &layer)
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_layer_v1::Error::LayerDestroyed as u32,
+                        Lingmo_corner_radius_layer_v1::Error::LayerDestroyed as u32,
                         format!("{:?} No layer found", resource),
                     );
                     return;
@@ -510,7 +510,7 @@ where
 
                 state.set_corner_radius(data);
             }
-            cosmic_corner_radius_layer_v1::Request::UnsetRadius => {
+            Lingmo_corner_radius_layer_v1::Request::UnsetRadius => {
                 let mut guard = data.lock().unwrap();
                 guard.corners = None;
 
@@ -524,7 +524,7 @@ where
                         .find(|s| s.shell_surface() == &layer)
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_layer_v1::Error::LayerDestroyed as u32,
+                        Lingmo_corner_radius_layer_v1::Error::LayerDestroyed as u32,
                         format!("{:?} No layer found", resource),
                     );
                     return;
@@ -539,7 +539,7 @@ where
 
                 state.unset_corner_radius(data);
             }
-            cosmic_corner_radius_layer_v1::Request::SetPadding {
+            Lingmo_corner_radius_layer_v1::Request::SetPadding {
                 top,
                 right,
                 bottom,
@@ -558,7 +558,7 @@ where
                         .find(|s| s.shell_surface() == &layer)
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_layer_v1::Error::LayerDestroyed as u32,
+                        Lingmo_corner_radius_layer_v1::Error::LayerDestroyed as u32,
                         format!("{:?} No layer found", resource),
                     );
                     return;
@@ -573,7 +573,7 @@ where
 
                 state.set_padding(data);
             }
-            cosmic_corner_radius_layer_v1::Request::UnsetPadding => {
+            Lingmo_corner_radius_layer_v1::Request::UnsetPadding => {
                 let mut guard = data.lock().unwrap();
                 guard.corners = None;
 
@@ -587,7 +587,7 @@ where
                         .find(|s| s.shell_surface() == &layer)
                 }) else {
                     resource.post_error(
-                        cosmic_corner_radius_layer_v1::Error::LayerDestroyed as u32,
+                        Lingmo_corner_radius_layer_v1::Error::LayerDestroyed as u32,
                         format!("{:?} No layer found", resource),
                     );
                     return;
@@ -633,7 +633,7 @@ fn xdg_radius_hook<D: 'static>(_state: &mut D, _dh: &DisplayHandle, surface: &Wl
                 && let Ok(obj) = obj.upgrade()
             {
                 obj.post_error(
-                    cosmic_corner_radius_toplevel_v1::Error::RadiusTooLarge as u32,
+                    Lingmo_corner_radius_toplevel_v1::Error::RadiusTooLarge as u32,
                     format!("{obj:?} corner radius too large"),
                 );
             }
@@ -673,7 +673,7 @@ fn layer_radius_hook<D: 'static>(_state: &mut D, _dh: &DisplayHandle, surface: &
                     && let Ok(obj) = obj.upgrade()
                 {
                     obj.post_error(
-                        cosmic_corner_radius_layer_v1::Error::PaddingTooLarge as u32,
+                        Lingmo_corner_radius_layer_v1::Error::PaddingTooLarge as u32,
                         format!("{obj:?} padding too large"),
                     );
                 }
@@ -694,7 +694,7 @@ fn layer_radius_hook<D: 'static>(_state: &mut D, _dh: &DisplayHandle, surface: &
                 && let Ok(obj) = obj.upgrade()
             {
                 obj.post_error(
-                    cosmic_corner_radius_layer_v1::Error::RadiusTooLarge as u32,
+                    Lingmo_corner_radius_layer_v1::Error::RadiusTooLarge as u32,
                     format!("{obj:?} corner radius too large"),
                 );
             }
@@ -789,17 +789,18 @@ impl CornerRadiusInternal {
 macro_rules! delegate_corner_radius {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::corner_radius::v1::server::cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1: ()
+            Lingmo_protocols::corner_radius::v1::server::Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1: ()
         ] => $crate::wayland::protocols::corner_radius::CornerRadiusState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::corner_radius::v1::server::cosmic_corner_radius_manager_v1::CosmicCornerRadiusManagerV1: ()
+            Lingmo_protocols::corner_radius::v1::server::Lingmo_corner_radius_manager_v1::LingmoCornerRadiusManagerV1: ()
         ] => $crate::wayland::protocols::corner_radius::CornerRadiusState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::corner_radius::v1::server::cosmic_corner_radius_toplevel_v1::CosmicCornerRadiusToplevelV1: CornerRadiusData
+            Lingmo_protocols::corner_radius::v1::server::Lingmo_corner_radius_toplevel_v1::LingmoCornerRadiusToplevelV1: CornerRadiusData
         ] => $crate::wayland::protocols::corner_radius::CornerRadiusState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::corner_radius::v1::server::cosmic_corner_radius_layer_v1::CosmicCornerRadiusLayerV1: CornerRadiusData
+            Lingmo_protocols::corner_radius::v1::server::Lingmo_corner_radius_layer_v1::LingmoCornerRadiusLayerV1: CornerRadiusData
         ] => $crate::wayland::protocols::corner_radius::CornerRadiusState);
     };
 }
 pub(crate) use delegate_corner_radius;
+

@@ -6,16 +6,16 @@ use crate::{
         element::AsGlowRenderer,
     },
     shell::{
-        CosmicSurface, Direction, FocusResult, MoveResult, OverviewMode, ResizeMode, Trigger,
+        LingmoSurface, Direction, FocusResult, MoveResult, OverviewMode, ResizeMode, Trigger,
         element::{
-            CosmicMapped, CosmicMappedRenderElement, CosmicStack, CosmicWindow,
+            LingmoMapped, LingmoMappedRenderElement, LingmoStack, LingmoWindow,
             resize_indicator::ResizeIndicator,
             stack::{
-                CosmicStackRenderElement, MoveResult as StackMoveResult,
+                LingmoStackRenderElement, MoveResult as StackMoveResult,
                 TAB_HEIGHT as STACK_TAB_HEIGHT,
             },
             swap_indicator::SwapIndicator,
-            window::CosmicWindowRenderElement,
+            window::LingmoWindowRenderElement,
         },
         focus::{
             FocusStackMut, FocusTarget,
@@ -37,8 +37,8 @@ use crate::{
     },
 };
 
-use cosmic_comp_config::AppearanceConfig;
-use cosmic_settings_config::shortcuts::action::{FocusDirection, ResizeDirection};
+use lingmo_comp_config::AppearanceConfig;
+use Lingmo_settings_config::shortcuts::action::{FocusDirection, ResizeDirection};
 use id_tree::{InsertBehavior, MoveBehavior, Node, NodeId, NodeIdError, RemoveBehavior, Tree};
 use keyframe::{
     ease,
@@ -88,7 +88,7 @@ pub const INITIAL_MOUSE_ANIMATION_DELAY: Duration = Duration::from_millis(500);
 pub struct NodeDesc {
     pub handle: WorkspaceHandle,
     pub node: NodeId,
-    pub stack_window: Option<CosmicSurface>,
+    pub stack_window: Option<LingmoSurface>,
     pub focus_stack: Vec<NodeId>,
 }
 
@@ -136,7 +136,7 @@ pub struct TilingLayout {
     backdrop_id: Id,
     swapping_stack_surface_id: Id,
     last_overview_hover: Option<(Option<Instant>, TargetZone)>,
-    pub theme: cosmic::Theme,
+    pub theme: Lingmo::Theme,
     pub appearance: AppearanceConfig,
 }
 
@@ -156,7 +156,7 @@ pub enum Data {
         pill_indicator: Option<PillIndicator>,
     },
     Mapped {
-        mapped: CosmicMapped,
+        mapped: LingmoMapped,
         last_geometry: Rectangle<i32, Local>,
         minimize_rect: Option<Rectangle<i32, Local>>,
     },
@@ -193,7 +193,7 @@ impl Data {
     fn is_group(&self) -> bool {
         matches!(self, Data::Group { .. })
     }
-    fn is_mapped(&self, mapped: Option<&CosmicMapped>) -> bool {
+    fn is_mapped(&self, mapped: Option<&LingmoMapped>) -> bool {
         match mapped {
             Some(m) => matches!(self, Data::Mapped { mapped, .. } if m == mapped),
             None => matches!(self, Data::Mapped { .. }),
@@ -336,7 +336,7 @@ impl Data {
 #[derive(Debug, Clone)]
 enum FocusedNodeData {
     Group(Vec<NodeId>, Weak<()>),
-    Window(CosmicMapped),
+    Window(LingmoMapped),
 }
 
 #[derive(Debug, Clone)]
@@ -350,7 +350,7 @@ pub struct RestoreTilingState {
 
 impl TilingLayout {
     pub fn new(
-        theme: cosmic::Theme,
+        theme: Lingmo::Theme,
         appearance: AppearanceConfig,
         output: &Output,
     ) -> TilingLayout {
@@ -395,7 +395,7 @@ impl TilingLayout {
 
     pub fn map<'a>(
         &mut self,
-        window: CosmicMapped,
+        window: LingmoMapped,
         focus_stack: Option<impl Iterator<Item = &'a FocusTarget> + 'a>,
         direction: Option<Direction>,
     ) {
@@ -406,7 +406,7 @@ impl TilingLayout {
 
     pub fn map_internal<'a>(
         &mut self,
-        window: impl Into<CosmicMapped>,
+        window: impl Into<LingmoMapped>,
         focus_stack: Option<impl Iterator<Item = &'a FocusTarget> + 'a>,
         direction: Option<Direction>,
         minimize_rect: Option<Rectangle<i32, Local>>,
@@ -437,7 +437,7 @@ impl TilingLayout {
 
     pub fn remap<'a>(
         &mut self,
-        window: CosmicMapped,
+        window: LingmoMapped,
         from: Option<Rectangle<i32, Local>>,
         tiling_state: Option<RestoreTilingState>,
         focus_stack: Option<impl Iterator<Item = &'a FocusTarget> + 'a>,
@@ -547,7 +547,7 @@ impl TilingLayout {
 
     fn map_to_tree(
         tree: &mut Tree<Data>,
-        window: impl Into<CosmicMapped>,
+        window: impl Into<LingmoMapped>,
         output: &Output,
         node: Option<NodeId>,
         direction: Option<Direction>,
@@ -615,7 +615,7 @@ impl TilingLayout {
         *window.tiling_node_id.lock().unwrap() = Some(window_id);
     }
 
-    pub fn replace_window(&mut self, old: &CosmicMapped, new: &CosmicMapped) {
+    pub fn replace_window(&mut self, old: &LingmoMapped, new: &LingmoMapped) {
         let gaps = self.gaps();
         let Some(old_id) = old.tiling_node_id.lock().unwrap().clone() else {
             return;
@@ -671,7 +671,7 @@ impl TilingLayout {
                     let _ = this.unmap(this_mapped, None);
                 }
 
-                let mapped: CosmicMapped = CosmicWindow::new(
+                let mapped: LingmoMapped = LingmoWindow::new(
                     stack_surface,
                     this_stack.loop_handle(),
                     this.theme.clone(),
@@ -1079,7 +1079,7 @@ impl TilingLayout {
                 }
                 this_stack.remove_window(this_surface);
 
-                let mapped: CosmicMapped = CosmicWindow::new(
+                let mapped: LingmoMapped = LingmoWindow::new(
                     this_surface.clone(),
                     this_stack.loop_handle(),
                     this.theme.clone(),
@@ -1165,7 +1165,7 @@ impl TilingLayout {
                 }
                 other_stack.remove_window(other_surface);
 
-                let mapped: CosmicMapped = CosmicWindow::new(
+                let mapped: LingmoMapped = LingmoWindow::new(
                     other_surface.clone(),
                     other_stack.loop_handle(),
                     this.theme.clone(),
@@ -1304,7 +1304,7 @@ impl TilingLayout {
 
     pub fn unmap(
         &mut self,
-        window: &CosmicMapped,
+        window: &LingmoMapped,
         to: Option<Rectangle<i32, Local>>,
     ) -> Result<Option<RestoreTilingState>, NodeIdError> {
         let node_id = window
@@ -1379,7 +1379,7 @@ impl TilingLayout {
 
     pub fn unmap_as_placeholder(
         &mut self,
-        window: &CosmicMapped,
+        window: &LingmoMapped,
         type_: PlaceholderType,
     ) -> Option<NodeId> {
         let node_id = window.tiling_node_id.lock().unwrap().take()?;
@@ -1411,7 +1411,7 @@ impl TilingLayout {
         Some(node_id)
     }
 
-    fn unmap_window_internal(&mut self, mapped: &CosmicMapped, minimizing: bool) -> bool {
+    fn unmap_window_internal(&mut self, mapped: &LingmoMapped, minimizing: bool) -> bool {
         let tiling_node_id = mapped.tiling_node_id.lock().unwrap().as_ref().cloned();
         let gaps = self.gaps();
 
@@ -1492,7 +1492,7 @@ impl TilingLayout {
     }
 
     // TODO: Move would needs this to be accurate during animations
-    pub fn element_geometry(&self, elem: &CosmicMapped) -> Option<Rectangle<i32, Local>> {
+    pub fn element_geometry(&self, elem: &LingmoMapped) -> Option<Rectangle<i32, Local>> {
         if let Some(id) = elem.tiling_node_id.lock().unwrap().as_ref() {
             let node = self.queue.trees.back().unwrap().0.get(id).ok()?;
             let data = node.data();
@@ -1521,7 +1521,7 @@ impl TilingLayout {
             match window.handle_move(direction) {
                 StackMoveResult::Handled => return MoveResult::Done,
                 StackMoveResult::MoveOut(surface, loop_handle) => {
-                    let mapped: CosmicMapped = CosmicWindow::new(
+                    let mapped: LingmoMapped = LingmoWindow::new(
                         surface,
                         loop_handle,
                         self.theme.clone(),
@@ -2131,7 +2131,7 @@ impl TilingLayout {
 
     pub fn toggle_stacking(
         &mut self,
-        mapped: &CosmicMapped,
+        mapped: &LingmoMapped,
         mut focus_stack: FocusStackMut,
     ) -> Option<KeyboardFocusTarget> {
         let gaps = self.gaps();
@@ -2184,7 +2184,7 @@ impl TilingLayout {
                 other.try_force_undecorated(false);
                 other.set_tiled(false);
                 let focused = other == focused;
-                let window = CosmicMapped::from(CosmicWindow::new(
+                let window = LingmoMapped::from(LingmoWindow::new(
                     other,
                     handle.clone(),
                     self.theme.clone(),
@@ -2286,7 +2286,7 @@ impl TilingLayout {
                         return None;
                     }
                     let handle = handle.unwrap();
-                    let stack = CosmicStack::new(
+                    let stack = LingmoStack::new(
                         surfaces.into_iter(),
                         handle,
                         self.theme.clone(),
@@ -2311,7 +2311,7 @@ impl TilingLayout {
                     stack.active().send_configure();
                     stack.refresh();
 
-                    let mapped = CosmicMapped::from(stack);
+                    let mapped = LingmoMapped::from(stack);
                     *mapped.last_geometry.lock().unwrap() = Some(geo);
                     *mapped.tiling_node_id.lock().unwrap() = Some(last_active);
                     focus_stack.append(mapped.clone());
@@ -2663,7 +2663,7 @@ impl TilingLayout {
         }
     }
 
-    pub fn drop_window(&mut self, window: CosmicMapped) -> (CosmicMapped, Point<i32, Local>) {
+    pub fn drop_window(&mut self, window: LingmoMapped) -> (LingmoMapped, Point<i32, Local>) {
         let gaps = self.gaps();
 
         let mut tree = self.queue.trees.back().unwrap().0.copy_clone();
@@ -2826,7 +2826,7 @@ impl TilingLayout {
     fn last_active_window<'a>(
         tree: &Tree<Data>,
         mut focus_stack: impl Iterator<Item = &'a FocusTarget>,
-    ) -> Option<(NodeId, CosmicMapped)> {
+    ) -> Option<(NodeId, LingmoMapped)> {
         focus_stack.find_map(|target| {
             tree.root_node_id().and_then(|root| {
                 tree.traverse_pre_order_ids(root).unwrap().find_map(|id| {
@@ -3431,7 +3431,7 @@ impl TilingLayout {
                 Some(None),
                 None,
                 None,
-                self.theme.cosmic(),
+                self.theme.Lingmo(),
                 &mut |_| {},
             );
 
@@ -3882,7 +3882,7 @@ impl TilingLayout {
         }
     }
 
-    pub fn mapped(&self) -> impl Iterator<Item = (&CosmicMapped, Rectangle<i32, Local>)> {
+    pub fn mapped(&self) -> impl Iterator<Item = (&LingmoMapped, Rectangle<i32, Local>)> {
         let tree = &self.queue.trees.back().unwrap().0;
         let iter = tree.root_node_id().map(|root| {
             tree.traverse_pre_order(root)
@@ -3921,7 +3921,7 @@ impl TilingLayout {
         iter.into_iter().flatten()
     }
 
-    pub fn windows(&self) -> impl Iterator<Item = (CosmicSurface, Rectangle<i32, Local>)> + '_ {
+    pub fn windows(&self) -> impl Iterator<Item = (LingmoSurface, Rectangle<i32, Local>)> + '_ {
         self.mapped().flat_map(|(mapped, geo)| {
             mapped.windows().map(move |(w, p)| {
                 (w, {
@@ -3934,7 +3934,7 @@ impl TilingLayout {
         })
     }
 
-    pub fn element_for_node(&self, node: &NodeId) -> Option<&CosmicMapped> {
+    pub fn element_for_node(&self, node: &NodeId) -> Option<&LingmoMapped> {
         let tree = &self.queue.trees.back().unwrap().0;
         tree.get(node).ok().and_then(|node| match node.data() {
             Data::Mapped { mapped, .. } => Some(mapped),
@@ -4013,20 +4013,20 @@ impl TilingLayout {
         &self,
         renderer: &mut R,
         seat: Option<&Seat<State>>,
-        focused: Option<&CosmicMapped>,
+        focused: Option<&LingmoMapped>,
         non_exclusive_zone: Rectangle<i32, Local>,
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
         resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
-        theme: &cosmic::theme::CosmicTheme,
+        theme: &Lingmo::theme::LingmoTheme,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+        push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
-        CosmicWindowRenderElement<R>: RenderElement<R>,
-        CosmicStackRenderElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
+        LingmoWindowRenderElement<R>: RenderElement<R>,
+        LingmoStackRenderElement<R>: RenderElement<R>,
     {
         let output_scale = self.output.current_scale().fractional_scale();
 
@@ -4181,15 +4181,15 @@ impl TilingLayout {
         seat: Option<&Seat<State>>,
         non_exclusive_zone: Rectangle<i32, Local>,
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
-        theme: &cosmic::theme::CosmicTheme,
+        theme: &Lingmo::theme::LingmoTheme,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+        push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
-        CosmicWindowRenderElement<R>: RenderElement<R>,
-        CosmicStackRenderElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
+        LingmoWindowRenderElement<R>: RenderElement<R>,
+        LingmoStackRenderElement<R>: RenderElement<R>,
     {
         let output_scale = self.output.current_scale().fractional_scale();
 
@@ -4303,7 +4303,7 @@ impl TilingLayout {
     }
 
     fn gaps(&self) -> (i32, i32) {
-        let g = self.theme.cosmic().gaps;
+        let g = self.theme.Lingmo().gaps;
         (g.0 as i32, g.1 as i32)
     }
 }
@@ -4353,14 +4353,14 @@ fn geometries_for_groupview<'a, R>(
     mouse_tiling: Option<Option<&TargetZone>>,
     swap_desc: Option<NodeDesc>,
     swap_tree: Option<&Tree<Data>>,
-    _theme: &cosmic::theme::CosmicTheme,
-    push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+    _theme: &Lingmo::theme::LingmoTheme,
+    push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
 ) -> HashMap<NodeId, Rectangle<i32, Local>>
 where
     R: AsGlowRenderer + 'a,
     R::TextureId: 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
-    CosmicWindowRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LingmoWindowRenderElement<R>: RenderElement<R>,
 {
     // we need to recalculate geometry for all elements, if we are drawing groups
     let gap: i32 = (if mouse_tiling.is_some() {
@@ -4991,13 +4991,13 @@ fn render_old_tree_popups<R>(
     percentage: f32,
     is_swap_mode: bool,
     scanout_node: Option<DrmNode>,
-    push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+    push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
 ) where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
-    CosmicWindowRenderElement<R>: RenderElement<R>,
-    CosmicStackRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LingmoWindowRenderElement<R>: RenderElement<R>,
+    LingmoStackRenderElement<R>: RenderElement<R>,
 {
     render_old_tree(
         reference_tree,
@@ -5028,15 +5028,15 @@ fn render_old_tree_windows<R>(
     percentage: f32,
     indicator_thickness: u8,
     is_swap_mode: bool,
-    theme: &cosmic::theme::CosmicTheme,
+    theme: &Lingmo::theme::LingmoTheme,
     scanout_node: Option<DrmNode>,
-    push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+    push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
 ) where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
-    CosmicWindowRenderElement<R>: RenderElement<R>,
-    CosmicStackRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LingmoWindowRenderElement<R>: RenderElement<R>,
+    LingmoStackRenderElement<R>: RenderElement<R>,
 {
     let window_hint = crate::theme::active_window_hint(theme);
     let mut lower_elements = Vec::default();
@@ -5044,7 +5044,7 @@ fn render_old_tree_windows<R>(
 
     let window_map =
         |elem, geo: Rectangle<i32, Local>, elem_geometry: Rectangle<i32, Physical>| match elem {
-            CosmicMappedRenderElement::Stack(elem) => constrain_render_elements(
+            LingmoMappedRenderElement::Stack(elem) => constrain_render_elements(
                 std::iter::once(elem),
                 geo.loc.as_logical().to_physical_precise_round(output_scale) - elem_geometry.loc,
                 geo.as_logical().to_physical_precise_round(output_scale),
@@ -5054,8 +5054,8 @@ fn render_old_tree_windows<R>(
                 output_scale,
             )
             .next()
-            .map(CosmicMappedRenderElement::TiledStack),
-            CosmicMappedRenderElement::Window(elem) => constrain_render_elements(
+            .map(LingmoMappedRenderElement::TiledStack),
+            LingmoMappedRenderElement::Window(elem) => constrain_render_elements(
                 std::iter::once(elem),
                 geo.loc.as_logical().to_physical_precise_round(output_scale) - elem_geometry.loc,
                 geo.as_logical().to_physical_precise_round(output_scale),
@@ -5065,7 +5065,7 @@ fn render_old_tree_windows<R>(
                 output_scale,
             )
             .next()
-            .map(CosmicMappedRenderElement::TiledWindow),
+            .map(LingmoMappedRenderElement::TiledWindow),
             x => Some(x),
         };
 
@@ -5079,7 +5079,7 @@ fn render_old_tree_windows<R>(
         |mapped, elem_geometry, geo, alpha, is_minimizing| {
             let radius = mapped.corner_radius(geo.size.as_logical(), indicator_thickness);
             if is_minimizing && indicator_thickness > 0 {
-                push(CosmicMappedRenderElement::FocusIndicator(
+                push(LingmoMappedRenderElement::FocusIndicator(
                     IndicatorShader::focus_element(
                         renderer,
                         Key::Window(Usage::FocusIndicator, mapped.clone().key()),
@@ -5139,7 +5139,7 @@ fn render_old_tree(
     output_scale: f64,
     percentage: f32,
     is_swap_mode: bool,
-    mut processor: impl FnMut(&CosmicMapped, Rectangle<i32, Physical>, Rectangle<i32, Local>, f32, bool),
+    mut processor: impl FnMut(&LingmoMapped, Rectangle<i32, Physical>, Rectangle<i32, Local>, f32, bool),
 ) {
     if let Some(root) = reference_tree.root_node_id() {
         let geometries = geometries.unwrap_or_default();
@@ -5225,13 +5225,13 @@ fn render_new_tree_popups<R>(
     overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
     swap_desc: Option<NodeDesc>,
     scanout_node: Option<DrmNode>,
-    push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+    push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
 ) where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
-    CosmicWindowRenderElement<R>: RenderElement<R>,
-    CosmicStackRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LingmoWindowRenderElement<R>: RenderElement<R>,
+    LingmoStackRenderElement<R>: RenderElement<R>,
 {
     let output_scale = output.current_scale().fractional_scale();
 
@@ -5278,7 +5278,7 @@ fn render_new_tree_windows<R>(
     old_geometries: Option<HashMap<NodeId, Rectangle<i32, Local>>>,
     is_overview: bool,
     seat: Option<&Seat<State>>,
-    focused: Option<&CosmicMapped>,
+    focused: Option<&LingmoMapped>,
     output: &Output,
     percentage: f32,
     transition: Option<f32>,
@@ -5288,15 +5288,15 @@ fn render_new_tree_windows<R>(
     swap_desc: Option<NodeDesc>,
     swapping_stack_surface_id: &Id,
     backdrop_id: &Id,
-    theme: &cosmic::theme::CosmicTheme,
+    theme: &Lingmo::theme::LingmoTheme,
     scanout_node: Option<DrmNode>,
-    push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+    push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
 ) where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
-    CosmicWindowRenderElement<R>: RenderElement<R>,
-    CosmicStackRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LingmoWindowRenderElement<R>: RenderElement<R>,
+    LingmoStackRenderElement<R>: RenderElement<R>,
 {
     let focused = match seat.and_then(|seat| seat.get_keyboard().unwrap().current_focus()) {
         Some(target @ KeyboardFocusTarget::Group(_)) => {
@@ -5338,16 +5338,16 @@ fn render_new_tree_windows<R>(
 
     let mut animating_window_upper_elements = Vec::new();
     let mut animating_window_lower_elements = Vec::new();
-    let mut animating_shadow_elements = SmallVec::<[CosmicMappedRenderElement<R>; 4]>::new_const();
+    let mut animating_shadow_elements = SmallVec::<[LingmoMappedRenderElement<R>; 4]>::new_const();
 
     let mut window_upper_elements = Vec::new();
     let mut window_lower_elements = Vec::new();
-    let mut shadow_elements = SmallVec::<[CosmicMappedRenderElement<R>; 4]>::new_const();
+    let mut shadow_elements = SmallVec::<[LingmoMappedRenderElement<R>; 4]>::new_const();
 
     let mut group_backdrop = None;
-    let mut indicators = SmallVec::<[CosmicMappedRenderElement<R>; 2]>::new_const();
-    let mut resize_elements = SmallVec::<[CosmicMappedRenderElement<R>; 10]>::new_const();
-    let mut swap_elements = SmallVec::<[CosmicMappedRenderElement<R>; 4]>::new_const();
+    let mut indicators = SmallVec::<[LingmoMappedRenderElement<R>; 2]>::new_const();
+    let mut resize_elements = SmallVec::<[LingmoMappedRenderElement<R>; 10]>::new_const();
+    let mut swap_elements = SmallVec::<[LingmoMappedRenderElement<R>; 4]>::new_const();
 
     let output_scale = output.current_scale().fractional_scale();
 
@@ -5398,7 +5398,7 @@ fn render_new_tree_windows<R>(
             .radius_s()
             .map(|x| if x < 4.0 { x } else { x + 4.0 })
             .map(|val| (val * scale.x.min(scale.y) as f32).round() as u8);
-        swap_elements.push(CosmicMappedRenderElement::FocusIndicator(
+        swap_elements.push(LingmoMappedRenderElement::FocusIndicator(
             IndicatorShader::focus_element(
                 renderer,
                 Key::from(swapping_stack_surface_id.clone()),
@@ -5426,7 +5426,7 @@ fn render_new_tree_windows<R>(
             // TODO
             0,
             &mut |elem| {
-                swap_elements.push(CosmicMappedRenderElement::GrabbedWindow(
+                swap_elements.push(LingmoMappedRenderElement::GrabbedWindow(
                     RescaleRenderElement::from_element(
                         elem.into(),
                         swap_geo
@@ -5511,7 +5511,7 @@ fn render_new_tree_windows<R>(
                         .unwrap_or(false)
                         || focused.as_ref() == Some(&node_id)
                     {
-                        indicators.push(CosmicMappedRenderElement::FocusIndicator(
+                        indicators.push(LingmoMappedRenderElement::FocusIndicator(
                             IndicatorShader::focus_element(
                                 renderer,
                                 match data {
@@ -5626,7 +5626,7 @@ fn render_new_tree_windows<R>(
                 };
 
                 let map_elem = |element| match element {
-                    CosmicMappedRenderElement::Stack(elem) => constrain_render_elements(
+                    LingmoMappedRenderElement::Stack(elem) => constrain_render_elements(
                         std::iter::once(elem),
                         geo.loc.as_logical().to_physical_precise_round(output_scale)
                             - elem_geometry.loc,
@@ -5637,8 +5637,8 @@ fn render_new_tree_windows<R>(
                         output_scale,
                     )
                     .next()
-                    .map(CosmicMappedRenderElement::TiledStack),
-                    CosmicMappedRenderElement::Window(elem) => constrain_render_elements(
+                    .map(LingmoMappedRenderElement::TiledStack),
+                    LingmoMappedRenderElement::Window(elem) => constrain_render_elements(
                         std::iter::once(elem),
                         geo.loc.as_logical().to_physical_precise_round(output_scale)
                             - elem_geometry.loc,
@@ -5649,8 +5649,8 @@ fn render_new_tree_windows<R>(
                         output_scale,
                     )
                     .next()
-                    .map(CosmicMappedRenderElement::TiledWindow),
-                    CosmicMappedRenderElement::Overlay(elem) => constrain_render_elements(
+                    .map(LingmoMappedRenderElement::TiledWindow),
+                    LingmoMappedRenderElement::Overlay(elem) => constrain_render_elements(
                         std::iter::once(elem),
                         geo.loc.as_logical().to_physical_precise_round(output_scale)
                             - elem_geometry.loc,
@@ -5661,12 +5661,12 @@ fn render_new_tree_windows<R>(
                         output_scale,
                     )
                     .next()
-                    .map(CosmicMappedRenderElement::TiledOverlay),
+                    .map(LingmoMappedRenderElement::TiledOverlay),
                     x => Some(x),
                 };
 
-                let mut upper_elements = SmallVec::<[CosmicMappedRenderElement<R>; 4]>::new_const();
-                let mut lower_elements = SmallVec::<[CosmicMappedRenderElement<R>; 4]>::new_const();
+                let mut upper_elements = SmallVec::<[LingmoMappedRenderElement<R>; 4]>::new_const();
+                let mut lower_elements = SmallVec::<[LingmoMappedRenderElement<R>; 4]>::new_const();
                 mapped.push_render_elements(
                     renderer,
                     //original_location,
@@ -5713,7 +5713,7 @@ fn render_new_tree_windows<R>(
                     active_geo.loc += geo.loc - mapped.geometry().loc.as_local();
                     upper_elements.insert(
                         0,
-                        CosmicMappedRenderElement::Overlay(BackdropShader::element(
+                        LingmoMappedRenderElement::Overlay(BackdropShader::element(
                             renderer,
                             Key::Window(Usage::Overlay, mapped.key()),
                             active_geo,
@@ -5937,3 +5937,5 @@ fn scale_to_center<C>(
         )
     }
 }
+
+

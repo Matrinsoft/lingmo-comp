@@ -5,9 +5,9 @@ use smithay::{
     output::Output,
 };
 
-/// Layer shell namespace used by `cosmic-workspaces`
+/// Layer shell namespace used by `Lingmo-workspaces`
 // TODO: Avoid special case, or add protocol to expose required behavior
-pub const WORKSPACE_OVERVIEW_NAMESPACE: &str = "cosmic-workspace-overview";
+pub const WORKSPACE_OVERVIEW_NAMESPACE: &str = "Lingmo-workspace-overview";
 
 /// Check if a workspace overview shell surface is open on the output
 pub fn workspace_overview_is_open(output: &Output) -> bool {
@@ -24,3 +24,4 @@ pub fn workspace_overview_is_open(output: &Output) -> bool {
                 .unwrap_or(false)
         })
 }
+

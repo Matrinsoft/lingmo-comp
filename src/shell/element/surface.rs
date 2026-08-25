@@ -153,49 +153,49 @@ fn scanout_kind_eval(
 }
 
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
-pub struct CosmicSurface(pub Window);
+pub struct LingmoSurface(pub Window);
 
 #[derive(Debug, Clone)]
-pub struct WeakCosmicSurface(pub WeakWindow);
+pub struct WeakLingmoSurface(pub WeakWindow);
 
-impl From<ToplevelSurface> for CosmicSurface {
+impl From<ToplevelSurface> for LingmoSurface {
     fn from(s: ToplevelSurface) -> Self {
-        CosmicSurface(Window::new_wayland_window(s))
+        LingmoSurface(Window::new_wayland_window(s))
     }
 }
 
-impl From<Window> for CosmicSurface {
+impl From<Window> for LingmoSurface {
     fn from(w: Window) -> Self {
-        CosmicSurface(w)
+        LingmoSurface(w)
     }
 }
 
-impl From<X11Surface> for CosmicSurface {
+impl From<X11Surface> for LingmoSurface {
     fn from(s: X11Surface) -> Self {
-        CosmicSurface(Window::new_x11_window(s))
+        LingmoSurface(Window::new_x11_window(s))
     }
 }
 
-impl PartialEq<WlSurface> for CosmicSurface {
+impl PartialEq<WlSurface> for LingmoSurface {
     fn eq(&self, other: &WlSurface) -> bool {
         self.wl_surface().is_some_and(|s| &*s == other)
     }
 }
 
-impl PartialEq<ToplevelSurface> for CosmicSurface {
+impl PartialEq<ToplevelSurface> for LingmoSurface {
     fn eq(&self, other: &ToplevelSurface) -> bool {
         self.wl_surface().is_some_and(|s| &*s == other.wl_surface())
     }
 }
 
-impl PartialEq<X11Surface> for CosmicSurface {
+impl PartialEq<X11Surface> for LingmoSurface {
     fn eq(&self, other: &X11Surface) -> bool {
         self.x11_surface() == Some(other)
     }
 }
 
-impl PartialEq<WeakCosmicSurface> for CosmicSurface {
-    fn eq(&self, other: &WeakCosmicSurface) -> bool {
+impl PartialEq<WeakLingmoSurface> for LingmoSurface {
+    fn eq(&self, other: &WeakLingmoSurface) -> bool {
         other.upgrade().is_some_and(|other| other == *self)
     }
 }
@@ -209,7 +209,7 @@ struct Sticky(AtomicBool);
 #[derive(Default)]
 struct GlobalGeometry(Mutex<Option<Rectangle<i32, Global>>>);
 
-impl CosmicSurface {
+impl LingmoSurface {
     pub fn title(&self) -> String {
         match self.0.underlying_surface() {
             WindowSurface::Wayland(toplevel) => with_states(toplevel.wl_surface(), |states| {
@@ -992,24 +992,24 @@ impl CosmicSurface {
         self.0.x11_surface()
     }
 
-    pub fn downgrade(&self) -> WeakCosmicSurface {
-        WeakCosmicSurface(self.0.downgrade())
+    pub fn downgrade(&self) -> WeakLingmoSurface {
+        WeakLingmoSurface(self.0.downgrade())
     }
 }
 
-impl WeakCosmicSurface {
-    pub fn upgrade(&self) -> Option<CosmicSurface> {
-        self.0.upgrade().map(CosmicSurface)
+impl WeakLingmoSurface {
+    pub fn upgrade(&self) -> Option<LingmoSurface> {
+        self.0.upgrade().map(LingmoSurface)
     }
 }
 
-impl IsAlive for CosmicSurface {
+impl IsAlive for LingmoSurface {
     fn alive(&self) -> bool {
         self.0.alive()
     }
 }
 
-impl SpaceElement for CosmicSurface {
+impl SpaceElement for LingmoSurface {
     fn geometry(&self) -> Rectangle<i32, Logical> {
         SpaceElement::geometry(&self.0)
     }
@@ -1048,7 +1048,7 @@ impl SpaceElement for CosmicSurface {
     }
 }
 
-impl KeyboardTarget<State> for CosmicSurface {
+impl KeyboardTarget<State> for LingmoSurface {
     fn enter(
         &self,
         seat: &Seat<State>,
@@ -1114,13 +1114,13 @@ impl KeyboardTarget<State> for CosmicSurface {
     }
 }
 
-impl WaylandFocus for CosmicSurface {
+impl WaylandFocus for LingmoSurface {
     fn wl_surface(&self) -> Option<Cow<'_, WlSurface>> {
         self.0.wl_surface()
     }
 }
 
-impl X11Relatable for CosmicSurface {
+impl X11Relatable for LingmoSurface {
     fn is_window(&self, window: &X11Surface) -> bool {
         self.x11_surface() == Some(window)
     }
@@ -1137,3 +1137,4 @@ fn with_toplevel_state<T, F: FnOnce(Option<&smithay::wayland::shell::xdg::Toplev
         toplevel.with_committed_state(cb)
     }
 }
+

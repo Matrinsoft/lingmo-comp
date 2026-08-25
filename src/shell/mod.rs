@@ -13,7 +13,7 @@ use wayland_backend::server::ClientId;
 
 use crate::{
     shell::{
-        element::CosmicStack, focus::FocusTarget, grabs::fullscreen_items,
+        element::LingmoStack, focus::FocusTarget, grabs::fullscreen_items,
         layout::tiling::PlaceholderType,
     },
     utils,
@@ -22,14 +22,14 @@ use crate::{
         protocols::workspace::{State as WState, WorkspaceCapabilities},
     },
 };
-use cosmic_comp_config::{
+use lingmo_comp_config::{
     AppearanceConfig, TileBehavior, ZoomConfig, ZoomMovement,
     workspace::{PinnedWorkspace, WorkspaceLayout, WorkspaceMode},
 };
-use cosmic_config::ConfigSet;
-use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
-use cosmic_settings_config::shortcuts::action::{Direction, FocusDirection, ResizeDirection};
-use cosmic_settings_config::{shortcuts, window_rules::ApplicationException};
+use Lingmo_config::ConfigSet;
+use Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::TilingState;
+use Lingmo_settings_config::shortcuts::action::{Direction, FocusDirection, ResizeDirection};
+use Lingmo_settings_config::{shortcuts, window_rules::ApplicationException};
 use keyframe::{ease, functions::EaseInOutCubic};
 use smithay::{
     backend::{input::TouchSlot, renderer::element::RenderElementStates},
@@ -96,14 +96,14 @@ pub mod layout;
 mod seats;
 mod workspace;
 pub mod zoom;
-pub use self::element::{CosmicMapped, CosmicMappedRenderElement, CosmicSurface};
+pub use self::element::{LingmoMapped, LingmoMappedRenderElement, LingmoSurface};
 pub use self::seats::*;
 pub use self::workspace::*;
 use self::zoom::{OutputZoomState, ZoomState};
 
 use self::{
     element::{
-        CosmicWindow, MaximizedState, resize_indicator::ResizeIndicator,
+        LingmoWindow, MaximizedState, resize_indicator::ResizeIndicator,
         swap_indicator::SwapIndicator,
     },
     focus::target::{KeyboardFocusTarget, PointerFocusTarget},
@@ -238,8 +238,8 @@ pub enum ActivationKey {
     X11(u32),
 }
 
-impl From<&CosmicSurface> for ActivationKey {
-    fn from(value: &CosmicSurface) -> Self {
+impl From<&LingmoSurface> for ActivationKey {
+    fn from(value: &LingmoSurface) -> Self {
         match value.0.underlying_surface() {
             WindowSurface::Wayland(toplevel) => {
                 ActivationKey::Wayland(toplevel.wl_surface().clone())
@@ -251,7 +251,7 @@ impl From<&CosmicSurface> for ActivationKey {
 
 #[derive(Debug)]
 pub struct PendingWindow {
-    pub surface: CosmicSurface,
+    pub surface: LingmoSurface,
     pub seat: Seat<State>,
     pub fullscreen: Option<Output>,
     pub maximized: bool,
@@ -279,7 +279,7 @@ pub struct Shell {
     pub previous_workspace_idx: Option<(Serial, WeakOutput, usize)>,
     pub xwayland_keyboard_grab: Option<XWaylandKeyboardGrab<State>>,
 
-    theme: cosmic::Theme,
+    theme: Lingmo::Theme,
     pub active_hint: bool,
     overview_mode: OverviewMode,
     swap_indicator: Option<SwapIndicator>,
@@ -364,7 +364,7 @@ pub struct WorkspaceSet {
     pub group: WorkspaceGroupHandle,
     tiling_enabled: bool,
     output: Output,
-    theme: cosmic::Theme,
+    theme: Lingmo::Theme,
     appearance: AppearanceConfig,
     pub sticky_layer: FloatingLayout,
     pub minimized_windows: Vec<MinimizedWindow>,
@@ -377,7 +377,7 @@ fn create_workspace(
     group_handle: &WorkspaceGroupHandle,
     active: bool,
     tiling: bool,
-    theme: cosmic::Theme,
+    theme: Lingmo::Theme,
     appearance: AppearanceConfig,
 ) -> Workspace {
     let workspace_handle = state
@@ -417,7 +417,7 @@ fn create_workspace_from_pinned(
     output: &Output,
     group_handle: &WorkspaceGroupHandle,
     active: bool,
-    theme: cosmic::Theme,
+    theme: Lingmo::Theme,
     appearance: AppearanceConfig,
 ) -> Workspace {
     let workspace_handle = state
@@ -461,7 +461,7 @@ fn merge_workspaces(
     mut workspace: Workspace,
     into: &mut Workspace,
     workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
-    toplevel_info_state: &mut ToplevelInfoState<State, CosmicSurface>,
+    toplevel_info_state: &mut ToplevelInfoState<State, LingmoSurface>,
 ) {
     if into.fullscreen.is_some() {
         // Don't handle the returned original workspace, for this nieche case.
@@ -487,7 +487,7 @@ impl WorkspaceSet {
         state: &mut WorkspaceUpdateGuard<'_, State>,
         output: &Output,
         tiling_enabled: bool,
-        theme: &cosmic::Theme,
+        theme: &Lingmo::Theme,
         appearance: AppearanceConfig,
     ) -> WorkspaceSet {
         let group_handle = state.create_workspace_group();
@@ -810,7 +810,7 @@ impl WorkspaceSet {
                 layer_map_for_output(&self.output).layers().find_map(|l| {
                     (l.wl_surface() == &root)
                         .then(|| {
-                            CosmicSurface::surface_tree_offset(l.wl_surface(), surface)
+                            LingmoSurface::surface_tree_offset(l.wl_surface(), surface)
                                 .map(|offset| (l.geometry().as_local(), offset))
                         })
                         .flatten()
@@ -827,24 +827,24 @@ pub struct Workspaces {
     mode: WorkspaceMode,
     autotile: bool,
     autotile_behavior: TileBehavior,
-    theme: cosmic::Theme,
+    theme: Lingmo::Theme,
     appearance: AppearanceConfig,
     // Persisted workspace to add on first `output_add`
     persisted_workspaces: Vec<PinnedWorkspace>,
 }
 
 impl Workspaces {
-    pub fn new(config: &Config, theme: cosmic::Theme) -> Workspaces {
+    pub fn new(config: &Config, theme: Lingmo::Theme) -> Workspaces {
         Workspaces {
             sets: IndexMap::new(),
             backup_set: None,
-            layout: config.cosmic_conf.workspaces.workspace_layout,
-            mode: config.cosmic_conf.workspaces.workspace_mode,
-            autotile: config.cosmic_conf.autotile,
-            autotile_behavior: config.cosmic_conf.autotile_behavior,
+            layout: config.Lingmo_conf.workspaces.workspace_layout,
+            mode: config.Lingmo_conf.workspaces.workspace_mode,
+            autotile: config.Lingmo_conf.autotile,
+            autotile_behavior: config.Lingmo_conf.autotile_behavior,
             theme,
-            appearance: config.cosmic_conf.appearance_settings,
-            persisted_workspaces: config.cosmic_conf.pinned_workspaces.clone(),
+            appearance: config.Lingmo_conf.appearance_settings,
+            persisted_workspaces: config.Lingmo_conf.pinned_workspaces.clone(),
         }
     }
 
@@ -1160,9 +1160,9 @@ impl Workspaces {
         xdg_activation_state: &XdgActivationState,
     ) {
         let old_mode = self.mode;
-        self.mode = config.cosmic_conf.workspaces.workspace_mode;
-        self.layout = config.cosmic_conf.workspaces.workspace_layout;
-        self.appearance = config.cosmic_conf.appearance_settings;
+        self.mode = config.Lingmo_conf.workspaces.workspace_mode;
+        self.layout = config.Lingmo_conf.workspaces.workspace_layout;
+        self.appearance = config.Lingmo_conf.appearance_settings;
 
         for set in self.sets.values_mut() {
             set.appearance = self.appearance;
@@ -1216,7 +1216,7 @@ impl Workspaces {
                                     output,
                                     &set.group,
                                     false,
-                                    config.cosmic_conf.autotile,
+                                    config.Lingmo_conf.autotile,
                                     self.theme.clone(),
                                     self.appearance,
                                 ),
@@ -1408,7 +1408,7 @@ impl Workspaces {
         )
     }
 
-    pub fn set_theme(&mut self, theme: cosmic::Theme) {
+    pub fn set_theme(&mut self, theme: Lingmo::Theme) {
         for (_, s) in &mut self.sets {
             s.theme = theme.clone();
 
@@ -1499,7 +1499,7 @@ impl Workspaces {
             .flat_map(|set| &set.workspaces)
             .flat_map(|w| w.to_pinned())
             .collect();
-        let config = config.cosmic_helper.clone();
+        let config = config.Lingmo_helper.clone();
         thread::spawn(move || {
             if let Err(err) = config.set("pinned_workspaces", pinned_workspaces) {
                 error!(?err, "Failed to update pinned_workspaces key");
@@ -1572,12 +1572,12 @@ impl Common {
     pub fn update_config(&mut self) {
         let mut shell = self.shell.write();
         let shell_ref = &mut *shell;
-        shell_ref.active_hint = self.config.cosmic_conf.active_hint;
-        shell_ref.appearance_conf = self.config.cosmic_conf.appearance_settings;
+        shell_ref.active_hint = self.config.Lingmo_conf.active_hint;
+        shell_ref.appearance_conf = self.config.Lingmo_conf.appearance_settings;
         if let Some(zoom_state) = shell_ref.zoom_state.as_mut() {
-            zoom_state.increment = self.config.cosmic_conf.accessibility_zoom.increment;
-            zoom_state.movement = self.config.cosmic_conf.accessibility_zoom.view_moves;
-            zoom_state.show_overlay = self.config.cosmic_conf.accessibility_zoom.show_overlay;
+            zoom_state.increment = self.config.Lingmo_conf.accessibility_zoom.increment;
+            zoom_state.movement = self.config.Lingmo_conf.accessibility_zoom.view_moves;
+            zoom_state.show_overlay = self.config.Lingmo_conf.accessibility_zoom.show_overlay;
 
             for output in shell_ref.workspaces.sets.keys() {
                 let output_state = output.user_data().get::<Mutex<OutputZoomState>>().unwrap();
@@ -1595,7 +1595,7 @@ impl Common {
         );
 
         for mapped in shell_ref.mapped() {
-            mapped.update_appearance_conf(&self.config.cosmic_conf.appearance_settings);
+            mapped.update_appearance_conf(&self.config.Lingmo_conf.appearance_settings);
         }
     }
 
@@ -1687,7 +1687,7 @@ impl Common {
 
 impl Shell {
     pub fn new(config: &Config) -> Self {
-        let theme = cosmic::theme::system_preference();
+        let theme = Lingmo::theme::system_preference();
 
         let tiling_exceptions = layout::TilingExceptions::new(config.tiling_exceptions.iter());
 
@@ -1704,13 +1704,13 @@ impl Shell {
             xwayland_keyboard_grab: None,
 
             theme,
-            active_hint: config.cosmic_conf.active_hint,
+            active_hint: config.Lingmo_conf.active_hint,
             overview_mode: OverviewMode::None,
             swap_indicator: None,
             resize_mode: ResizeMode::None,
             resize_state: None,
             resize_indicator: None,
-            appearance_conf: config.cosmic_conf.appearance_settings,
+            appearance_conf: config.Lingmo_conf.appearance_settings,
             zoom_state: None,
             tiling_exceptions,
 
@@ -1970,9 +1970,9 @@ impl Shell {
         }
     }
 
-    /// Coerce a keyboard focus target into a CosmicMapped element. This is useful when performing window specific
+    /// Coerce a keyboard focus target into a LingmoMapped element. This is useful when performing window specific
     /// actions, such as closing a window
-    pub fn focused_element(&self, focus_target: &KeyboardFocusTarget) -> Option<CosmicMapped> {
+    pub fn focused_element(&self, focus_target: &KeyboardFocusTarget) -> Option<LingmoMapped> {
         match focus_target {
             KeyboardFocusTarget::Element(window) => Some(window).cloned(),
             KeyboardFocusTarget::Popup(PopupKind::Xdg(popup)) => {
@@ -2143,9 +2143,9 @@ impl Shell {
         }
     }
 
-    pub fn element_for_surface<S>(&self, surface: &S) -> Option<&CosmicMapped>
+    pub fn element_for_surface<S>(&self, surface: &S) -> Option<&LingmoMapped>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         self.workspaces.sets.values().find_map(|set| {
             set.minimized_windows
@@ -2167,7 +2167,7 @@ impl Shell {
 
     pub fn is_surface_mapped<S>(&self, surface: &S) -> bool
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         self.workspaces.sets.values().any(|set| {
             set.minimized_windows
@@ -2192,7 +2192,7 @@ impl Shell {
         })
     }
 
-    pub fn space_for(&self, mapped: &CosmicMapped) -> Option<&Workspace> {
+    pub fn space_for(&self, mapped: &LingmoMapped) -> Option<&Workspace> {
         self.workspaces.spaces().find(|workspace| {
             workspace.mapped().any(|m| m == mapped)
                 || workspace
@@ -2202,7 +2202,7 @@ impl Shell {
         })
     }
 
-    pub fn space_for_mut(&mut self, mapped: &CosmicMapped) -> Option<&mut Workspace> {
+    pub fn space_for_mut(&mut self, mapped: &LingmoMapped) -> Option<&mut Workspace> {
         self.workspaces.spaces_mut().find(|workspace| {
             workspace.mapped().any(|m| m == mapped)
                 || workspace
@@ -2619,10 +2619,10 @@ impl Shell {
 
     pub fn remap_unfullscreened_window(
         &mut self,
-        surface: CosmicSurface,
+        surface: LingmoSurface,
         mut state: Option<FullscreenRestoreState>,
         loop_handle: &LoopHandle<'static, State>,
-    ) -> CosmicMapped {
+    ) -> LingmoMapped {
         if let Some(FullscreenRestoreState::Stack { state: stack_state }) = &state {
             if let Some(mapped) = self.mapped().find(|m| **m == stack_state.stack)
                 && let Some(stack) = mapped.stack_ref()
@@ -2636,14 +2636,14 @@ impl Shell {
         }
 
         let window = if state.as_ref().is_some_and(|s| s.was_stack()) {
-            CosmicMapped::from(CosmicStack::new(
+            LingmoMapped::from(LingmoStack::new(
                 std::iter::once(surface),
                 loop_handle.clone(),
                 self.theme.clone(),
                 self.appearance_conf,
             ))
         } else {
-            CosmicMapped::from(CosmicWindow::new(
+            LingmoMapped::from(LingmoWindow::new(
                 surface,
                 loop_handle.clone(),
                 self.theme.clone(),
@@ -2814,8 +2814,8 @@ impl Shell {
     #[must_use]
     pub fn map_window(
         &mut self,
-        window: &CosmicSurface,
-        toplevel_info: &mut ToplevelInfoState<State, CosmicSurface>,
+        window: &LingmoSurface,
+        toplevel_info: &mut ToplevelInfoState<State, LingmoSurface>,
         workspace_state: &mut WorkspaceState<State>,
         loop_handle: &LoopHandle<'static, State>,
     ) -> Option<KeyboardFocusTarget> {
@@ -2922,7 +2922,7 @@ impl Shell {
                 .then_some(KeyboardFocusTarget::Element(focused));
         }
 
-        let mapped = CosmicMapped::from(CosmicWindow::new(
+        let mapped = LingmoMapped::from(LingmoWindow::new(
             window.clone(),
             loop_handle.clone(),
             self.theme.clone(),
@@ -3028,10 +3028,10 @@ impl Shell {
         &mut self,
         surface: &S,
         seat: &Seat<State>,
-        toplevel_info: &mut ToplevelInfoState<State, CosmicSurface>,
+        toplevel_info: &mut ToplevelInfoState<State, LingmoSurface>,
     ) -> Option<PendingWindow>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         for set in self.workspaces.sets.values_mut() {
             let sticky_res = set.sticky_layer.mapped().find_map(|m| {
@@ -3249,7 +3249,7 @@ impl Shell {
     pub fn move_window(
         &mut self,
         seat: Option<&Seat<State>>,
-        window: &CosmicSurface,
+        window: &LingmoSurface,
         from: &WorkspaceHandle,
         to: &WorkspaceHandle,
         follow: bool,
@@ -3317,7 +3317,7 @@ impl Shell {
             let to_workspace = self.workspaces.space_for_handle_mut(to).unwrap(); // checked above
             let minimized_window = match window_state {
                 WorkspaceRestoreData::Floating(previous) => {
-                    let window = CosmicMapped::from(CosmicWindow::new(
+                    let window = LingmoMapped::from(LingmoWindow::new(
                         window.clone(),
                         evlh.clone(),
                         self.theme.clone(),
@@ -3327,7 +3327,7 @@ impl Shell {
                     MinimizedWindow::Floating { window, previous }
                 }
                 WorkspaceRestoreData::Tiling(previous) => {
-                    let window = CosmicMapped::from(CosmicWindow::new(
+                    let window = LingmoMapped::from(LingmoWindow::new(
                         window.clone(),
                         evlh.clone(),
                         self.theme.clone(),
@@ -3386,7 +3386,7 @@ impl Shell {
             if !matches!(window_state, WorkspaceRestoreData::Fullscreen(_))
                 && !to_workspace.tiling_enabled
             {
-                let mapped = CosmicMapped::from(CosmicWindow::new(
+                let mapped = LingmoMapped::from(LingmoWindow::new(
                     window.clone(),
                     evlh.clone(),
                     self.theme.clone(),
@@ -3403,7 +3403,7 @@ impl Shell {
             } else if !matches!(window_state, WorkspaceRestoreData::Fullscreen(_))
                 && to_workspace.tiling_enabled
             {
-                let mapped = CosmicMapped::from(CosmicWindow::new(
+                let mapped = LingmoMapped::from(LingmoWindow::new(
                     window.clone(),
                     evlh.clone(),
                     self.theme.clone(),
@@ -3448,7 +3448,7 @@ impl Shell {
     pub fn move_element(
         &mut self,
         seat: Option<&Seat<State>>,
-        mapped: &CosmicMapped,
+        mapped: &LingmoMapped,
         from: &WorkspaceHandle,
         to: &WorkspaceHandle,
         follow: bool,
@@ -3555,7 +3555,7 @@ impl Shell {
         new_pos.map(|pos| (focus_target, pos))
     }
 
-    pub fn update_reactive_popups(&self, mapped: &CosmicMapped) {
+    pub fn update_reactive_popups(&self, mapped: &LingmoMapped) {
         if let Some(workspace) = self.space_for(mapped)
             && let Some(element_loc) = workspace
                 .element_geometry(mapped)
@@ -3592,7 +3592,7 @@ impl Shell {
             return None; // TODO: an application can send a menu request for a touch event
         };
 
-        let items_for_element = |mapped: &CosmicMapped,
+        let items_for_element = |mapped: &LingmoMapped,
                                  is_tiled: bool,
                                  is_sticky: bool,
                                  tiling_enabled: bool,
@@ -3694,7 +3694,7 @@ impl Shell {
         };
 
         let mut theme = self.theme.clone();
-        theme.transparent = theme.cosmic().frosted_windows;
+        theme.transparent = theme.Lingmo().frosted_windows;
         let grab = MenuGrab::new(
             GrabStartData::Pointer(start_data),
             seat,
@@ -3771,7 +3771,7 @@ impl Shell {
             .unwrap();
 
         let mapped = if move_out_of_stack {
-            let new_mapped: CosmicMapped = CosmicWindow::new(
+            let new_mapped: LingmoMapped = LingmoWindow::new(
                 window.clone(),
                 evlh.clone(),
                 self.theme.clone(),
@@ -3804,8 +3804,8 @@ impl Shell {
             GrabStartData::Pointer(start_data) => Trigger::Pointer(start_data.button),
             GrabStartData::Touch(start_data) => Trigger::Touch(start_data.slot),
         };
-        let active_hint = if config.cosmic_conf.active_hint {
-            self.theme.cosmic().active_hint as u8
+        let active_hint = if config.Lingmo_conf.active_hint {
+            self.theme.Lingmo().active_hint as u8
         } else {
             0
         };
@@ -3950,7 +3950,7 @@ impl Shell {
             initial_window_location,
             cursor_output,
             active_hint,
-            config.cosmic_conf.edge_snap_threshold as f64,
+            config.Lingmo_conf.edge_snap_threshold as f64,
             layer,
             release,
             evlh.clone(),
@@ -3986,7 +3986,7 @@ impl Shell {
         }
     }
 
-    pub fn element_geometry(&self, mapped: &CosmicMapped) -> Option<Rectangle<i32, Global>> {
+    pub fn element_geometry(&self, mapped: &LingmoMapped) -> Option<Rectangle<i32, Global>> {
         if let Some(set) = self
             .workspaces
             .sets
@@ -4191,7 +4191,7 @@ impl Shell {
 
     pub fn menu_resize_request(
         &mut self,
-        mapped: &CosmicMapped,
+        mapped: &LingmoMapped,
         seat: &Seat<State>,
         edge: ResizeEdge,
         edge_snap_threshold: u32,
@@ -4284,7 +4284,7 @@ impl Shell {
 
     pub fn maximize_toggle(
         &mut self,
-        window: &CosmicMapped,
+        window: &LingmoMapped,
         seat: &Seat<State>,
         loop_handle: &LoopHandle<'static, State>,
     ) {
@@ -4300,7 +4300,7 @@ impl Shell {
 
     pub fn minimize_request<S>(&mut self, surface: &S)
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         if let Some((set, mapped)) = self.workspaces.sets.values_mut().find_map(|set| {
             let mapped = set
@@ -4346,7 +4346,7 @@ impl Shell {
         seat: &Seat<State>,
         loop_handle: &LoopHandle<'static, State>,
     ) where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         if let Some((set, window)) = self.workspaces.sets.values_mut().find_map(|set| {
             set.minimized_windows
@@ -4392,7 +4392,7 @@ impl Shell {
 
     pub fn maximize_request(
         &mut self,
-        mapped: &CosmicMapped,
+        mapped: &LingmoMapped,
         seat: &Seat<State>,
         animate: bool,
         loop_handle: &LoopHandle<'static, State>,
@@ -4431,7 +4431,7 @@ impl Shell {
         }
     }
 
-    pub fn unmaximize_request(&mut self, mapped: &CosmicMapped) -> Option<Size<i32, Logical>> {
+    pub fn unmaximize_request(&mut self, mapped: &LingmoMapped) -> Option<Size<i32, Logical>> {
         if let Some(set) = self.workspaces.sets.values_mut().find(|set| {
             set.sticky_layer.mapped().any(|m| m == mapped)
                 || set
@@ -4621,7 +4621,7 @@ impl Shell {
     pub fn toggle_stacking(
         &mut self,
         seat: &Seat<State>,
-        window: &CosmicMapped,
+        window: &LingmoMapped,
     ) -> Option<KeyboardFocusTarget> {
         if let Some(set) = self
             .workspaces
@@ -4698,7 +4698,7 @@ impl Shell {
         }
     }
 
-    pub fn toggle_sticky(&mut self, seat: &Seat<State>, mapped: &CosmicMapped) {
+    pub fn toggle_sticky(&mut self, seat: &Seat<State>, mapped: &LingmoMapped) {
         // clean from focus-stacks
         for workspace in self.workspaces.spaces_mut() {
             for seat in self.seats.iter() {
@@ -4827,7 +4827,7 @@ impl Shell {
         _loop_handle: &LoopHandle<'static, State>,
     ) -> Option<KeyboardFocusTarget>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         let mapped = self.element_for_surface(surface).cloned()?;
         let seat = self.seats.last_active().clone();
@@ -4958,7 +4958,7 @@ impl Shell {
         loop_handle: &LoopHandle<'static, State>,
     ) -> Option<KeyboardFocusTarget>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         let maybe_workspace = self.workspaces.iter_mut().find_map(|(_, s)| {
             s.workspaces
@@ -4981,11 +4981,11 @@ impl Shell {
 
     pub fn update_toolkit(
         &mut self,
-        toolkit: cosmic::config::CosmicTk,
+        toolkit: Lingmo::config::LingmoTk,
         xdg_activation_state: &XdgActivationState,
         workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
     ) {
-        let mut container = cosmic::config::COSMIC_TK.write().unwrap();
+        let mut container = Lingmo::config::Lingmo_TK.write().unwrap();
         if *container != toolkit {
             *container = toolkit;
             drop(container);
@@ -4996,7 +4996,7 @@ impl Shell {
 
     pub fn set_theme(
         &mut self,
-        theme: cosmic::Theme,
+        theme: Lingmo::Theme,
         xdg_activation_state: &XdgActivationState,
         workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
     ) {
@@ -5005,7 +5005,7 @@ impl Shell {
         self.workspaces.set_theme(theme.clone());
     }
 
-    pub fn theme(&self) -> &cosmic::Theme {
+    pub fn theme(&self) -> &Lingmo::Theme {
         &self.theme
     }
 
@@ -5089,7 +5089,7 @@ impl Shell {
         output_presentation_feedback
     }
 
-    pub fn mapped(&self) -> impl Iterator<Item = &CosmicMapped> {
+    pub fn mapped(&self) -> impl Iterator<Item = &LingmoMapped> {
         self.workspaces.iter().flat_map(|(_, set)| {
             set.sticky_layer
                 .mapped()
@@ -5154,3 +5154,5 @@ pub fn check_grab_preconditions(
 
     Some(start_data)
 }
+
+

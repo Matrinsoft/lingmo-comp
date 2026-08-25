@@ -9,13 +9,13 @@ use std::{
 use crate::{
     backend::render::cursor::{Cursor, load_cursor_env, load_cursor_theme},
     shell::{
-        CosmicSurface, PendingWindow, Shell, focus::target::KeyboardFocusTarget, grabs::ReleaseMode,
+        LingmoSurface, PendingWindow, Shell, focus::target::KeyboardFocusTarget, grabs::ReleaseMode,
     },
     state::State,
     utils::prelude::*,
     wayland::handlers::xdg_activation::ActivationContext,
 };
-use cosmic_comp_config::{EavesdroppingKeyboardMode, XwaylandDescaling};
+use lingmo_comp_config::{EavesdroppingKeyboardMode, XwaylandDescaling};
 use smithay::{
     backend::{
         allocator::Fourcc,
@@ -398,7 +398,7 @@ impl Common {
         serial: Serial,
         time: u32,
     ) {
-        let config = self.config.cosmic_conf.xwayland_eavesdropping.keyboard;
+        let config = self.config.Lingmo_conf.xwayland_eavesdropping.keyboard;
         if config == EavesdroppingKeyboardMode::None {
             return;
         }
@@ -480,7 +480,7 @@ impl Common {
         serial: Serial,
         time: u32,
     ) {
-        if !self.config.cosmic_conf.xwayland_eavesdropping.pointer {
+        if !self.config.Lingmo_conf.xwayland_eavesdropping.pointer {
             return;
         }
 
@@ -635,7 +635,7 @@ impl Common {
     }
 
     pub fn update_xwayland_settings(&mut self) {
-        let new_scale = match self.config.cosmic_conf.descale_xwayland {
+        let new_scale = match self.config.Lingmo_conf.descale_xwayland {
             XwaylandDescaling::Disabled => 1.,
             XwaylandDescaling::Enabled => {
                 let shell = self.shell.read();
@@ -709,7 +709,7 @@ impl Common {
             if xwayland
                 .xrdb_thread
                 .send((
-                    cosmic::icon_theme::default(),
+                    Lingmo::icon_theme::default(),
                     (new_scale * cursor_size as f64).round() as u32,
                 ))
                 .is_err()
@@ -818,7 +818,7 @@ impl XwmHandler for State {
             pending.fullscreen = fullscreen;
             pending.maximized = maximized;
         } else {
-            let surface = CosmicSurface::from(window);
+            let surface = LingmoSurface::from(window);
             shell.pending_windows.push(PendingWindow {
                 surface,
                 seat,
@@ -1038,7 +1038,7 @@ impl XwmHandler for State {
                 &seat,
                 None,
                 resize_edge.into(),
-                self.common.config.cosmic_conf.edge_snap_threshold,
+                self.common.config.Lingmo_conf.edge_snap_threshold,
                 true,
             ) {
                 std::mem::drop(shell);
@@ -1296,3 +1296,5 @@ impl XwmHandler for State {
         xwayland_state.xwm = None;
     }
 }
+
+

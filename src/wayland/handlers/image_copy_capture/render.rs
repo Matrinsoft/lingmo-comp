@@ -39,11 +39,11 @@ use crate::{
     backend::render::{
         CursorMode, ElementFilter, RendererRef,
         cursor::{self, CursorRenderElement},
-        element::{AsGlowRenderer, CosmicElement, DamageElement},
+        element::{AsGlowRenderer, LingmoElement, DamageElement},
         render_workspace,
         wayland::SurfaceRenderElement,
     },
-    shell::{CosmicMappedRenderElement, CosmicSurface, WorkspaceRenderElement},
+    shell::{LingmoMappedRenderElement, LingmoSurface, WorkspaceRenderElement},
     state::{Common, KmsNodes, State},
     utils::prelude::{PointExt, PointGlobalExt, RectExt, RectLocalExt, SeatExt},
     wayland::{
@@ -349,8 +349,8 @@ pub fn render_workspace_to_buffer(
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicElement<R>: RenderElement<R>,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
+        LingmoElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
         WorkspaceRenderElement<R>: RenderElement<R>,
     {
         let cursor_mode = if draw_cursor {
@@ -543,7 +543,7 @@ pub fn render_window_to_buffer(
     state: &mut State,
     session: &SessionRef,
     frame: Frame,
-    toplevel: &CosmicSurface,
+    toplevel: &LingmoSurface,
 ) {
     if !toplevel.alive() {
         toplevel.clone().remove_session(session);
@@ -578,7 +578,7 @@ pub fn render_window_to_buffer(
         additional_damage: Vec<Rectangle<i32, BufferCoords>>,
         draw_cursor: bool,
         common: &mut Common,
-        toplevel: &CosmicSurface,
+        toplevel: &LingmoSurface,
         geometry: Rectangle<i32, Logical>,
     ) -> Result<
         (
@@ -590,8 +590,8 @@ pub fn render_window_to_buffer(
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicElement<R>: RenderElement<R>,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
+        LingmoElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
     {
         let mut elements: Vec<_> = additional_damage
             .into_iter()
@@ -655,7 +655,7 @@ pub fn render_window_to_buffer(
                 );
             }
 
-            // TODO cosmic-workspaces wants to omit, but metadata cursor capture in portal should
+            // TODO Lingmo-workspaces wants to omit, but metadata cursor capture in portal should
             // still include dnd surface in window capture buffer?
             if draw_cursor && let Some(dnd_icon) = get_dnd_icon(&seat) {
                 cursor::draw_dnd_icon(
@@ -845,8 +845,8 @@ pub fn render_cursor_to_buffer(
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicElement<R>: RenderElement<R>,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
+        LingmoElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
     {
         let mut elements: Vec<_> = additional_damage
             .into_iter()
@@ -965,3 +965,4 @@ pub fn render_cursor_to_buffer(
         );
     }
 }
+

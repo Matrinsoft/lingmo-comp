@@ -1,4 +1,4 @@
-﻿#![allow(
+#![allow(
     clippy::too_many_arguments,
     clippy::type_complexity,
     clippy::len_without_is_empty,
@@ -79,7 +79,7 @@ impl State {
             if let Err(err) =
                 session::run_socket(self.common.event_loop_handle.clone(), &self.common)
             {
-                warn!(?err, "Failed to setup cosmic-session communication");
+                warn!(?err, "Failed to setup lingmo-session communication");
             }
 
             self.common.kiosk_child = if let Some(mut command) = self.kiosk_command.take() {
@@ -131,7 +131,7 @@ pub fn run(hooks: crate::hooks::Hooks) -> Result<(), Box<dyn Error>> {
             }
             Some("--version") | Some("-V") => {
                 println!(
-                    "cosmic-comp {} (git commit {})",
+                    "lingmo-comp {} (git commit {})",
                     env!("CARGO_PKG_VERSION"),
                     git_hash
                 );
@@ -147,7 +147,7 @@ pub fn run(hooks: crate::hooks::Hooks) -> Result<(), Box<dyn Error>> {
 
     // setup logger
     logger::init_logger()?;
-    info!("Cosmic starting up!");
+    info!("Lingmo starting up!");
 
     profiling::register_thread!("Main Thread");
     #[cfg(feature = "profile-with-tracy")]
@@ -162,7 +162,7 @@ pub fn run(hooks: crate::hooks::Hooks) -> Result<(), Box<dyn Error>> {
 
     // init hook globals
     hooks::HOOKS.set(hooks)
-        .expect("Hooks global has already been initialized. Running multiple instances of COSMIC in one process is not supported.");
+        .expect("Hooks global has already been initialized. Running multiple instances of Lingmo in one process is not supported.");
 
     // init event loop
     let mut event_loop = EventLoop::try_new().with_context(|| "Failed to initialize event loop")?;
@@ -279,17 +279,17 @@ pub fn run(hooks: crate::hooks::Hooks) -> Result<(), Box<dyn Error>> {
 
 fn print_help(version: &str, git_rev: &str) {
     println!(
-        r#"cosmic-comp {version} (git commit {git_rev})
+        r#"lingmo-comp {version} (git commit {git_rev})
 System76 <info@system76.com>
 
-Designed for the COSMIC鈩?desktop environment, cosmic-comp is a Wayland Compositor.
+Designed for the Lingmo�?desktop environment, lingmo-comp is a Wayland Compositor.
 
 Project home page: https://github.com/Matrinsoft/lingmo-comp
 
 Options:
   -h, --help          Show this message
   --no-xwayland       Run without Xwayland
-  -v, --version       Show the version of cosmic-comp"#
+  -v, --version       Show the version of lingmo-comp"#
     );
 }
 
@@ -365,3 +365,4 @@ fn refresh(state: &mut State) {
     KeyboardLayoutState::refresh(state);
     state.last_refresh = LastRefresh::At(Instant::now());
 }
+

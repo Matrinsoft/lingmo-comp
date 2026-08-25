@@ -2,18 +2,18 @@
 authors = ["Victoria Brekenfeld"]
 edition = "2024"
 license = "GPL-3.0-only"
-name = "cosmic-comp"
+name = "lingmo-comp"
 version = "1.0.0"
 rust-version = "1.93"
 
 [workspace]
-members = ["cosmic-comp-config"]
+members = ["lingmo-comp-config"]
 
 [dependencies]
 anyhow = { version = "1.0.102", features = ["backtrace"] }
 bitflags = "2.11.0"
 calloop = { version = "0.14.4", features = ["executor", "stream"] }
-cosmic-comp-config = { path = "cosmic-comp-config", features = [
+lingmo-comp-config = { path = "lingmo-comp-config", features = [
     "libdisplay-info",
     "output",
 ] }

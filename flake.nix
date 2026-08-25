@@ -1,5 +1,5 @@
 {
-  description = "Compositor for the COSMIC desktop environment";
+  description = "Compositor for the Lingmo desktop environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -43,7 +43,7 @@
           rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
           craneLib = (crane.mkLib pkgs).overrideToolchain rust-toolchain;
           craneArgs = {
-            pname = "cosmic-comp";
+            pname = "lingmo-comp";
             version = self.rev or "dirty";
 
             src = nix-filter.lib.filter {
@@ -54,7 +54,7 @@
                 ./Cargo.toml
                 ./Cargo.lock
                 ./resources
-                ./cosmic-comp-config
+                ./lingmo-comp-config
               ];
             };
 
@@ -92,16 +92,16 @@
           };
 
           cargoArtifacts = craneLib.buildDepsOnly craneArgs;
-          cosmic-comp = craneLib.buildPackage (craneArgs // { inherit cargoArtifacts; });
+          lingmo-comp = craneLib.buildPackage (craneArgs // { inherit cargoArtifacts; });
         in
         {
-          apps.cosmic-comp = {
+          apps.lingmo-comp = {
             type = "app";
             program = lib.getExe self'.packages.default;
           };
 
-          checks.cosmic-comp = cosmic-comp;
-          packages.default = cosmic-comp;
+          checks.lingmo-comp = lingmo-comp;
+          packages.default = lingmo-comp;
 
           devShells.default = craneLib.devShell {
             LD_LIBRARY_PATH = lib.makeLibraryPath (
@@ -109,7 +109,7 @@
             );
 
             # include build inputs
-            inputsFrom = [ cosmic-comp ];
+            inputsFrom = [ lingmo-comp ];
           };
         };
     };

@@ -27,9 +27,9 @@ use crate::{
     },
     config::ScreenFilter,
     shell::{
-        CosmicMappedRenderElement, OutputId, OverviewMode, SeatExt, Trigger, WorkspaceDelta,
+        LingmoMappedRenderElement, OutputId, OverviewMode, SeatExt, Trigger, WorkspaceDelta,
         WorkspaceRenderElement,
-        element::CosmicMappedKey,
+        element::LingmoMappedKey,
         focus::{FocusTarget, Stage, render_input_order, target::WindowGroup},
         grabs::{SeatMenuGrabState, SeatMoveGrabState},
         layout::tiling::ANIMATION_DURATION,
@@ -49,7 +49,7 @@ use crate::{
     },
 };
 
-use cosmic::Theme;
+use Lingmo::Theme;
 use smithay::{
     backend::{
         allocator::Fourcc,
@@ -92,7 +92,7 @@ pub mod cursor;
 pub mod element;
 pub mod shadow;
 pub mod wayland;
-use self::element::{AsGlowRenderer, CosmicElement};
+use self::element::{AsGlowRenderer, LingmoElement};
 
 use super::kms::Timings;
 
@@ -149,7 +149,7 @@ pub enum Usage {
 pub enum Key {
     Static(WeakId),
     Group(Weak<()>),
-    Window(Usage, CosmicMappedKey),
+    Window(Usage, LingmoMappedKey),
 }
 impl std::hash::Hash for Key {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -487,11 +487,11 @@ pub fn cursor_elements<'a, 'frame, R>(
     mode: CursorMode,
     exclude_dnd_icon: bool,
     scanout_node: Option<DrmNode>,
-    push: &mut dyn FnMut(CosmicElement<R>),
+    push: &mut dyn FnMut(LingmoElement<R>),
 ) where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     let scale = output.current_scale().fractional_scale();
     let (focal_point, zoom_scale) = zoom_state
@@ -521,7 +521,7 @@ pub fn cursor_elements<'a, 'frame, R>(
                 blur_strength,
                 mode != CursorMode::NotDefault,
                 &mut |elem, hotspot| {
-                    push(CosmicElement::Cursor(RescaleRenderElement::from_element(
+                    push(LingmoElement::Cursor(RescaleRenderElement::from_element(
                         RelocateRenderElement::from_element(
                             elem,
                             Point::from((-hotspot.x, -hotspot.y)),
@@ -544,11 +544,11 @@ pub fn cursor_elements<'a, 'frame, R>(
                 (location + dnd_icon.offset.to_f64()).to_i32_round(),
                 scale,
                 blur_strength,
-                &mut |elem| push(CosmicElement::Dnd(elem)),
+                &mut |elem| push(LingmoElement::Dnd(elem)),
             );
         }
 
-        let theme = theme.cosmic();
+        let theme = theme.Lingmo();
         if let Some(grab_state) = seat
             .user_data()
             .get::<SeatMoveGrabState>()
@@ -558,7 +558,7 @@ pub fn cursor_elements<'a, 'frame, R>(
             .as_ref()
         {
             grab_state.render(renderer, output, theme, scanout_node, &mut |elem| {
-                push(CosmicElement::MoveGrab(RescaleRenderElement::from_element(
+                push(LingmoElement::MoveGrab(RescaleRenderElement::from_element(
                     elem,
                     focal_point
                         .as_logical()
@@ -579,7 +579,7 @@ pub fn cursor_elements<'a, 'frame, R>(
         {
             let should_scale = !grab_state.is_in_screen_space();
             grab_state.render(renderer, output, &mut |elem| {
-                push(CosmicElement::MoveGrab(RescaleRenderElement::from_element(
+                push(LingmoElement::MoveGrab(RescaleRenderElement::from_element(
                     elem.into(),
                     if should_scale {
                         focal_point
@@ -615,11 +615,11 @@ pub fn output_elements<R>(
     cursor_mode: CursorMode,
     _fps: Option<(&EguiState, &Timings)>,
     scanout_node: Option<DrmNode>,
-) -> Result<Vec<CosmicElement<R>>, RenderError<R::Error>>
+) -> Result<Vec<LingmoElement<R>>, RenderError<R::Error>>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
     #[cfg(feature = "debug")]
@@ -714,14 +714,14 @@ pub fn workspace_elements<R>(
     cursor_mode: CursorMode,
     element_filter: ElementFilter,
     scanout_node: Option<DrmNode>,
-) -> Result<Vec<CosmicElement<R>>, RenderError<R::Error>>
+) -> Result<Vec<LingmoElement<R>>, RenderError<R::Error>>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
-    let mut elements = Vec::<CosmicElement<R>>::new();
+    let mut elements = Vec::<LingmoElement<R>>::new();
 
     let shell_ref = shell.read();
     let seats = shell_ref.seats.iter().cloned().collect::<Vec<_>>();
@@ -729,7 +729,7 @@ where
         return Ok(Vec::new());
     }
     let theme = shell_ref.theme().clone();
-    let blur_strength = (theme.cosmic().frosted as u8 + 1) as usize;
+    let blur_strength = (theme.Lingmo().frosted as u8 + 1) as usize;
     let scale = output.current_scale().fractional_scale();
     // we don't want to hold a shell lock across `cursor_elements`,
     // that is prone to deadlock with the main-thread on some grabs.
@@ -786,7 +786,7 @@ where
         .ok_or(OutputNoMode)?;
     let is_active_space = workspace.output == focused_output;
     let active_hint = if shell.active_hint {
-        theme.cosmic().active_hint as u8
+        theme.Lingmo().active_hint as u8
     } else {
         0
     };
@@ -824,7 +824,7 @@ where
         match stage {
             Stage::ZoomUI => {
                 ZoomState::render(renderer, output, &mut |elem| {
-                    elements.push(CosmicElement::Zoom(elem))
+                    elements.push(LingmoElement::Zoom(elem))
                 });
             }
             Stage::SessionLock(lock_surface) => {
@@ -1009,7 +1009,7 @@ where
                     resize_indicator.clone(),
                     active_hint,
                     alpha,
-                    theme.cosmic(),
+                    theme.Lingmo(),
                     scanout_node,
                     &mut |elem| {
                         if let Some(elem) = crop_to_output(elem.into()) {
@@ -1024,11 +1024,11 @@ where
                     last_active_seat,
                     !move_active && is_active_space,
                     overview.clone(),
-                    theme.cosmic(),
+                    theme.Lingmo(),
                     scanout_node,
                     &mut |elem| {
                         if let Some(elem) = crop_to_output(elem) {
-                            elements.push(CosmicElement::Workspace(
+                            elements.push(LingmoElement::Workspace(
                                 RelocateRenderElement::from_element(
                                     elem,
                                     offset.to_physical_precise_round(scale),
@@ -1047,11 +1047,11 @@ where
                     overview.clone(),
                     resize_indicator.clone(),
                     active_hint,
-                    theme.cosmic(),
+                    theme.Lingmo(),
                     scanout_node,
                     &mut |elem| {
                         if let Some(elem) = crop_to_output(elem) {
-                            elements.push(CosmicElement::Workspace(
+                            elements.push(LingmoElement::Workspace(
                                 RelocateRenderElement::from_element(
                                     elem,
                                     offset.to_physical_precise_round(scale),
@@ -1244,8 +1244,8 @@ pub fn render_output<'d, R>(
 where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicElement<R>: RenderElement<R>,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
     let shell_ref = shell.read();
@@ -1384,7 +1384,7 @@ where
                     ConstrainAlign::CENTER,
                     1.0,
                 )
-                .map(CosmicElement::Postprocess)
+                .map(LingmoElement::Postprocess)
                 .collect::<Vec<_>>()
             };
 
@@ -1549,21 +1549,21 @@ pub fn render_workspace<'d, R>(
     current: (WorkspaceHandle, usize),
     cursor_mode: CursorMode,
     element_filter: ElementFilter,
-) -> Result<(RenderOutputResult<'d>, Vec<CosmicElement<R>>), RenderError<R::Error>>
+) -> Result<(RenderOutputResult<'d>, Vec<LingmoElement<R>>), RenderError<R::Error>>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    CosmicElement<R>: RenderElement<R>,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
-    let mut elements: Vec<CosmicElement<R>> = if let Some(additional_damage) = additional_damage {
+    let mut elements: Vec<LingmoElement<R>> = if let Some(additional_damage) = additional_damage {
         let output_geo = output.geometry().to_local(output).as_logical();
         additional_damage
             .into_iter()
             .filter_map(|rect| rect.intersection(output_geo))
             .map(DamageElement::new)
-            .map(CosmicElement::from)
+            .map(LingmoElement::from)
             .collect()
     } else {
         Vec::new()
@@ -1593,3 +1593,4 @@ where
 
     res.map(|res| (res, elements))
 }
+

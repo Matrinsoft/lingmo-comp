@@ -12,7 +12,7 @@ pub fn inhibit_lid(common: &Common) -> Result<OwnedFd> {
         manager
             .inhibit(
                 HandleLidSwitch,
-                "cosmic-comp",
+                "lingmo-comp",
                 "External output connected",
                 "block",
             )
@@ -32,3 +32,4 @@ pub fn lid_closed(common: &Common) -> Result<bool> {
             .context("Failed to talk to logind")
     })
 }
+

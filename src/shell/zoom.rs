@@ -1,14 +1,14 @@
 use std::{sync::Mutex, time::Instant};
 
 use calloop::LoopHandle;
-use cosmic::{
+use Lingmo::{
     Apply,
     iced::{Alignment, Background, Border, Length, alignment::Vertical, widget as iced_widget},
     theme,
     widget::{self, icon::Named},
 };
-use cosmic_comp_config::ZoomMovement;
-use cosmic_config::ConfigSet;
+use lingmo_comp_config::ZoomMovement;
+use Lingmo_config::ConfigSet;
 use keyframe::{ease, functions::Linear};
 use smithay::{
     backend::renderer::ImportMem,
@@ -72,9 +72,9 @@ impl OutputZoomState {
         increment: u32,
         movement: ZoomMovement,
         loop_handle: LoopHandle<'static, State>,
-        mut theme: cosmic::Theme,
+        mut theme: Lingmo::Theme,
     ) -> OutputZoomState {
-        theme.transparent = theme.cosmic().frosted_system_interface;
+        theme.transparent = theme.Lingmo().frosted_system_interface;
         let cursor_position = seat.get_pointer().unwrap().current_location().as_global();
         let focal_point = cursor_position.to_local(output);
         let output_geometry = output.geometry().to_f64();
@@ -190,7 +190,7 @@ impl OutputZoomState {
             scale.fractional_scale().into(),
             1.0,
             self.element
-                .with_theme(|theme| theme.cosmic().radius_s())
+                .with_theme(|theme| theme.Lingmo().radius_s())
                 .map(|x| x.round() as u8),
             push,
             None,
@@ -466,7 +466,7 @@ impl ZoomProgram {
 impl Program for ZoomProgram {
     type Message = ZoomMessage;
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
         widget::row::with_children(vec![
             widget::button::icon(Named::new("list-remove-symbolic").size(16).prefer_svg(true))
                 .on_press(ZoomMessage::Decrease)
@@ -503,15 +503,15 @@ impl Program for ZoomProgram {
         .apply(widget::container)
         .padding(8)
         .class(theme::Container::custom(|theme| {
-            let cosmic = theme.cosmic();
-            let component = &cosmic.background(theme.transparent).component;
+            let Lingmo = theme.Lingmo();
+            let component = &Lingmo.background(theme.transparent).component;
             iced_widget::container::Style {
                 snap: true,
                 icon_color: Some(component.on.into()),
                 text_color: Some(component.on.into()),
                 background: Some(Background::Color(component.base.into())),
                 border: Border {
-                    radius: cosmic.radius_s().into(),
+                    radius: Lingmo.radius_s().into(),
                     width: 1.0,
                     color: component.divider.into(),
                 },
@@ -526,13 +526,13 @@ impl Program for ZoomProgram {
         message: Self::Message,
         loop_handle: &LoopHandle<'static, State>,
         last_seat: Option<&(Seat<State>, Serial)>,
-    ) -> cosmic::Task<Self::Message> {
+    ) -> Lingmo::Task<Self::Message> {
         match message {
             ZoomMessage::Decrease => {
                 let _ = loop_handle.insert_idle(|state| {
                     let seat = state.common.shell.read().seats.last_active().clone();
                     let increment =
-                        state.common.config.cosmic_conf.accessibility_zoom.increment as f64 / 100.0;
+                        state.common.config.Lingmo_conf.accessibility_zoom.increment as f64 / 100.0;
 
                     state.update_zoom(&seat, -increment, true);
                 });
@@ -541,7 +541,7 @@ impl Program for ZoomProgram {
                 let _ = loop_handle.insert_idle(|state| {
                     let seat = state.common.shell.read().seats.last_active().clone();
                     let increment =
-                        state.common.config.cosmic_conf.accessibility_zoom.increment as f64 / 100.0;
+                        state.common.config.Lingmo_conf.accessibility_zoom.increment as f64 / 100.0;
 
                     state.update_zoom(&seat, increment, true);
                 });
@@ -581,7 +581,7 @@ impl Program for ZoomProgram {
                                 std::mem::drop(output_state_ref);
 
                                 let mut theme = state.common.theme.clone();
-                                theme.transparent = theme.cosmic().frosted_system_interface;
+                                theme.transparent = theme.Lingmo().frosted_system_interface;
                                 let grab = MenuGrab::new(
                                     start_data,
                                     &seat,
@@ -593,16 +593,16 @@ impl Program for ZoomProgram {
                                                     state
                                                         .common
                                                         .config
-                                                        .cosmic_conf
+                                                        .Lingmo_conf
                                                         .accessibility_zoom
                                                         .view_moves = ZoomMovement::Continuously;
                                                     if let Err(err) =
-                                                        state.common.config.cosmic_helper.set(
+                                                        state.common.config.Lingmo_helper.set(
                                                             "accessibility_zoom",
                                                             state
                                                                 .common
                                                                 .config
-                                                                .cosmic_conf
+                                                                .Lingmo_conf
                                                                 .accessibility_zoom,
                                                         )
                                                     {
@@ -623,16 +623,16 @@ impl Program for ZoomProgram {
                                                     state
                                                         .common
                                                         .config
-                                                        .cosmic_conf
+                                                        .Lingmo_conf
                                                         .accessibility_zoom
                                                         .view_moves = ZoomMovement::OnEdge;
                                                     if let Err(err) =
-                                                        state.common.config.cosmic_helper.set(
+                                                        state.common.config.Lingmo_helper.set(
                                                             "accessibility_zoom",
                                                             state
                                                                 .common
                                                                 .config
-                                                                .cosmic_conf
+                                                                .Lingmo_conf
                                                                 .accessibility_zoom,
                                                         )
                                                     {
@@ -653,16 +653,16 @@ impl Program for ZoomProgram {
                                                     state
                                                         .common
                                                         .config
-                                                        .cosmic_conf
+                                                        .Lingmo_conf
                                                         .accessibility_zoom
                                                         .view_moves = ZoomMovement::Centered;
                                                     if let Err(err) =
-                                                        state.common.config.cosmic_helper.set(
+                                                        state.common.config.Lingmo_helper.set(
                                                             "accessibility_zoom",
                                                             state
                                                                 .common
                                                                 .config
-                                                                .cosmic_conf
+                                                                .Lingmo_conf
                                                                 .accessibility_zoom,
                                                         )
                                                     {
@@ -680,7 +680,7 @@ impl Program for ZoomProgram {
                                         Item::new(crate::fl!("a11y-zoom-settings"), |handle| {
                                             let _ = handle.insert_idle(move |state| {
                                                 state.spawn_command(
-                                                    "cosmic-settings accessibility-magnifier"
+                                                    "Lingmo-settings accessibility-magnifier"
                                                         .into(),
                                                 );
                                             });
@@ -748,7 +748,7 @@ impl Program for ZoomProgram {
                                 std::mem::drop(output_state_ref);
 
                                 let mut theme = state.common.theme.clone();
-                                theme.transparent = theme.cosmic().frosted_system_interface;
+                                theme.transparent = theme.Lingmo().frosted_system_interface;
                                 let grab = MenuGrab::new(
                                     start_data,
                                     &seat,
@@ -758,17 +758,17 @@ impl Program for ZoomProgram {
                                                 state
                                                     .common
                                                     .config
-                                                    .cosmic_conf
+                                                    .Lingmo_conf
                                                     .accessibility_zoom
                                                     .increment = val;
                                                 state.common.update_config();
                                                 if let Err(err) =
-                                                    state.common.config.cosmic_helper.set(
+                                                    state.common.config.Lingmo_helper.set(
                                                         "accessibility_zoom",
                                                         state
                                                             .common
                                                             .config
-                                                            .cosmic_conf
+                                                            .Lingmo_conf
                                                             .accessibility_zoom,
                                                     )
                                                 {
@@ -805,12 +805,12 @@ impl Program for ZoomProgram {
                     state
                         .common
                         .config
-                        .cosmic_conf
+                        .Lingmo_conf
                         .accessibility_zoom
                         .show_overlay = false;
-                    if let Err(err) = state.common.config.cosmic_helper.set(
+                    if let Err(err) = state.common.config.Lingmo_helper.set(
                         "accessibility_zoom",
-                        state.common.config.cosmic_conf.accessibility_zoom,
+                        state.common.config.Lingmo_conf.accessibility_zoom,
                     ) {
                         error!(?err, "Failed to update zoom config");
                     }
@@ -839,7 +839,7 @@ impl Program for ZoomProgram {
                 }
             }
         }
-        cosmic::Task::none()
+        Lingmo::Task::none()
     }
 }
 
@@ -1097,3 +1097,5 @@ impl IsAlive for ZoomFocusTarget {
         }
     }
 }
+
+

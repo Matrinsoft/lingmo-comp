@@ -14,7 +14,7 @@ use smithay::{
     },
 };
 
-use crate::shell::{CosmicSurface, Workspace};
+use crate::shell::{LingmoSurface, Workspace};
 
 type ImageCopySessionsData = RefCell<ImageCopySessions>;
 type PendingImageCopyBuffers = Mutex<Vec<(SessionRef, Frame)>>;
@@ -181,7 +181,7 @@ impl SessionHolder for Workspace {
     }
 }
 
-impl SessionHolder for CosmicSurface {
+impl SessionHolder for LingmoSurface {
     fn add_session(&mut self, session: Session) {
         self.user_data()
             .insert_if_missing(ImageCopySessionsData::default);
@@ -247,3 +247,4 @@ impl SessionHolder for CosmicSurface {
             })
     }
 }
+

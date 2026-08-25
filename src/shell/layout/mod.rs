@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use cosmic_settings_config::{shortcuts::action::Orientation, window_rules::ApplicationException};
+use Lingmo_settings_config::{shortcuts::action::Orientation, window_rules::ApplicationException};
 use regex::{Regex, RegexSet};
 use smithay::{
     desktop::WindowSurface,
@@ -9,12 +9,12 @@ use smithay::{
 };
 use tracing::warn;
 
-use super::CosmicSurface;
+use super::LingmoSurface;
 
 pub mod floating;
 pub mod tiling;
 
-pub fn is_dialog(window: &CosmicSurface) -> bool {
+pub fn is_dialog(window: &LingmoSurface) -> bool {
     // Check "window type"
     match window.0.underlying_surface() {
         WindowSurface::Wayland(toplevel) => {
@@ -89,7 +89,7 @@ impl TilingExceptions {
     }
 }
 
-pub fn has_floating_exception(exceptions: &TilingExceptions, window: &CosmicSurface) -> bool {
+pub fn has_floating_exception(exceptions: &TilingExceptions, window: &LingmoSurface) -> bool {
     // else take a look at our exceptions
     let appid_matches = exceptions.app_ids.matches(&window.app_id());
     let title_matches = exceptions.titles.matches(&window.title());
@@ -101,3 +101,4 @@ pub fn has_floating_exception(exceptions: &TilingExceptions, window: &CosmicSurf
 
     false
 }
+

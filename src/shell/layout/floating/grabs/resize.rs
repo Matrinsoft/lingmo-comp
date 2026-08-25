@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use crate::{
     backend::render::cursor::CursorState,
     shell::{
-        element::CosmicMapped,
+        element::LingmoMapped,
         focus::target::PointerFocusTarget,
         grabs::{GrabStartData, ReleaseMode, ResizeEdge},
     },
@@ -56,7 +56,7 @@ pub enum ResizeState {
 pub struct ResizeSurfaceGrab {
     start_data: GrabStartData,
     seat: Seat<State>,
-    window: CosmicMapped,
+    window: LingmoMapped,
     edges: ResizeEdge,
     output: Output,
     edge_snap_threshold: u32,
@@ -407,7 +407,7 @@ impl ResizeGrabMarker {
 impl ResizeSurfaceGrab {
     pub fn new(
         start_data: GrabStartData,
-        mapped: CosmicMapped,
+        mapped: LingmoMapped,
         edges: ResizeEdge,
         output: Output,
         edge_snap_threshold: u32,
@@ -458,7 +458,7 @@ impl ResizeSurfaceGrab {
         }
     }
 
-    pub fn apply_resize_to_location(window: CosmicMapped, shell: &mut Shell) {
+    pub fn apply_resize_to_location(window: LingmoMapped, shell: &mut Shell) {
         let mut resize_state = window.resize_state.lock().unwrap();
 
         if resize_state.is_none() {
@@ -580,3 +580,4 @@ impl Drop for ResizeSurfaceGrab {
         cursor_state.lock().unwrap().unset_shape();
     }
 }
+

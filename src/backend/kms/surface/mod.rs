@@ -4,7 +4,7 @@ use crate::{
     backend::render::{
         CLEAR_COLOR, CursorMode, GlMultiError, GlMultiRenderer, PostprocessOutputConfig,
         PostprocessShader, PostprocessState,
-        element::{CosmicElement, DamageElement},
+        element::{LingmoElement, DamageElement},
         init_shaders, output_elements,
     },
     config::ScreenFilter,
@@ -19,7 +19,7 @@ use crate::{
 
 use anyhow::{Context, Result};
 use calloop::channel::Channel;
-use cosmic_comp_config::output::comp::AdaptiveSync;
+use lingmo_comp_config::output::comp::AdaptiveSync;
 use smithay::{
     backend::{
         allocator::{
@@ -641,10 +641,10 @@ fn surface_thread(
                 }
             }
             Event::Msg(ThreadCommand::AllowFrameFlags(flag, mut flags)) => {
-                if crate::utils::env::bool_var("COSMIC_DISABLE_DIRECT_SCANOUT").unwrap_or(false) {
+                if crate::utils::env::bool_var("Lingmo_DISABLE_DIRECT_SCANOUT").unwrap_or(false) {
                     flags.remove(FrameFlags::ALLOW_SCANOUT);
                 }
-                if crate::utils::env::bool_var("COSMIC_DISABLE_OVERLAY_SCANOUT").unwrap_or(false) {
+                if crate::utils::env::bool_var("Lingmo_DISABLE_OVERLAY_SCANOUT").unwrap_or(false) {
                     flags.remove(FrameFlags::ALLOW_OVERLAY_PLANE_SCANOUT);
                 }
 
@@ -713,9 +713,9 @@ impl SurfaceThreadState {
                 .max(min_min_refresh_interval),
         ));
 
-        if crate::utils::env::bool_var("COSMIC_DISABLE_DIRECT_SCANOUT").unwrap_or(false) {
+        if crate::utils::env::bool_var("Lingmo_DISABLE_DIRECT_SCANOUT").unwrap_or(false) {
             self.frame_flags.remove(FrameFlags::ALLOW_SCANOUT);
-        } else if crate::utils::env::bool_var("COSMIC_DISABLE_OVERLAY_SCANOUT").unwrap_or(false) {
+        } else if crate::utils::env::bool_var("Lingmo_DISABLE_OVERLAY_SCANOUT").unwrap_or(false) {
             self.frame_flags
                 .remove(FrameFlags::ALLOW_OVERLAY_PLANE_SCANOUT);
         }
@@ -1591,7 +1591,7 @@ fn get_surface_dmabuf_feedback(
 
 fn take_screencopy_frames(
     output: &Output,
-    elements: &[CosmicElement<GlMultiRenderer>],
+    elements: &[LingmoElement<GlMultiRenderer>],
     has_cursor_mode_none: &mut bool,
 ) -> Vec<(
     ScreencopySessionRef,
@@ -1660,8 +1660,8 @@ fn send_screencopy_result<'a>(
     output: &Output,
     pre_postprocess_data: &mut PrePostprocessData,
     tx: &std::sync::mpsc::Sender<PendingImageCopyData>,
-    frame_result: &RenderFrameResult<GbmBuffer, GbmFramebuffer, CosmicElement<GlMultiRenderer<'a>>>,
-    elements: &[CosmicElement<GlMultiRenderer<'a>>],
+    frame_result: &RenderFrameResult<GbmBuffer, GbmFramebuffer, LingmoElement<GlMultiRenderer<'a>>>,
+    elements: &[LingmoElement<GlMultiRenderer<'a>>],
     (session, frame, res): (
         &ScreencopySessionRef,
         ScreencopyFrame,
@@ -1723,7 +1723,7 @@ fn send_screencopy_result<'a>(
         let filter = (!session.draw_cursor())
             .then(|| {
                 elements.iter().filter_map(|elem| {
-                    if let CosmicElement::Cursor(_) = elem {
+                    if let LingmoElement::Cursor(_) = elem {
                         Some(elem.id().clone())
                     } else {
                         None
@@ -1862,7 +1862,7 @@ fn postprocess_elements<'a>(
     pre_postprocess_data: &PrePostprocessData,
     postprocess_state: &PostprocessState,
     screen_filter: &ScreenFilter,
-) -> Vec<CosmicElement<GlMultiRenderer<'a>>> {
+) -> Vec<LingmoElement<GlMultiRenderer<'a>>> {
     let postprocess_texture_shader = Borrow::<GlesRenderer>::borrow(renderer.as_ref())
         .egl_context()
         .user_data()
@@ -1954,6 +1954,8 @@ fn postprocess_elements<'a>(
         ConstrainAlign::CENTER,
         postprocess_state.output_config.fractional_scale,
     )
-    .map(CosmicElement::<GlMultiRenderer>::Postprocess)
+    .map(LingmoElement::<GlMultiRenderer>::Postprocess)
     .collect::<Vec<_>>()
 }
+
+

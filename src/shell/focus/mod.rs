@@ -1,5 +1,5 @@
 use crate::{
-    shell::{CosmicSurface, MinimizedWindow, Shell, Trigger, element::CosmicMapped},
+    shell::{LingmoSurface, MinimizedWindow, Shell, Trigger, element::LingmoMapped},
     state::{Common, State},
     utils::prelude::*,
     wayland::handlers::{xdg_shell::PopupGrabData, xwayland_keyboard_grab::XWaylandGrabSeatData},
@@ -32,29 +32,29 @@ pub mod target;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FocusTarget {
-    Window(CosmicMapped),
-    Fullscreen(CosmicSurface),
+    Window(LingmoMapped),
+    Fullscreen(LingmoSurface),
 }
 
-impl PartialEq<CosmicMapped> for FocusTarget {
-    fn eq(&self, other: &CosmicMapped) -> bool {
+impl PartialEq<LingmoMapped> for FocusTarget {
+    fn eq(&self, other: &LingmoMapped) -> bool {
         matches!(self, FocusTarget::Window(mapped) if mapped == other)
     }
 }
 
-impl PartialEq<CosmicSurface> for FocusTarget {
-    fn eq(&self, other: &CosmicSurface) -> bool {
+impl PartialEq<LingmoSurface> for FocusTarget {
+    fn eq(&self, other: &LingmoSurface) -> bool {
         matches!(self, FocusTarget::Fullscreen(surface) if surface == other)
     }
 }
 
-impl indexmap::Equivalent<FocusTarget> for CosmicMapped {
+impl indexmap::Equivalent<FocusTarget> for LingmoMapped {
     fn equivalent(&self, key: &FocusTarget) -> bool {
         key == self
     }
 }
 
-impl indexmap::Equivalent<FocusTarget> for CosmicSurface {
+impl indexmap::Equivalent<FocusTarget> for LingmoSurface {
     fn equivalent(&self, key: &FocusTarget) -> bool {
         key == self
     }
@@ -69,14 +69,14 @@ impl Hash for FocusTarget {
     }
 }
 
-impl From<CosmicMapped> for FocusTarget {
-    fn from(value: CosmicMapped) -> Self {
+impl From<LingmoMapped> for FocusTarget {
+    fn from(value: LingmoMapped) -> Self {
         Self::Window(value)
     }
 }
 
-impl From<CosmicSurface> for FocusTarget {
-    fn from(value: CosmicSurface) -> Self {
+impl From<LingmoSurface> for FocusTarget {
+    fn from(value: LingmoSurface) -> Self {
         Self::Fullscreen(value)
     }
 }
@@ -382,7 +382,7 @@ fn update_focus_state(
         }
 
         if should_update_cursor
-            && state.common.config.cosmic_conf.cursor_follows_focus
+            && state.common.config.Lingmo_conf.cursor_follows_focus
             && target.is_some()
         {
             //need to borrow mutably for surface under
@@ -460,7 +460,7 @@ fn update_focus_state(
     }
 }
 
-fn raise_with_children(floating_layer: &mut FloatingLayout, focused: &CosmicMapped) {
+fn raise_with_children(floating_layer: &mut FloatingLayout, focused: &LingmoMapped) {
     if floating_layer.mapped().any(|m| m == focused) {
         floating_layer.space.raise_element(focused, true);
         for element in floating_layer
@@ -791,3 +791,4 @@ fn exclusive_layer_surface_layer(shell: &Shell) -> Option<Layer> {
     }
     layer
 }
+

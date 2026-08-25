@@ -21,11 +21,11 @@ use crate::{
         },
     },
 };
-use cosmic_comp_config::AppearanceConfig;
-use cosmic_comp_config::workspace::{OutputMatch, PinnedWorkspace};
+use lingmo_comp_config::AppearanceConfig;
+use lingmo_comp_config::workspace::{OutputMatch, PinnedWorkspace};
 
-use cosmic::theme::CosmicTheme;
-use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
+use Lingmo::theme::LingmoTheme;
+use Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::TilingState;
 use id_tree::Tree;
 use indexmap::IndexSet;
 use keyframe::{ease, functions::EaseInOutCubic};
@@ -58,11 +58,11 @@ use std::{
 use wayland_backend::server::ClientId;
 
 use super::{
-    CosmicMappedRenderElement, CosmicSurface, ResizeDirection, ResizeMode,
+    LingmoMappedRenderElement, LingmoSurface, ResizeDirection, ResizeMode,
     element::{
-        CosmicMapped, CosmicMappedKey, MaximizedState, resize_indicator::ResizeIndicator,
-        stack::CosmicStackRenderElement, swap_indicator::SwapIndicator,
-        window::CosmicWindowRenderElement,
+        LingmoMapped, LingmoMappedKey, MaximizedState, resize_indicator::ResizeIndicator,
+        stack::LingmoStackRenderElement, swap_indicator::SwapIndicator,
+        window::LingmoWindowRenderElement,
     },
     focus::{
         FocusStack, FocusStackMut,
@@ -123,27 +123,27 @@ pub struct Workspace {
 #[derive(Debug)]
 pub enum MinimizedWindow {
     Fullscreen {
-        surface: CosmicSurface,
+        surface: LingmoSurface,
         previous: Option<FullscreenRestoreData>,
     },
     Floating {
-        window: CosmicMapped,
+        window: LingmoMapped,
         previous: FloatingRestoreData,
     },
     Tiling {
-        window: CosmicMapped,
+        window: LingmoMapped,
         previous: TilingRestoreData,
     },
 }
 
-impl PartialEq<CosmicMapped> for MinimizedWindow {
-    fn eq(&self, other: &CosmicMapped) -> bool {
+impl PartialEq<LingmoMapped> for MinimizedWindow {
+    fn eq(&self, other: &LingmoMapped) -> bool {
         self.mapped().is_some_and(|m| m == other)
     }
 }
 
 impl MinimizedWindow {
-    pub fn mapped(&self) -> Option<&CosmicMapped> {
+    pub fn mapped(&self) -> Option<&LingmoMapped> {
         match self {
             MinimizedWindow::Floating { window, .. } | MinimizedWindow::Tiling { window, .. } => {
                 Some(window)
@@ -152,7 +152,7 @@ impl MinimizedWindow {
         }
     }
 
-    pub fn mapped_mut(&mut self) -> Option<&mut CosmicMapped> {
+    pub fn mapped_mut(&mut self) -> Option<&mut LingmoMapped> {
         match self {
             MinimizedWindow::Floating { window, .. } | MinimizedWindow::Tiling { window, .. } => {
                 Some(window)
@@ -161,7 +161,7 @@ impl MinimizedWindow {
         }
     }
 
-    pub fn active_window(&self) -> CosmicSurface {
+    pub fn active_window(&self) -> LingmoSurface {
         match self {
             MinimizedWindow::Floating { window, .. } | MinimizedWindow::Tiling { window, .. } => {
                 window.active_window()
@@ -170,11 +170,11 @@ impl MinimizedWindow {
         }
     }
 
-    pub fn windows(&self) -> impl Iterator<Item = CosmicSurface> + '_ {
+    pub fn windows(&self) -> impl Iterator<Item = LingmoSurface> + '_ {
         match self {
             MinimizedWindow::Floating { window, .. } | MinimizedWindow::Tiling { window, .. } => {
                 Box::new(window.windows().map(|(s, _)| s))
-                    as Box<dyn Iterator<Item = CosmicSurface>>
+                    as Box<dyn Iterator<Item = LingmoSurface>>
             }
             MinimizedWindow::Fullscreen { surface, .. } => {
                 Box::new(std::iter::once(surface.clone())) as _
@@ -210,7 +210,7 @@ impl MinimizedWindow {
 
 #[derive(Debug, Clone)]
 pub struct FullscreenSurface {
-    pub surface: CosmicSurface,
+    pub surface: LingmoSurface,
     pub previous_state: Option<FullscreenRestoreState>,
     pub previous_geometry: Option<Rectangle<i32, Local>>,
     start_at: Option<Instant>,
@@ -330,7 +330,7 @@ pub struct TilingRestoreData {
 
 #[derive(Debug, Clone)]
 pub struct StackRestoreData {
-    pub stack: CosmicMappedKey,
+    pub stack: LingmoMappedKey,
     pub idx: usize,
 }
 
@@ -385,7 +385,7 @@ impl Workspace {
         handle: WorkspaceHandle,
         output: Output,
         tiling_enabled: bool,
-        theme: cosmic::Theme,
+        theme: Lingmo::Theme,
         appearance: AppearanceConfig,
     ) -> Workspace {
         let tiling_layer = TilingLayout::new(theme.clone(), appearance, &output);
@@ -419,7 +419,7 @@ impl Workspace {
         pinned: &PinnedWorkspace,
         handle: WorkspaceHandle,
         output: Output,
-        theme: cosmic::Theme,
+        theme: Lingmo::Theme,
         appearance: AppearanceConfig,
     ) -> Self {
         let tiling_layer = TilingLayout::new(theme.clone(), appearance, &output);
@@ -457,7 +457,7 @@ impl Workspace {
         if self.pinned {
             debug_assert!(self.id.is_some());
             Some(PinnedWorkspace {
-                output: cosmic_comp_config::workspace::OutputMatch {
+                output: lingmo_comp_config::workspace::OutputMatch {
                     name: output.name,
                     edid: output.edid,
                 },
@@ -502,7 +502,7 @@ impl Workspace {
     /// cleans up any window that is not alive anymore
     pub fn refresh_focus_stack(&mut self) {
         for (seat, stack) in self.focus_stack.0.iter_mut() {
-            let fullscreen_surfaces: Vec<&CosmicSurface> = self
+            let fullscreen_surfaces: Vec<&LingmoSurface> = self
                 .fullscreen_surfaces
                 .iter()
                 .filter(|f| f.alive() && f.ended_at.is_none())
@@ -638,7 +638,7 @@ impl Workspace {
             .any(|i| output_matches(i, output, disambiguate))
     }
 
-    pub fn unmap_element(&mut self, mapped: &CosmicMapped) -> Option<WorkspaceRestoreData> {
+    pub fn unmap_element(&mut self, mapped: &LingmoMapped) -> Option<WorkspaceRestoreData> {
         let was_maximized = if mapped.maximized_state.lock().unwrap().is_some() {
             // If surface is maximized then unmaximize it, so it is assigned to only one layer
             self.unmaximize_request(mapped)
@@ -684,9 +684,9 @@ impl Workspace {
         None
     }
 
-    pub fn unmap_surface<S>(&mut self, surface: &S) -> Option<(CosmicSurface, WorkspaceRestoreData)>
+    pub fn unmap_surface<S>(&mut self, surface: &S) -> Option<(LingmoSurface, WorkspaceRestoreData)>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         if let Some(idx) = self
             .fullscreen_surfaces
@@ -747,7 +747,7 @@ impl Workspace {
 
     pub fn fullscreen_geometry_for_surface(
         &self,
-        surface: &CosmicSurface,
+        surface: &LingmoSurface,
     ) -> Rectangle<i32, Local> {
         let bbox = surface.bbox().as_local();
 
@@ -769,9 +769,9 @@ impl Workspace {
         self.fullscreen_geometry_for_surface(&fullscreen.surface)
     }
 
-    pub fn element_for_surface<S>(&self, surface: &S) -> Option<&CosmicMapped>
+    pub fn element_for_surface<S>(&self, surface: &S) -> Option<&LingmoMapped>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         self.floating_layer
             .mapped()
@@ -982,7 +982,7 @@ impl Workspace {
             .update_pointer_position(location, overview);
     }
 
-    pub fn element_geometry(&self, elem: &CosmicMapped) -> Option<Rectangle<i32, Local>> {
+    pub fn element_geometry(&self, elem: &LingmoMapped) -> Option<Rectangle<i32, Local>> {
         self.floating_layer
             .element_geometry(elem)
             .or_else(|| self.tiling_layer.element_geometry(elem))
@@ -993,7 +993,7 @@ impl Workspace {
         self.floating_layer.recalculate();
     }
 
-    pub fn unmaximize_request(&mut self, elem: &CosmicMapped) -> Option<Rectangle<i32, Local>> {
+    pub fn unmaximize_request(&mut self, elem: &LingmoMapped) -> Option<Rectangle<i32, Local>> {
         let mut state = elem.maximized_state.lock().unwrap();
         if let Some(state) = state.take() {
             if let Some(minimized) = self.minimized_windows.iter_mut().find(|m| *m == elem) {
@@ -1038,7 +1038,7 @@ impl Workspace {
 
     pub fn minimize<S>(&mut self, surface: &S, to: Rectangle<i32, Local>) -> Option<MinimizedWindow>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         if let Some(idx) = self
             .fullscreen_surfaces
@@ -1145,7 +1145,7 @@ impl Workspace {
         from: Rectangle<i32, Local>,
         seat: &Seat<State>,
     ) -> Option<(
-        CosmicSurface,
+        LingmoSurface,
         Option<FullscreenRestoreState>,
         Option<Rectangle<i32, Local>>,
     )> {
@@ -1248,7 +1248,7 @@ impl Workspace {
 
     pub fn map_fullscreen<'a>(
         &mut self,
-        window: &CosmicSurface,
+        window: &LingmoSurface,
         seat: impl Into<Option<&'a Seat<State>>>,
         restore: Option<FullscreenRestoreState>,
         previous_geometry: Option<Rectangle<i32, Local>>,
@@ -1280,12 +1280,12 @@ impl Workspace {
         &mut self,
         surface: &S,
     ) -> Option<(
-        CosmicSurface,
+        LingmoSurface,
         Option<FullscreenRestoreState>,
         Option<Rectangle<i32, Local>>,
     )>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         let idx = self
             .fullscreen_surfaces
@@ -1305,7 +1305,7 @@ impl Workspace {
         &mut self,
         idx: usize,
     ) -> Option<(
-        CosmicSurface,
+        LingmoSurface,
         Option<FullscreenRestoreState>,
         Option<Rectangle<i32, Local>>,
     )> {
@@ -1357,12 +1357,12 @@ impl Workspace {
         &mut self,
         surface: &S,
     ) -> Option<(
-        CosmicSurface,
+        LingmoSurface,
         Option<FullscreenRestoreState>,
         Option<Rectangle<i32, Local>>,
     )>
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         let idx = self
             .fullscreen_surfaces
@@ -1482,7 +1482,7 @@ impl Workspace {
         }
     }
 
-    pub fn toggle_floating_window(&mut self, seat: &Seat<State>, window: &CosmicMapped) {
+    pub fn toggle_floating_window(&mut self, seat: &Seat<State>, window: &LingmoMapped) {
         if self.tiling_enabled {
             if window.is_maximized(false) {
                 self.unmaximize_request(window);
@@ -1512,7 +1512,7 @@ impl Workspace {
         }
     }
 
-    pub fn mapped(&self) -> impl Iterator<Item = &CosmicMapped> {
+    pub fn mapped(&self) -> impl Iterator<Item = &LingmoMapped> {
         self.floating_layer
             .mapped()
             .chain(self.tiling_layer.mapped().map(|(w, _)| w))
@@ -1538,7 +1538,7 @@ impl Workspace {
 
     pub fn is_floating<S>(&self, surface: &S) -> bool
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         self.floating_layer
             .mapped()
@@ -1554,7 +1554,7 @@ impl Workspace {
 
     pub fn is_tiled<S>(&self, surface: &S) -> bool
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         self.tiling_layer
             .mapped()
@@ -1621,15 +1621,15 @@ impl Workspace {
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
         resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
-        theme: &CosmicTheme,
+        theme: &LingmoTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(WorkspaceRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
-        CosmicWindowRenderElement<R>: RenderElement<R>,
-        CosmicStackRenderElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
+        LingmoWindowRenderElement<R>: RenderElement<R>,
+        LingmoStackRenderElement<R>: RenderElement<R>,
         WorkspaceRenderElement<R>: RenderElement<R>,
     {
         let output_scale = self.output.current_scale().fractional_scale();
@@ -1821,7 +1821,7 @@ impl Workspace {
 
             if let Some(alpha) = alpha {
                 push(
-                    Into::<CosmicMappedRenderElement<R>>::into(BackdropShader::element(
+                    Into::<LingmoMappedRenderElement<R>>::into(BackdropShader::element(
                         renderer,
                         self.backdrop_id.clone(),
                         Rectangle::from_size(self.output.geometry().size.as_local()),
@@ -1846,15 +1846,15 @@ impl Workspace {
         last_active_seat: &Seat<State>,
         render_focus: bool,
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
-        theme: &CosmicTheme,
+        theme: &LingmoTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(WorkspaceRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        CosmicMappedRenderElement<R>: RenderElement<R>,
-        CosmicWindowRenderElement<R>: RenderElement<R>,
-        CosmicStackRenderElement<R>: RenderElement<R>,
+        LingmoMappedRenderElement<R>: RenderElement<R>,
+        LingmoWindowRenderElement<R>: RenderElement<R>,
+        LingmoStackRenderElement<R>: RenderElement<R>,
         WorkspaceRenderElement<R>: RenderElement<R>,
     {
         let output_scale = self.output.current_scale().fractional_scale();
@@ -1988,9 +1988,9 @@ where
 {
     OverrideRedirect(SurfaceRenderElement<R>),
     LowerLayerShell(NamespacedElement<SurfaceRenderElement<R>>),
-    Fullscreen(RescaleRenderElement<CosmicWindowRenderElement<R>>),
-    FullscreenPopup(CosmicWindowRenderElement<R>),
-    Window(CosmicMappedRenderElement<R>),
+    Fullscreen(RescaleRenderElement<LingmoWindowRenderElement<R>>),
+    FullscreenPopup(LingmoWindowRenderElement<R>),
+    Window(LingmoMappedRenderElement<R>),
     Backdrop(TextureRenderElement<GlesTexture>),
 }
 
@@ -2221,24 +2221,24 @@ where
     }
 }
 
-impl<R> From<RescaleRenderElement<CosmicWindowRenderElement<R>>> for WorkspaceRenderElement<R>
+impl<R> From<RescaleRenderElement<LingmoWindowRenderElement<R>>> for WorkspaceRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
-    fn from(elem: RescaleRenderElement<CosmicWindowRenderElement<R>>) -> Self {
+    fn from(elem: RescaleRenderElement<LingmoWindowRenderElement<R>>) -> Self {
         WorkspaceRenderElement::Fullscreen(elem)
     }
 }
 
-impl<R> From<CosmicWindowRenderElement<R>> for WorkspaceRenderElement<R>
+impl<R> From<LingmoWindowRenderElement<R>> for WorkspaceRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
-    fn from(elem: CosmicWindowRenderElement<R>) -> Self {
+    fn from(elem: LingmoWindowRenderElement<R>) -> Self {
         WorkspaceRenderElement::FullscreenPopup(elem)
     }
 }
@@ -2247,7 +2247,7 @@ impl<R> From<SurfaceRenderElement<R>> for WorkspaceRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: SurfaceRenderElement<R>) -> Self {
         WorkspaceRenderElement::OverrideRedirect(elem)
@@ -2258,20 +2258,20 @@ impl<R> From<NamespacedElement<SurfaceRenderElement<R>>> for WorkspaceRenderElem
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: NamespacedElement<SurfaceRenderElement<R>>) -> Self {
         WorkspaceRenderElement::LowerLayerShell(elem)
     }
 }
 
-impl<R> From<CosmicMappedRenderElement<R>> for WorkspaceRenderElement<R>
+impl<R> From<LingmoMappedRenderElement<R>> for WorkspaceRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
-    fn from(elem: CosmicMappedRenderElement<R>) -> Self {
+    fn from(elem: LingmoMappedRenderElement<R>) -> Self {
         WorkspaceRenderElement::Window(elem)
     }
 }
@@ -2280,9 +2280,11 @@ impl<R> From<TextureRenderElement<GlesTexture>> for WorkspaceRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: TextureRenderElement<GlesTexture>) -> Self {
         WorkspaceRenderElement::Backdrop(elem)
     }
 }
+
+

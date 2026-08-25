@@ -1,0 +1,12 @@
+[Unit]
+Description=Lingmo wayland compositor
+BindsTo=lingmo-session.target
+Wants=lingmo-session-pre.target
+After=lingmo-session-pre.target
+Before=lingmo-session.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/lingmo-comp
+Restart=never
+ExecStopPost=/usr/bin/systemctl --user unset-environment DISPLAY WAYLAND_DISPLAY

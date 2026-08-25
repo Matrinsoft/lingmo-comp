@@ -1,5 +1,5 @@
 use calloop::LoopHandle;
-use cosmic_settings_config::shortcuts;
+use Lingmo_settings_config::shortcuts;
 use smithay::{
     input::{
         Seat,
@@ -25,7 +25,7 @@ use smithay::{
 };
 
 use crate::{
-    shell::{CosmicMapped, ManagedLayer},
+    shell::{LingmoMapped, ManagedLayer},
     state::State,
     utils::prelude::Global,
 };
@@ -475,7 +475,7 @@ pub enum MoveGrab {
 impl MoveGrab {
     pub fn new(
         start_data: GrabStartData,
-        window: CosmicMapped,
+        window: LingmoMapped,
         seat: &Seat<State>,
         initial_window_location: Point<i32, Global>,
         cursor_output: Output,
@@ -798,3 +798,4 @@ impl TouchGrab<State> for MoveGrab {
         }
     }
 }
+

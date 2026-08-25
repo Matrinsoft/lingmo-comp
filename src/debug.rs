@@ -101,11 +101,11 @@ pub fn fps_ui(
                 .anchor(egui::Align2::LEFT_TOP, (10.0, 10.0))
                 .show(ctx, |ui| {
                     ui.label(format!(
-                        "cosmic-comp version {}",
+                        "lingmo-comp version {}",
                         std::env!("CARGO_PKG_VERSION")
                     ));
                     if let Some(hash) = std::option_env!("GIT_HASH").and_then(|x| x.get(0..10)) {
-                        ui.label(format!("î˜¥: {hash}"));
+                        ui.label(format!("î˜? {hash}"));
                     }
 
                     if !debug_active {
@@ -349,3 +349,4 @@ fn format_keyboard_focus(focus: Option<KeyboardFocusTarget>) -> String {
         None => "None".to_string(),
     }
 }
+

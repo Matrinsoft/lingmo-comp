@@ -4,7 +4,7 @@ bindir = $(prefix)/bin
 libdir = $(prefix)/lib
 sharedir = $(prefix)/share
 
-BINARY = cosmic-comp
+BINARY = lingmo-comp
 CARGO_TARGET_DIR ?= target
 TARGET = debug
 DEBUG ?= 0
@@ -23,8 +23,8 @@ endif
 
 TARGET_BIN="$(DESTDIR)$(bindir)/$(BINARY)"
 
-KEYBINDINGS_CONF="$(DESTDIR)$(sharedir)/cosmic/com.system76.CosmicSettings.Shortcuts/v1/defaults"
-TILING_EXCEPTIONS_CONF="$(DESTDIR)$(sharedir)/cosmic/com.system76.CosmicSettings.WindowRules/v1/tiling_exception_defaults"
+KEYBINDINGS_CONF="$(DESTDIR)$(sharedir)/lingmo/com.lingmoos.LingmoSettings.Shortcuts/v1/defaults"
+TILING_EXCEPTIONS_CONF="$(DESTDIR)$(sharedir)/lingmo/com.lingmoos.LingmoSettings.WindowRules/v1/tiling_exception_defaults"
 
 all: extract-vendor
 	cargo build $(ARGS)
@@ -54,14 +54,18 @@ install:
 	install -Dm0644 "data/tiling-exceptions.ron" "$(TILING_EXCEPTIONS_CONF)"
 
 install-bare-session: install
-	install -Dm0644 "data/cosmic.desktop" "$(DESTDIR)$(sharedir)/wayland-sessions/cosmic.desktop"
-	install -Dm0644 "data/cosmic-session.target" "$(DESTDIR)$(libdir)/systemd/user/cosmic-session.target"
-	install -Dm0644 "data/cosmic-session-pre.target" "$(DESTDIR)$(libdir)/systemd/user/cosmic-session-pre.target"
-	install -Dm0644 "data/cosmic-comp.service" "$(DESTDIR)$(libdir)/systemd/user/cosmic-comp.service"
-	install -Dm0755 "data/cosmic-service" "$(DESTDIR)/$(bindir)/cosmic-service"
+	install -Dm0644 "data/lingmo.desktop" "$(DESTDIR)$(sharedir)/wayland-sessions/lingmo.desktop"
+	install -Dm0644 "data/lingmo-session.target" "$(DESTDIR)$(libdir)/systemd/user/lingmo-session.target"
+	install -Dm0644 "data/lingmo-session-pre.target" "$(DESTDIR)$(libdir)/systemd/user/lingmo-session-pre.target"
+	install -Dm0644 "data/lingmo-comp.service" "$(DESTDIR)$(libdir)/systemd/user/lingmo-comp.service"
+	install -Dm0755 "data/lingmo-service" "$(DESTDIR)/$(bindir)/lingmo-service"
 
 uninstall:
 	rm "$(TARGET_BIN)" "$(KEYBINDINGS_CONF)"
 
 uninstall-bare-session:
-	rm "$(DESTDIR)$(sharedir)/wayland-sessions/cosmic.desktop"
+	rm "$(DESTDIR)$(sharedir)/wayland-sessions/lingmo.desktop"
+	rm "$(DESTDIR)$(libdir)/systemd/user/lingmo-session.target"
+	rm "$(DESTDIR)$(libdir)/systemd/user/lingmo-session-pre.target"
+	rm "$(DESTDIR)$(libdir)/systemd/user/lingmo-comp.service"
+	rm "$(DESTDIR)/$(bindir)/lingmo-service"

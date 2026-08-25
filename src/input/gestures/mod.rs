@@ -1,4 +1,4 @@
-use cosmic_settings_config::shortcuts::action::Direction;
+use Lingmo_settings_config::shortcuts::action::Direction;
 use smithay::utils::{Logical, Point};
 use std::{collections::VecDeque, time::Duration};
 use tracing::trace;
@@ -171,3 +171,4 @@ impl RubberBand {
         self.derivative(diff)
     }
 }
+

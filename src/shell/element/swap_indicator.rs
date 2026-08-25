@@ -5,7 +5,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use cosmic::{
+use Lingmo::{
     Apply,
     iced::{
         core::{Alignment, Background, Border, Color, Length},
@@ -30,9 +30,9 @@ pub struct SwapIndicator {
 impl SwapIndicator {
     pub fn new(
         evlh: LoopHandle<'static, crate::state::State>,
-        mut theme: cosmic::Theme,
+        mut theme: Lingmo::Theme,
     ) -> SwapIndicator {
-        theme.transparent = theme.cosmic().frosted_system_interface;
+        theme.transparent = theme.Lingmo().frosted_system_interface;
         SwapIndicator {
             location: Point::default(),
             elem: IcedElement::new(SwapIndicatorInternal, Size::from((1, 1)), evlh, theme),
@@ -68,7 +68,7 @@ impl SwapIndicator {
             scale,
             alpha,
             self.elem
-                .with_theme(|theme| theme.cosmic().radius_s())
+                .with_theme(|theme| theme.Lingmo().radius_s())
                 .map(|x| x.round() as u8),
             push_above,
             push_below,
@@ -90,7 +90,7 @@ pub struct SwapIndicatorInternal;
 impl Program for SwapIndicatorInternal {
     type Message = ();
 
-    fn view(&self) -> cosmic::Element<'_, Self::Message> {
+    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
         row(vec![
             from_name("window-swap-symbolic")
                 .size(32)
@@ -107,21 +107,21 @@ impl Program for SwapIndicatorInternal {
         .padding(16)
         .apply(container)
         .class(theme::Container::custom(|theme| {
-            let mut background = theme.cosmic().accent_color();
+            let mut background = theme.Lingmo().accent_color();
             if theme.transparent {
                 background.alpha = theme
-                    .cosmic()
+                    .Lingmo()
                     .alpha_map
-                    .blurred_alpha(theme.cosmic().frosted);
+                    .blurred_alpha(theme.Lingmo().frosted);
             }
 
             container::Style {
                 snap: true,
-                icon_color: Some(Color::from(theme.cosmic().accent.on)),
-                text_color: Some(Color::from(theme.cosmic().accent.on)),
+                icon_color: Some(Color::from(theme.Lingmo().accent.on)),
+                text_color: Some(Color::from(theme.Lingmo().accent.on)),
                 background: Some(Background::Color(background.into())),
                 border: Border {
-                    radius: theme.cosmic().radius_s().into(),
+                    radius: theme.Lingmo().radius_s().into(),
                     width: 0.0,
                     color: Color::TRANSPARENT,
                 },
@@ -133,3 +133,4 @@ impl Program for SwapIndicatorInternal {
         .into()
     }
 }
+

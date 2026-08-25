@@ -10,7 +10,7 @@ use crate::{
     config::{CompOutputConfig, Config, ScreenFilter},
     dbus::DBusState,
     input::{PointerFocusState, gestures::GestureState},
-    shell::{CosmicSurface, SeatExt, Shell, grabs::SeatMoveGrabState},
+    shell::{LingmoSurface, SeatExt, Shell, grabs::SeatMoveGrabState},
     utils::prelude::OutputExt,
     wayland::{
         handlers::{data_device::get_dnd_icon, image_copy_capture::SessionHolder},
@@ -18,7 +18,7 @@ use crate::{
             a11y::A11yState,
             corner_radius::CornerRadiusState,
             drm::WlDrmState,
-            image_capture_source::CosmicImageCaptureSourceState,
+            image_capture_source::LingmoImageCaptureSourceState,
             keyboard_layout::KeyboardLayoutState,
             output_configuration::OutputConfigurationState,
             output_power::OutputPowerState,
@@ -32,7 +32,7 @@ use crate::{
 };
 use anyhow::Context;
 use calloop::RegistrationToken;
-use cosmic_comp_config::output::comp::{OutputConfig, OutputState};
+use lingmo_comp_config::output::comp::{OutputConfig, OutputState};
 use i18n_embed::{
     DesktopLanguageRequester,
     fluent::{FluentLanguageLoader, fluent_language_loader},
@@ -162,12 +162,12 @@ unsafe impl Sync for ClientState {}
 
 impl ClientState {
     /// We treat a client as "sandboxed" if it has a security context for any sandbox engine
-    /// other than `com.system76.CosmicPanel`
+    /// other than `com.lingmoos.LingmoPanel`
     pub fn not_sandboxed(&self) -> bool {
         self.security_context
             .as_ref()
             .is_none_or(|security_context| {
-                security_context.sandbox_engine.as_deref() == Some("com.system76.CosmicPanel")
+                security_context.sandbox_engine.as_deref() == Some("com.lingmoos.LingmoPanel")
             })
     }
 }
@@ -271,7 +271,7 @@ pub struct Common {
     >,
 
     pub kiosk_child: Option<Child>,
-    pub theme: cosmic::Theme,
+    pub theme: Lingmo::Theme,
 
     // wayland state
     pub compositor_state: CompositorState,
@@ -287,7 +287,7 @@ pub struct Common {
     pub primary_selection_state: PrimarySelectionState,
     pub ext_data_control_state: ExtDataControlState,
     pub wlr_data_control_state: WlrDataControlState,
-    pub cosmic_image_capture_source_state: CosmicImageCaptureSourceState,
+    pub Lingmo_image_capture_source_state: LingmoImageCaptureSourceState,
     pub output_capture_source_state: OutputCaptureSourceState,
     pub toplevel_capture_source_state: ToplevelCaptureSourceState,
     pub image_copy_capture_state: ImageCopyCaptureState,
@@ -311,7 +311,7 @@ pub struct Common {
     // shell-related wayland state
     pub xdg_shell_state: XdgShellState,
     pub layer_shell_state: WlrLayerShellState,
-    pub toplevel_info_state: ToplevelInfoState<State, CosmicSurface>,
+    pub toplevel_info_state: ToplevelInfoState<State, LingmoSurface>,
     pub toplevel_management_state: ToplevelManagementState,
     pub xdg_activation_state: XdgActivationState,
     pub xdg_foreign_state: XdgForeignState,
@@ -680,8 +680,8 @@ impl State {
             OverlapNotifyState::new::<Self, _>(dh, client_has_no_security_context);
         let presentation_state = PresentationState::new::<Self>(dh, clock.id() as u32);
         let primary_selection_state = PrimarySelectionState::new::<Self>(dh);
-        let cosmic_image_capture_source_state =
-            CosmicImageCaptureSourceState::new::<Self, _>(dh, client_not_sandboxed);
+        let Lingmo_image_capture_source_state =
+            LingmoImageCaptureSourceState::new::<Self, _>(dh, client_not_sandboxed);
         let output_capture_source_state =
             OutputCaptureSourceState::new_with_filter::<State, _>(dh, client_not_sandboxed);
         let toplevel_capture_source_state =
@@ -784,7 +784,7 @@ impl State {
                 ei_pointer_buttons: std::collections::HashMap::new(),
 
                 kiosk_child: None,
-                theme: cosmic::theme::system_preference(),
+                theme: Lingmo::theme::system_preference(),
 
                 compositor_state,
                 corner_radius_state,
@@ -794,7 +794,7 @@ impl State {
                 idle_notifier_state,
                 idle_inhibit_manager_state,
                 idle_inhibiting_surfaces,
-                cosmic_image_capture_source_state,
+                Lingmo_image_capture_source_state,
                 output_capture_source_state,
                 toplevel_capture_source_state,
                 image_copy_capture_state,
@@ -1446,3 +1446,6 @@ impl Common {
         }
     }
 }
+
+
+

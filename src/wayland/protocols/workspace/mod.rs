@@ -16,13 +16,13 @@ use smithay::{
 };
 use wayland_backend::protocol::WEnum;
 
-use cosmic_protocols::workspace::v2::server::{
-    zcosmic_workspace_handle_v2::{self, ZcosmicWorkspaceHandleV2},
-    zcosmic_workspace_manager_v2::ZcosmicWorkspaceManagerV2,
+use Lingmo_protocols::workspace::v2::server::{
+    zLingmo_workspace_handle_v2::{self, ZLingmoWorkspaceHandleV2},
+    zLingmo_workspace_manager_v2::ZLingmoWorkspaceManagerV2,
 };
 
-mod cosmic_v2;
-pub use cosmic_v2::CosmicWorkspaceV2Data;
+mod Lingmo_v2;
+pub use Lingmo_v2::LingmoWorkspaceV2Data;
 mod ext;
 pub use ext::{WorkspaceData, WorkspaceGroupData, WorkspaceManagerData};
 
@@ -32,11 +32,11 @@ bitflags::bitflags! {
         const Activate = 1;
         const Deactivate = 2;
         const Remove = 4;
-        /// not in legacy cosmic protocol
+        /// not in legacy Lingmo protocol
         const Assign = 8;
-        /// cosmic specific
+        /// Lingmo specific
         const Rename = 16;
-        /// cosmic specific
+        /// Lingmo specific
         const SetTilingState = 32;
         const Pin = 64;
         const Move = 128;
@@ -49,7 +49,7 @@ bitflags::bitflags! {
         const Active = 1;
         const Urgent = 2;
         const Hidden = 4;
-        /// cosmic specific
+        /// Lingmo specific
         const Pinned = 8;
     }
 }
@@ -61,7 +61,7 @@ where
 {
     dh: DisplayHandle,
     ext_global: GlobalId,
-    cosmic_v2_global: GlobalId,
+    Lingmo_v2_global: GlobalId,
     ext_instances: Vec<ExtWorkspaceManagerV1>,
     groups: Vec<WorkspaceGroup>,
     _marker: std::marker::PhantomData<D>,
@@ -110,7 +110,7 @@ pub struct Workspace {
     capabilities: WorkspaceCapabilities,
     coordinates: Vec<u32>,
     states: State,
-    tiling: zcosmic_workspace_handle_v2::TilingState,
+    tiling: zLingmo_workspace_handle_v2::TilingState,
     ext_id: Option<String>,
 }
 
@@ -125,9 +125,9 @@ where
         + Dispatch<ExtWorkspaceManagerV1, WorkspaceManagerData>
         + Dispatch<ExtWorkspaceGroupHandleV1, WorkspaceGroupData>
         + Dispatch<ExtWorkspaceHandleV1, WorkspaceData>
-        + GlobalDispatch<ZcosmicWorkspaceManagerV2, WorkspaceGlobalData>
-        + Dispatch<ZcosmicWorkspaceManagerV2, ()>
-        + Dispatch<ZcosmicWorkspaceHandleV2, CosmicWorkspaceV2Data>
+        + GlobalDispatch<ZLingmoWorkspaceManagerV2, WorkspaceGlobalData>
+        + Dispatch<ZLingmoWorkspaceManagerV2, ()>
+        + Dispatch<ZLingmoWorkspaceHandleV2, LingmoWorkspaceV2Data>
         + Sized
         + 'static,
 {
@@ -151,7 +151,7 @@ pub enum Request {
     },
     SetTilingState {
         workspace: WorkspaceHandle,
-        state: WEnum<zcosmic_workspace_handle_v2::TilingState>,
+        state: WEnum<zLingmo_workspace_handle_v2::TilingState>,
     },
     Create {
         in_group: WorkspaceGroupHandle,
@@ -192,7 +192,7 @@ where
             },
         );
 
-        let cosmic_v2_global = dh.create_global::<D, ZcosmicWorkspaceManagerV2, _>(
+        let Lingmo_v2_global = dh.create_global::<D, ZLingmoWorkspaceManagerV2, _>(
             2,
             WorkspaceGlobalData {
                 filter: Box::new(client_filter.clone()),
@@ -202,7 +202,7 @@ where
         WorkspaceState {
             dh: dh.clone(),
             ext_global,
-            cosmic_v2_global,
+            Lingmo_v2_global,
             ext_instances: Vec::new(),
             groups: Vec::new(),
             _marker: std::marker::PhantomData,
@@ -276,7 +276,7 @@ where
     pub fn workspace_tiling_state(
         &self,
         workspace: &WorkspaceHandle,
-    ) -> Option<zcosmic_workspace_handle_v2::TilingState> {
+    ) -> Option<zLingmo_workspace_handle_v2::TilingState> {
         self.groups.iter().find_map(|g| {
             g.workspaces
                 .iter()
@@ -333,8 +333,8 @@ where
         self.ext_global.clone()
     }
 
-    pub fn cosmic_v2_global_id(&self) -> GlobalId {
-        self.cosmic_v2_global.clone()
+    pub fn Lingmo_v2_global_id(&self) -> GlobalId {
+        self.Lingmo_v2_global.clone()
     }
 }
 
@@ -355,7 +355,7 @@ where
     pub fn create_workspace(
         &mut self,
         group: &WorkspaceGroupHandle,
-        tiling: zcosmic_workspace_handle_v2::TilingState,
+        tiling: zLingmo_workspace_handle_v2::TilingState,
         ext_id: Option<String>,
     ) -> Option<WorkspaceHandle> {
         if let Some(group) = self.0.groups.iter_mut().find(|g| g.id == group.id) {
@@ -578,14 +578,14 @@ where
     pub fn workspace_tiling_state(
         &self,
         workspace: &WorkspaceHandle,
-    ) -> Option<zcosmic_workspace_handle_v2::TilingState> {
+    ) -> Option<zLingmo_workspace_handle_v2::TilingState> {
         self.0.workspace_tiling_state(workspace)
     }
 
     pub fn set_workspace_tiling_state(
         &mut self,
         workspace: &WorkspaceHandle,
-        state: zcosmic_workspace_handle_v2::TilingState,
+        state: zLingmo_workspace_handle_v2::TilingState,
     ) {
         if let Some(workspace) = self
             .0
@@ -645,14 +645,15 @@ macro_rules! delegate_workspace {
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
 
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-        cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZcosmicWorkspaceManagerV2: $crate::wayland::protocols::workspace::WorkspaceGlobalData
+        Lingmo_protocols::workspace::v2::server::zLingmo_workspace_manager_v2::ZLingmoWorkspaceManagerV2: $crate::wayland::protocols::workspace::WorkspaceGlobalData
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZcosmicWorkspaceManagerV2: ()
+            Lingmo_protocols::workspace::v2::server::zLingmo_workspace_manager_v2::ZLingmoWorkspaceManagerV2: ()
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZcosmicWorkspaceHandleV2: $crate::wayland::protocols::workspace::CosmicWorkspaceV2Data
+            Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::ZLingmoWorkspaceHandleV2: $crate::wayland::protocols::workspace::LingmoWorkspaceV2Data
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
     };
 }
 pub(crate) use delegate_workspace;
+

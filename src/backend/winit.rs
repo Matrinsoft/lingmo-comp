@@ -9,7 +9,7 @@ use crate::{
     wayland::protocols::drm::WlDrmState,
 };
 use anyhow::{Context, Result, anyhow};
-use cosmic_comp_config::output::comp::{OutputConfig, TransformDef};
+use lingmo_comp_config::output::comp::{OutputConfig, TransformDef};
 use smithay::{
     backend::{
         drm::NodeType,
@@ -149,7 +149,7 @@ pub fn init_backend(
     let props = PhysicalProperties {
         size: (0, 0).into(),
         subpixel: Subpixel::Unknown,
-        make: "COSMIC".to_string(),
+        make: "Lingmo".to_string(),
         model: name.clone(),
         serial_number: "Unknown".to_string(),
     };
@@ -352,3 +352,5 @@ impl State {
         };
     }
 }
+
+

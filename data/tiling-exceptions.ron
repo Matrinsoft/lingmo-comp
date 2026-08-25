@@ -20,8 +20,8 @@
 	(appid: "Authy Desktop", titles: [".*"]),
 	(appid: "Com.github.amezin.ddterm", titles: [".*"]),
 	(appid: "Com.github.donadigo.eddy", titles: [".*"]),
-	(appid: "com.system76.CosmicFilesDialog", titles: [".*"]),
-	(appid: "com.system76.CosmicStoreDialog", titles: [".*"]),
+	(appid: "com.lingmoos.LingmoFilesDialog", titles: [".*"]),
+	(appid: "com.lingmoos.LingmoStoreDialog", titles: [".*"]),
 	(appid: "Enpass", titles: ["Enpass Assistant"]),
 	(appid: "Gjs", titles: ["Settings"]),
 	(appid: "Gnome-initial-setup", titles: [".*"]),
@@ -51,3 +51,4 @@
 	(appid: "^(slack|com.slack.Slack)", titles: ["^.*?(Huddle Preview).*"]),
 	(appid: "^(thunderbird|org.mozilla.thunderbird)(-esr|_esr)*", titles: ["^(Write:).*"]),
 ]
+

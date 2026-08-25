@@ -3,7 +3,7 @@ use crate::{
         kms::render::gles::GbmGlowBackend,
         render::{GlMultiError, wayland::SurfaceRenderElement},
     },
-    shell::{CosmicMappedRenderElement, WorkspaceRenderElement},
+    shell::{LingmoMappedRenderElement, WorkspaceRenderElement},
     utils::iced::IcedRenderElement,
 };
 
@@ -32,18 +32,18 @@ use smithay::{
 
 use super::{GlMultiRenderer, cursor::CursorRenderElement};
 
-pub enum CosmicElement<R>
+pub enum LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     Workspace(
         RelocateRenderElement<CropRenderElement<RescaleRenderElement<WorkspaceRenderElement<R>>>>,
     ),
     Cursor(RescaleRenderElement<RelocateRenderElement<CursorRenderElement<R>>>),
     Dnd(SurfaceRenderElement<R>),
-    MoveGrab(RescaleRenderElement<CosmicMappedRenderElement<R>>),
+    MoveGrab(RescaleRenderElement<LingmoMappedRenderElement<R>>),
     Postprocess(
         CropRenderElement<RelocateRenderElement<RescaleRenderElement<TextureShaderElement>>>,
     ),
@@ -53,93 +53,93 @@ where
     Egui(TextureRenderElement<GlesTexture>),
 }
 
-impl<R> Element for CosmicElement<R>
+impl<R> Element for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn id(&self) -> &Id {
         match self {
-            CosmicElement::Workspace(elem) => elem.id(),
-            CosmicElement::Cursor(elem) => elem.id(),
-            CosmicElement::Dnd(elem) => elem.id(),
-            CosmicElement::MoveGrab(elem) => elem.id(),
-            CosmicElement::Postprocess(elem) => elem.id(),
-            CosmicElement::Zoom(elem) => elem.id(),
-            CosmicElement::Damage(elem) => elem.id(),
+            LingmoElement::Workspace(elem) => elem.id(),
+            LingmoElement::Cursor(elem) => elem.id(),
+            LingmoElement::Dnd(elem) => elem.id(),
+            LingmoElement::MoveGrab(elem) => elem.id(),
+            LingmoElement::Postprocess(elem) => elem.id(),
+            LingmoElement::Zoom(elem) => elem.id(),
+            LingmoElement::Damage(elem) => elem.id(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.id(),
+            LingmoElement::Egui(elem) => elem.id(),
         }
     }
 
     fn current_commit(&self) -> CommitCounter {
         match self {
-            CosmicElement::Workspace(elem) => elem.current_commit(),
-            CosmicElement::Cursor(elem) => elem.current_commit(),
-            CosmicElement::Dnd(elem) => elem.current_commit(),
-            CosmicElement::MoveGrab(elem) => elem.current_commit(),
-            CosmicElement::Postprocess(elem) => elem.current_commit(),
-            CosmicElement::Zoom(elem) => elem.current_commit(),
-            CosmicElement::Damage(elem) => elem.current_commit(),
+            LingmoElement::Workspace(elem) => elem.current_commit(),
+            LingmoElement::Cursor(elem) => elem.current_commit(),
+            LingmoElement::Dnd(elem) => elem.current_commit(),
+            LingmoElement::MoveGrab(elem) => elem.current_commit(),
+            LingmoElement::Postprocess(elem) => elem.current_commit(),
+            LingmoElement::Zoom(elem) => elem.current_commit(),
+            LingmoElement::Damage(elem) => elem.current_commit(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.current_commit(),
+            LingmoElement::Egui(elem) => elem.current_commit(),
         }
     }
 
     fn src(&self) -> Rectangle<f64, smithay::utils::Buffer> {
         match self {
-            CosmicElement::Workspace(elem) => elem.src(),
-            CosmicElement::Cursor(elem) => elem.src(),
-            CosmicElement::Dnd(elem) => elem.src(),
-            CosmicElement::MoveGrab(elem) => elem.src(),
-            CosmicElement::Postprocess(elem) => elem.src(),
-            CosmicElement::Zoom(elem) => elem.src(),
-            CosmicElement::Damage(elem) => elem.src(),
+            LingmoElement::Workspace(elem) => elem.src(),
+            LingmoElement::Cursor(elem) => elem.src(),
+            LingmoElement::Dnd(elem) => elem.src(),
+            LingmoElement::MoveGrab(elem) => elem.src(),
+            LingmoElement::Postprocess(elem) => elem.src(),
+            LingmoElement::Zoom(elem) => elem.src(),
+            LingmoElement::Damage(elem) => elem.src(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.src(),
+            LingmoElement::Egui(elem) => elem.src(),
         }
     }
 
     fn geometry(&self, scale: Scale<f64>) -> Rectangle<i32, Physical> {
         match self {
-            CosmicElement::Workspace(elem) => elem.geometry(scale),
-            CosmicElement::Cursor(elem) => elem.geometry(scale),
-            CosmicElement::Dnd(elem) => elem.geometry(scale),
-            CosmicElement::MoveGrab(elem) => elem.geometry(scale),
-            CosmicElement::Postprocess(elem) => elem.geometry(scale),
-            CosmicElement::Zoom(elem) => elem.geometry(scale),
-            CosmicElement::Damage(elem) => elem.geometry(scale),
+            LingmoElement::Workspace(elem) => elem.geometry(scale),
+            LingmoElement::Cursor(elem) => elem.geometry(scale),
+            LingmoElement::Dnd(elem) => elem.geometry(scale),
+            LingmoElement::MoveGrab(elem) => elem.geometry(scale),
+            LingmoElement::Postprocess(elem) => elem.geometry(scale),
+            LingmoElement::Zoom(elem) => elem.geometry(scale),
+            LingmoElement::Damage(elem) => elem.geometry(scale),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.geometry(scale),
+            LingmoElement::Egui(elem) => elem.geometry(scale),
         }
     }
 
     fn location(&self, scale: Scale<f64>) -> Point<i32, Physical> {
         match self {
-            CosmicElement::Workspace(elem) => elem.location(scale),
-            CosmicElement::Cursor(elem) => elem.location(scale),
-            CosmicElement::Dnd(elem) => elem.location(scale),
-            CosmicElement::MoveGrab(elem) => elem.location(scale),
-            CosmicElement::Postprocess(elem) => elem.location(scale),
-            CosmicElement::Zoom(elem) => elem.location(scale),
-            CosmicElement::Damage(elem) => elem.location(scale),
+            LingmoElement::Workspace(elem) => elem.location(scale),
+            LingmoElement::Cursor(elem) => elem.location(scale),
+            LingmoElement::Dnd(elem) => elem.location(scale),
+            LingmoElement::MoveGrab(elem) => elem.location(scale),
+            LingmoElement::Postprocess(elem) => elem.location(scale),
+            LingmoElement::Zoom(elem) => elem.location(scale),
+            LingmoElement::Damage(elem) => elem.location(scale),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.location(scale),
+            LingmoElement::Egui(elem) => elem.location(scale),
         }
     }
 
     fn transform(&self) -> smithay::utils::Transform {
         match self {
-            CosmicElement::Workspace(elem) => elem.transform(),
-            CosmicElement::Cursor(elem) => elem.transform(),
-            CosmicElement::Dnd(elem) => elem.transform(),
-            CosmicElement::MoveGrab(elem) => elem.transform(),
-            CosmicElement::Postprocess(elem) => elem.transform(),
-            CosmicElement::Zoom(elem) => elem.transform(),
-            CosmicElement::Damage(elem) => elem.transform(),
+            LingmoElement::Workspace(elem) => elem.transform(),
+            LingmoElement::Cursor(elem) => elem.transform(),
+            LingmoElement::Dnd(elem) => elem.transform(),
+            LingmoElement::MoveGrab(elem) => elem.transform(),
+            LingmoElement::Postprocess(elem) => elem.transform(),
+            LingmoElement::Zoom(elem) => elem.transform(),
+            LingmoElement::Damage(elem) => elem.transform(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.transform(),
+            LingmoElement::Egui(elem) => elem.transform(),
         }
     }
 
@@ -149,80 +149,80 @@ where
         commit: Option<CommitCounter>,
     ) -> DamageSet<i32, Physical> {
         match self {
-            CosmicElement::Workspace(elem) => elem.damage_since(scale, commit),
-            CosmicElement::Cursor(elem) => elem.damage_since(scale, commit),
-            CosmicElement::Dnd(elem) => elem.damage_since(scale, commit),
-            CosmicElement::MoveGrab(elem) => elem.damage_since(scale, commit),
-            CosmicElement::Postprocess(elem) => elem.damage_since(scale, commit),
-            CosmicElement::Zoom(elem) => elem.damage_since(scale, commit),
-            CosmicElement::Damage(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Workspace(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Cursor(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Dnd(elem) => elem.damage_since(scale, commit),
+            LingmoElement::MoveGrab(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Postprocess(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Zoom(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Damage(elem) => elem.damage_since(scale, commit),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.damage_since(scale, commit),
+            LingmoElement::Egui(elem) => elem.damage_since(scale, commit),
         }
     }
 
     fn opaque_regions(&self, scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
         match self {
-            CosmicElement::Workspace(elem) => elem.opaque_regions(scale),
-            CosmicElement::Cursor(elem) => elem.opaque_regions(scale),
-            CosmicElement::Dnd(elem) => elem.opaque_regions(scale),
-            CosmicElement::MoveGrab(elem) => elem.opaque_regions(scale),
-            CosmicElement::Postprocess(elem) => elem.opaque_regions(scale),
-            CosmicElement::Zoom(elem) => elem.opaque_regions(scale),
-            CosmicElement::Damage(elem) => elem.opaque_regions(scale),
+            LingmoElement::Workspace(elem) => elem.opaque_regions(scale),
+            LingmoElement::Cursor(elem) => elem.opaque_regions(scale),
+            LingmoElement::Dnd(elem) => elem.opaque_regions(scale),
+            LingmoElement::MoveGrab(elem) => elem.opaque_regions(scale),
+            LingmoElement::Postprocess(elem) => elem.opaque_regions(scale),
+            LingmoElement::Zoom(elem) => elem.opaque_regions(scale),
+            LingmoElement::Damage(elem) => elem.opaque_regions(scale),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.opaque_regions(scale),
+            LingmoElement::Egui(elem) => elem.opaque_regions(scale),
         }
     }
 
     fn alpha(&self) -> f32 {
         match self {
-            CosmicElement::Workspace(elem) => elem.alpha(),
-            CosmicElement::Cursor(elem) => elem.alpha(),
-            CosmicElement::Dnd(elem) => elem.alpha(),
-            CosmicElement::MoveGrab(elem) => elem.alpha(),
-            CosmicElement::Postprocess(elem) => elem.alpha(),
-            CosmicElement::Zoom(elem) => elem.alpha(),
-            CosmicElement::Damage(elem) => elem.alpha(),
+            LingmoElement::Workspace(elem) => elem.alpha(),
+            LingmoElement::Cursor(elem) => elem.alpha(),
+            LingmoElement::Dnd(elem) => elem.alpha(),
+            LingmoElement::MoveGrab(elem) => elem.alpha(),
+            LingmoElement::Postprocess(elem) => elem.alpha(),
+            LingmoElement::Zoom(elem) => elem.alpha(),
+            LingmoElement::Damage(elem) => elem.alpha(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.alpha(),
+            LingmoElement::Egui(elem) => elem.alpha(),
         }
     }
 
     fn kind(&self) -> Kind {
         match self {
-            CosmicElement::Workspace(elem) => elem.kind(),
-            CosmicElement::Cursor(elem) => elem.kind(),
-            CosmicElement::Dnd(elem) => elem.kind(),
-            CosmicElement::MoveGrab(elem) => elem.kind(),
-            CosmicElement::Postprocess(elem) => elem.kind(),
-            CosmicElement::Zoom(elem) => elem.kind(),
-            CosmicElement::Damage(elem) => elem.kind(),
+            LingmoElement::Workspace(elem) => elem.kind(),
+            LingmoElement::Cursor(elem) => elem.kind(),
+            LingmoElement::Dnd(elem) => elem.kind(),
+            LingmoElement::MoveGrab(elem) => elem.kind(),
+            LingmoElement::Postprocess(elem) => elem.kind(),
+            LingmoElement::Zoom(elem) => elem.kind(),
+            LingmoElement::Damage(elem) => elem.kind(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.kind(),
+            LingmoElement::Egui(elem) => elem.kind(),
         }
     }
 
     fn is_framebuffer_effect(&self) -> bool {
         match self {
-            CosmicElement::Workspace(elem) => elem.is_framebuffer_effect(),
-            CosmicElement::Cursor(elem) => elem.is_framebuffer_effect(),
-            CosmicElement::Dnd(elem) => elem.is_framebuffer_effect(),
-            CosmicElement::MoveGrab(elem) => elem.is_framebuffer_effect(),
-            CosmicElement::Postprocess(elem) => elem.is_framebuffer_effect(),
-            CosmicElement::Zoom(elem) => elem.is_framebuffer_effect(),
-            CosmicElement::Damage(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Workspace(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Cursor(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Dnd(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::MoveGrab(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Postprocess(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Zoom(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Damage(elem) => elem.is_framebuffer_effect(),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => elem.is_framebuffer_effect(),
+            LingmoElement::Egui(elem) => elem.is_framebuffer_effect(),
         }
     }
 }
 
-impl<R> RenderElement<R> for CosmicElement<R>
+impl<R> RenderElement<R> for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn draw(
         &self,
@@ -234,17 +234,17 @@ where
         cache: Option<&UserDataMap>,
     ) -> Result<(), R::Error> {
         match self {
-            CosmicElement::Workspace(elem) => {
+            LingmoElement::Workspace(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            CosmicElement::Cursor(elem) => {
+            LingmoElement::Cursor(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            CosmicElement::Dnd(elem) => elem.draw(frame, src, dst, damage, opaque_regions, cache),
-            CosmicElement::MoveGrab(elem) => {
+            LingmoElement::Dnd(elem) => elem.draw(frame, src, dst, damage, opaque_regions, cache),
+            LingmoElement::MoveGrab(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            CosmicElement::Postprocess(elem) => {
+            LingmoElement::Postprocess(elem) => {
                 let glow_frame = R::glow_frame_mut(frame);
                 RenderElement::<GlowRenderer>::draw(
                     elem,
@@ -257,12 +257,12 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            CosmicElement::Zoom(elem) => elem.draw(frame, src, dst, damage, opaque_regions, cache),
-            CosmicElement::Damage(elem) => {
+            LingmoElement::Zoom(elem) => elem.draw(frame, src, dst, damage, opaque_regions, cache),
+            LingmoElement::Damage(elem) => {
                 RenderElement::<R>::draw(elem, frame, src, dst, damage, opaque_regions, cache)
             }
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => {
+            LingmoElement::Egui(elem) => {
                 let glow_frame = R::glow_frame_mut(frame);
                 RenderElement::<GlowRenderer>::draw(
                     elem,
@@ -280,18 +280,18 @@ where
 
     fn underlying_storage(&self, renderer: &mut R) -> Option<UnderlyingStorage<'_>> {
         match self {
-            CosmicElement::Workspace(elem) => elem.underlying_storage(renderer),
-            CosmicElement::Cursor(elem) => elem.underlying_storage(renderer),
-            CosmicElement::Dnd(elem) => elem.underlying_storage(renderer),
-            CosmicElement::MoveGrab(elem) => elem.underlying_storage(renderer),
-            CosmicElement::Postprocess(elem) => {
+            LingmoElement::Workspace(elem) => elem.underlying_storage(renderer),
+            LingmoElement::Cursor(elem) => elem.underlying_storage(renderer),
+            LingmoElement::Dnd(elem) => elem.underlying_storage(renderer),
+            LingmoElement::MoveGrab(elem) => elem.underlying_storage(renderer),
+            LingmoElement::Postprocess(elem) => {
                 let glow_renderer = renderer.glow_renderer_mut();
                 elem.underlying_storage(glow_renderer)
             }
-            CosmicElement::Zoom(elem) => elem.underlying_storage(renderer),
-            CosmicElement::Damage(elem) => elem.underlying_storage(renderer),
+            LingmoElement::Zoom(elem) => elem.underlying_storage(renderer),
+            LingmoElement::Damage(elem) => elem.underlying_storage(renderer),
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => {
+            LingmoElement::Egui(elem) => {
                 let glow_renderer = renderer.glow_renderer_mut();
                 elem.underlying_storage(glow_renderer)
             }
@@ -306,23 +306,23 @@ where
         cache: &UserDataMap,
     ) -> Result<(), <R>::Error> {
         match self {
-            CosmicElement::Workspace(elem) => elem.capture_framebuffer(frame, src, dst, cache),
-            CosmicElement::Cursor(elem) => elem.capture_framebuffer(frame, src, dst, cache),
-            CosmicElement::Dnd(elem) => elem.capture_framebuffer(frame, src, dst, cache),
-            CosmicElement::MoveGrab(elem) => elem.capture_framebuffer(frame, src, dst, cache),
-            CosmicElement::Postprocess(elem) => {
+            LingmoElement::Workspace(elem) => elem.capture_framebuffer(frame, src, dst, cache),
+            LingmoElement::Cursor(elem) => elem.capture_framebuffer(frame, src, dst, cache),
+            LingmoElement::Dnd(elem) => elem.capture_framebuffer(frame, src, dst, cache),
+            LingmoElement::MoveGrab(elem) => elem.capture_framebuffer(frame, src, dst, cache),
+            LingmoElement::Postprocess(elem) => {
                 let glow_frame = R::glow_frame_mut(frame);
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem, glow_frame, src, dst, cache,
                 )
                 .map_err(R::from_gles_error)
             }
-            CosmicElement::Zoom(elem) => elem.capture_framebuffer(frame, src, dst, cache),
-            CosmicElement::Damage(elem) => {
+            LingmoElement::Zoom(elem) => elem.capture_framebuffer(frame, src, dst, cache),
+            LingmoElement::Damage(elem) => {
                 RenderElement::<R>::capture_framebuffer(elem, frame, src, dst, cache)
             }
             #[cfg(feature = "debug")]
-            CosmicElement::Egui(elem) => {
+            LingmoElement::Egui(elem) => {
                 let glow_frame = R::glow_frame_mut(frame);
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem, glow_frame, src, dst, cache,
@@ -334,11 +334,11 @@ where
 }
 
 impl<R> From<CropRenderElement<RescaleRenderElement<WorkspaceRenderElement<R>>>>
-    for CosmicElement<R>
+    for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: CropRenderElement<RescaleRenderElement<WorkspaceRenderElement<R>>>) -> Self {
         Self::Workspace(RelocateRenderElement::from_element(
@@ -349,22 +349,22 @@ where
     }
 }
 
-impl<R> From<IcedRenderElement<R>> for CosmicElement<R>
+impl<R> From<IcedRenderElement<R>> for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(value: IcedRenderElement<R>) -> Self {
         Self::Zoom(value)
     }
 }
 
-impl<R> From<DamageElement> for CosmicElement<R>
+impl<R> From<DamageElement> for LingmoElement<R>
 where
     R: Renderer + ImportAll + ImportMem + AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(value: DamageElement) -> Self {
         Self::Damage(value)
@@ -372,11 +372,11 @@ where
 }
 
 #[cfg(feature = "debug")]
-impl<R> From<TextureRenderElement<GlesTexture>> for CosmicElement<R>
+impl<R> From<TextureRenderElement<GlesTexture>> for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    CosmicMappedRenderElement<R>: RenderElement<R>,
+    LingmoMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: TextureRenderElement<GlesTexture>) -> Self {
         Self::Egui(elem)
@@ -524,3 +524,4 @@ impl<R: Renderer> RenderElement<R> for DamageElement {
         Ok(())
     }
 }
+

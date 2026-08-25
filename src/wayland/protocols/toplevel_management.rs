@@ -11,9 +11,9 @@ use smithay::{
     utils::{Logical, Rectangle},
 };
 
-pub use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplelevelManagementCapabilitiesV1 as ManagementCapabilities;
-use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::{
-    self, ZcosmicToplevelManagerV1,
+pub use Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplelevelManagementCapabilitiesV1 as ManagementCapabilities;
+use Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::{
+    self, ZLingmoToplevelManagerV1,
 };
 
 use super::{
@@ -23,7 +23,7 @@ use super::{
 
 #[derive(Debug)]
 pub struct ToplevelManagementState {
-    instances: Vec<ZcosmicToplevelManagerV1>,
+    instances: Vec<ZLingmoToplevelManagerV1>,
     capabilities: Vec<ManagementCapabilities>,
     global: GlobalId,
 }
@@ -108,14 +108,14 @@ impl ToplevelManagementState {
         client_filter: F,
     ) -> ToplevelManagementState
     where
-        D: GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData>
-            + Dispatch<ZcosmicToplevelManagerV1, ()>
+        D: GlobalDispatch<ZLingmoToplevelManagerV1, ToplevelManagerGlobalData>
+            + Dispatch<ZLingmoToplevelManagerV1, ()>
             + ToplevelManagementHandler
             + 'static,
         <D as ToplevelInfoHandler>::Window: ManagementWindow,
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + 'static,
     {
-        let global = dh.create_global::<D, ZcosmicToplevelManagerV1, _>(
+        let global = dh.create_global::<D, ZLingmoToplevelManagerV1, _>(
             4,
             ToplevelManagerGlobalData {
                 filter: Box::new(client_filter),
@@ -133,11 +133,11 @@ impl ToplevelManagementState {
     }
 }
 
-impl<D> GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData, D>
+impl<D> GlobalDispatch<ZLingmoToplevelManagerV1, ToplevelManagerGlobalData, D>
     for ToplevelManagementState
 where
-    D: GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData>
-        + Dispatch<ZcosmicToplevelManagerV1, ()>
+    D: GlobalDispatch<ZLingmoToplevelManagerV1, ToplevelManagerGlobalData>
+        + Dispatch<ZLingmoToplevelManagerV1, ()>
         + ToplevelManagementHandler
         + 'static,
     <D as ToplevelInfoHandler>::Window: ManagementWindow,
@@ -146,7 +146,7 @@ where
         state: &mut D,
         _dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZcosmicToplevelManagerV1>,
+        resource: New<ZLingmoToplevelManagerV1>,
         _global_data: &ToplevelManagerGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -167,10 +167,10 @@ where
     }
 }
 
-impl<D> Dispatch<ZcosmicToplevelManagerV1, (), D> for ToplevelManagementState
+impl<D> Dispatch<ZLingmoToplevelManagerV1, (), D> for ToplevelManagementState
 where
-    D: GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData>
-        + Dispatch<ZcosmicToplevelManagerV1, ()>
+    D: GlobalDispatch<ZLingmoToplevelManagerV1, ToplevelManagerGlobalData>
+        + Dispatch<ZLingmoToplevelManagerV1, ()>
         + ToplevelManagementHandler
         + 'static,
     <D as ToplevelInfoHandler>::Window: ManagementWindow,
@@ -178,54 +178,54 @@ where
     fn request(
         state: &mut D,
         _client: &Client,
-        _obj: &ZcosmicToplevelManagerV1,
-        request: zcosmic_toplevel_manager_v1::Request,
+        _obj: &ZLingmoToplevelManagerV1,
+        request: zLingmo_toplevel_manager_v1::Request,
         _data: &(),
         dh: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zcosmic_toplevel_manager_v1::Request::Activate { toplevel, seat } => {
+            zLingmo_toplevel_manager_v1::Request::Activate { toplevel, seat } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.activate(dh, &window, Seat::from_resource(&seat));
             }
-            zcosmic_toplevel_manager_v1::Request::Close { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::Close { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.close(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::SetFullscreen { toplevel, output } => {
+            zLingmo_toplevel_manager_v1::Request::SetFullscreen { toplevel, output } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.fullscreen(dh, &window, output.as_ref().and_then(Output::from_resource))
             }
-            zcosmic_toplevel_manager_v1::Request::UnsetFullscreen { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::UnsetFullscreen { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.unfullscreen(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::SetMaximized { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::SetMaximized { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.maximize(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::UnsetMaximized { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::UnsetMaximized { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.unmaximize(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::SetMinimized { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::SetMinimized { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.minimize(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::UnsetMinimized { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::UnsetMinimized { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.unminimize(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::SetSticky { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::SetSticky { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.set_sticky(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::UnsetSticky { toplevel } => {
+            zLingmo_toplevel_manager_v1::Request::UnsetSticky { toplevel } => {
                 let window = window_from_handle(toplevel).unwrap();
                 state.unset_sticky(dh, &window);
             }
-            zcosmic_toplevel_manager_v1::Request::SetRectangle {
+            zLingmo_toplevel_manager_v1::Request::SetRectangle {
                 toplevel,
                 surface,
                 x,
@@ -248,8 +248,8 @@ where
                     }
                 }
             }
-            zcosmic_toplevel_manager_v1::Request::MoveToWorkspace { .. } => {}
-            zcosmic_toplevel_manager_v1::Request::MoveToExtWorkspace {
+            zLingmo_toplevel_manager_v1::Request::MoveToWorkspace { .. } => {}
+            zLingmo_toplevel_manager_v1::Request::MoveToExtWorkspace {
                 toplevel,
                 workspace,
                 output,
@@ -266,7 +266,7 @@ where
         }
     }
 
-    fn destroyed(state: &mut D, client: ClientId, resource: &ZcosmicToplevelManagerV1, _data: &()) {
+    fn destroyed(state: &mut D, client: ClientId, resource: &ZLingmoToplevelManagerV1, _data: &()) {
         let mng_state = state.toplevel_management_state();
         mng_state.instances.retain(|i| i != resource);
         if !mng_state
@@ -292,11 +292,12 @@ where
 macro_rules! delegate_toplevel_management {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplevelManagerV1: $crate::wayland::protocols::toplevel_management::ToplevelManagerGlobalData
+            Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplevelManagerV1: $crate::wayland::protocols::toplevel_management::ToplevelManagerGlobalData
         ] => $crate::wayland::protocols::toplevel_management::ToplevelManagementState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplevelManagerV1: ()
+            Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplevelManagerV1: ()
         ] => $crate::wayland::protocols::toplevel_management::ToplevelManagementState);
     };
 }
 pub(crate) use delegate_toplevel_management;
+

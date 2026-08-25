@@ -31,7 +31,7 @@ use smithay::{
 };
 
 use crate::{
-    shell::{CosmicSurface, CursorGeometry, Shell},
+    shell::{LingmoSurface, CursorGeometry, Shell},
     state::{BackendData, State},
     utils::prelude::{
         OutputExt, PointExt, PointGlobalExt, PointLocalExt, RectExt, RectLocalExt, SeatExt,
@@ -406,7 +406,7 @@ fn constraints_for_output(output: &Output, backend: &mut BackendData) -> Option<
 }
 
 fn constraints_for_toplevel(
-    surface: &CosmicSurface,
+    surface: &LingmoSurface,
     backend: &mut BackendData,
 ) -> Option<BufferConstraints> {
     let size = surface.geometry().size.to_buffer(1, Transform::Normal);
@@ -472,3 +472,4 @@ fn constraints_for_renderer(
 
     constraints
 }
+

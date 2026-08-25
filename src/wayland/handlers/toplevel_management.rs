@@ -10,7 +10,7 @@ use smithay::{
 };
 
 use crate::{
-    shell::{CosmicSurface, Shell, WorkspaceDelta, focus::target::KeyboardFocusTarget},
+    shell::{LingmoSurface, Shell, WorkspaceDelta, focus::target::KeyboardFocusTarget},
     utils::prelude::*,
     wayland::protocols::{
         toplevel_info::ToplevelInfoHandler,
@@ -112,7 +112,7 @@ impl ToplevelManagementHandler for State {
 
             // move pointer to window if it’s on a different monitor/output
             if seat.active_output() != *output
-                && self.common.config.cosmic_conf.cursor_follows_focus
+                && self.common.config.Lingmo_conf.cursor_follows_focus
                 && let Some(new_pos) = new_pos
             {
                 seat.set_active_output(output);
@@ -261,13 +261,13 @@ impl ToplevelManagementHandler for State {
     }
 }
 
-impl ManagementWindow for CosmicSurface {
+impl ManagementWindow for LingmoSurface {
     fn close(&self) {
-        CosmicSurface::close(self)
+        LingmoSurface::close(self)
     }
 }
 
-pub fn minimize_rectangle(output: &Output, window: &CosmicSurface) -> Rectangle<i32, Local> {
+pub fn minimize_rectangle(output: &Output, window: &LingmoSurface) -> Rectangle<i32, Local> {
     toplevel_rectangle_for(window)
         .find_map(|(surface, relative)| {
             let map = layer_map_for_output(output);
@@ -293,3 +293,4 @@ pub fn minimize_rectangle(output: &Output, window: &CosmicSurface) -> Rectangle<
 }
 
 delegate_toplevel_management!(State);
+

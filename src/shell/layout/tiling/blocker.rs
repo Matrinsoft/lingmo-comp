@@ -1,4 +1,4 @@
-use crate::shell::element::CosmicSurface;
+use crate::shell::element::LingmoSurface;
 use smithay::{
     reexports::wayland_server::{Client, Resource, backend::ClientId},
     utils::{IsAlive, Serial},
@@ -14,7 +14,7 @@ use std::{
 
 #[derive(Debug, Clone)]
 pub struct TilingBlocker {
-    pub necessary_acks: Vec<(CosmicSurface, Serial)>,
+    pub necessary_acks: Vec<(LingmoSurface, Serial)>,
     start: Instant,
 }
 
@@ -29,7 +29,7 @@ impl Blocker for TilingBlocker {
 }
 
 impl TilingBlocker {
-    pub fn new(configures: impl IntoIterator<Item = (CosmicSurface, Serial)>) -> Self {
+    pub fn new(configures: impl IntoIterator<Item = (LingmoSurface, Serial)>) -> Self {
         TilingBlocker {
             necessary_acks: configures.into_iter().collect(),
             start: Instant::now(),
@@ -60,3 +60,4 @@ impl TilingBlocker {
             .collect::<HashMap<ClientId, Client>>()
     }
 }
+

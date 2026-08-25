@@ -1,4 +1,4 @@
-use cosmic::{
+use Lingmo::{
     Apply,
     font::Font,
     iced::{
@@ -27,19 +27,19 @@ impl From<TabRuleTheme> for theme::Rule {
     fn from(theme: TabRuleTheme) -> Self {
         match theme {
             TabRuleTheme::ActiveActivated => Self::custom(|theme| widget::rule::Style {
-                color: theme.cosmic().accent_color().into(),
+                color: theme.Lingmo().accent_color().into(),
                 snap: true,
                 radius: 0.0.into(),
                 fill_mode: FillMode::Full,
             }),
             TabRuleTheme::ActiveDeactivated => Self::custom(|theme| widget::rule::Style {
-                color: theme.cosmic().palette.neutral_5.into(),
+                color: theme.Lingmo().palette.neutral_5.into(),
                 snap: true,
                 radius: 0.0.into(),
                 fill_mode: FillMode::Full,
             }),
             TabRuleTheme::Default => Self::custom(|theme| widget::rule::Style {
-                color: theme.cosmic().palette.neutral_5.into(),
+                color: theme.Lingmo().palette.neutral_5.into(),
                 snap: true,
                 radius: 8.0.into(),
                 fill_mode: FillMode::Padded(4),
@@ -61,19 +61,19 @@ impl From<TabBackgroundTheme> for theme::Container<'_> {
             TabBackgroundTheme::ActiveActivated => {
                 Self::custom(move |theme| widget::container::Style {
                     snap: true,
-                    icon_color: Some(Color::from(theme.cosmic().accent_text_color())),
-                    text_color: Some(Color::from(theme.cosmic().accent_text_color())),
+                    icon_color: Some(Color::from(theme.Lingmo().accent_text_color())),
+                    text_color: Some(Color::from(theme.Lingmo().accent_text_color())),
                     background: Some(Background::Color({
                         let mut color = theme
-                            .cosmic()
-                            .primary(theme.cosmic().frosted_windows)
+                            .Lingmo()
+                            .primary(theme.Lingmo().frosted_windows)
                             .component
                             .selected;
-                        if theme.cosmic().frosted_windows {
+                        if theme.Lingmo().frosted_windows {
                             color.alpha = theme
-                                .cosmic()
+                                .Lingmo()
                                 .alpha_map
-                                .blurred_alpha(theme.cosmic().frosted);
+                                .blurred_alpha(theme.Lingmo().frosted);
                         }
                         color.into()
                     })),
@@ -92,15 +92,15 @@ impl From<TabBackgroundTheme> for theme::Container<'_> {
                     text_color: None,
                     background: Some(Background::Color({
                         let mut color = theme
-                            .cosmic()
-                            .primary(theme.cosmic().frosted_windows)
+                            .Lingmo()
+                            .primary(theme.Lingmo().frosted_windows)
                             .component
                             .base;
-                        if theme.cosmic().frosted_windows {
+                        if theme.Lingmo().frosted_windows {
                             color.alpha = theme
-                                .cosmic()
+                                .Lingmo()
                                 .alpha_map
-                                .blurred_alpha(theme.cosmic().frosted);
+                                .blurred_alpha(theme.Lingmo().frosted);
                         }
                         color.into()
                     })),
@@ -145,7 +145,7 @@ impl<Message: TabMessage + 'static> Tab<Message> {
             id,
             app_icon: from_name(app_id.into()).size(16).icon(),
             title: title.into(),
-            font: cosmic::font::default(),
+            font: Lingmo::font::default(),
             close_message: None,
             press_message: None,
             right_click_message: None,
@@ -258,12 +258,12 @@ pub(super) struct TabInternal<'a, Message: TabMessage> {
     idx: usize,
     active: bool,
     background: theme::Container<'a>,
-    elements: Vec<cosmic::Element<'a, Message>>,
+    elements: Vec<Lingmo::Element<'a, Message>>,
     press_message: Option<Message>,
     right_click_message: Option<Message>,
 }
 
-impl<Message> Widget<Message, cosmic::Theme, cosmic::Renderer> for TabInternal<'_, Message>
+impl<Message> Widget<Message, Lingmo::Theme, Lingmo::Renderer> for TabInternal<'_, Message>
 where
     Message: TabMessage,
 {
@@ -287,7 +287,7 @@ where
         Size::new(Length::Fill, Length::Fill)
     }
 
-    fn layout(&mut self, tree: &mut Tree, renderer: &cosmic::Renderer, limits: &Limits) -> Node {
+    fn layout(&mut self, tree: &mut Tree, renderer: &Lingmo::Renderer, limits: &Limits) -> Node {
         let min_size = Size {
             height: TAB_HEIGHT as f32,
             width: if self.active {
@@ -310,15 +310,15 @@ where
             .min_height(size.height)
             .width(size.width)
             .height(size.height);
-        cosmic::iced::core::layout::flex::resolve(
-            cosmic::iced::core::layout::flex::Axis::Horizontal,
+        Lingmo::iced::core::layout::flex::resolve(
+            Lingmo::iced::core::layout::flex::Axis::Horizontal,
             renderer,
             &limits,
             Length::Fill,
             Length::Fill,
             0.into(),
             8.,
-            cosmic::iced::Alignment::Center,
+            Lingmo::iced::Alignment::Center,
             if size.width >= CLOSE_BREAKPOINT as f32 {
                 &mut self.elements
             } else if size.width >= TEXT_BREAKPOINT as f32 {
@@ -334,7 +334,7 @@ where
         &mut self,
         tree: &mut Tree,
         layout: Layout<'_>,
-        renderer: &cosmic::Renderer,
+        renderer: &Lingmo::Renderer,
         operation: &mut dyn Operation<()>,
     ) {
         operation.container(None, layout.bounds());
@@ -357,7 +357,7 @@ where
         event: &event::Event,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
-        renderer: &cosmic::Renderer,
+        renderer: &Lingmo::Renderer,
         clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
@@ -408,7 +408,7 @@ where
         layout: Layout<'_>,
         cursor: mouse::Cursor,
         viewport: &Rectangle,
-        renderer: &cosmic::Renderer,
+        renderer: &Lingmo::Renderer,
     ) -> mouse::Interaction {
         self.elements
             .iter()
@@ -426,14 +426,14 @@ where
     fn draw(
         &self,
         tree: &Tree,
-        renderer: &mut cosmic::Renderer,
-        theme: &cosmic::Theme,
+        renderer: &mut Lingmo::Renderer,
+        theme: &Lingmo::Theme,
         renderer_style: &renderer::Style,
         layout: Layout<'_>,
         cursor: mouse::Cursor,
         viewport: &Rectangle,
     ) {
-        use cosmic::widget::container::Catalog;
+        use Lingmo::widget::container::Catalog;
         let style = theme.style(&self.background);
 
         draw_background(renderer, &style, layout.bounds());
@@ -464,10 +464,10 @@ where
         &'b mut self,
         tree: &'b mut Tree,
         layout: Layout<'b>,
-        renderer: &cosmic::Renderer,
+        renderer: &Lingmo::Renderer,
         viewport: &Rectangle,
-        translation: cosmic::iced::Vector,
-    ) -> Option<overlay::Element<'b, Message, cosmic::Theme, cosmic::Renderer>> {
+        translation: Lingmo::iced::Vector,
+    ) -> Option<overlay::Element<'b, Message, Lingmo::Theme, Lingmo::Renderer>> {
         overlay::from_children(
             &mut self.elements,
             tree,
@@ -478,3 +478,4 @@ where
         )
     }
 }
+

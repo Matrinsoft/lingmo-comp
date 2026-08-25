@@ -13,7 +13,7 @@ use smithay::{
 
 use crate::{
     backend::render::element::AsGlowRenderer,
-    shell::element::CosmicMappedKey,
+    shell::element::LingmoMappedKey,
     utils::prelude::{Local, RectLocalExt},
 };
 
@@ -28,7 +28,7 @@ pub struct ShadowParameters {
     radius: [u8; 4],
     dark_mode: bool,
 }
-type ShadowCache = RefCell<HashMap<CosmicMappedKey, (ShadowParameters, PixelShaderElement)>>;
+type ShadowCache = RefCell<HashMap<LingmoMappedKey, (ShadowParameters, PixelShaderElement)>>;
 
 impl ShadowShader {
     pub fn get<R: AsGlowRenderer>(renderer: &R) -> GlesPixelProgram {
@@ -43,7 +43,7 @@ impl ShadowShader {
 
     pub fn element<R: AsGlowRenderer>(
         renderer: &R,
-        key: CosmicMappedKey,
+        key: LingmoMappedKey,
         geo: Rectangle<i32, Local>,
         radius: [u8; 4],
         alpha: f32,
@@ -189,3 +189,4 @@ impl ShadowShader {
         cache.get(&key).unwrap().1.clone()
     }
 }
+

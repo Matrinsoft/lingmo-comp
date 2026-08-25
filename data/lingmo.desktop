@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Lingmo
+Commment=This session logs you into Lingmo
+Commment[sv]=Denna session loggar in dig till Lingmo
+Exec=/usr/bin/lingmo-service
+Type=Application
+DesktopNames=pop:LINGMO
+X-GDM-SessionRegisters=false

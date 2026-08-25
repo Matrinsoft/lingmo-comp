@@ -1,5 +1,5 @@
 use super::{
-    CosmicSurface,
+    LingmoSurface,
     window::{Focus, RESIZE_BORDER},
 };
 use crate::{
@@ -9,7 +9,7 @@ use crate::{
     },
     hooks::{Decorations, HOOKS},
     shell::{
-        element::{CosmicMappedKey, CosmicMappedKeyInner},
+        element::{LingmoMappedKey, LingmoMappedKeyInner},
         focus::target::PointerFocusTarget,
         grabs::{ReleaseMode, ResizeEdge},
         layout::tiling::NodeDesc,
@@ -21,8 +21,8 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use cosmic::{
-    Apply, Element as CosmicElement, Theme,
+use Lingmo::{
+    Apply, Element as LingmoElement, Theme,
     iced::{
         Alignment,
         core::{Background, Border, Color, Length, border::Radius},
@@ -30,10 +30,10 @@ use cosmic::{
         runtime::Task,
         widget::{self as iced_widget, scrollable::AbsoluteOffset},
     },
-    theme, widget as cosmic_widget,
+    theme, widget as Lingmo_widget,
 };
-use cosmic_comp_config::AppearanceConfig;
-use cosmic_settings_config::shortcuts;
+use lingmo_comp_config::AppearanceConfig;
+use Lingmo_settings_config::shortcuts;
 use shortcuts::action::{Direction, FocusDirection};
 use smithay::{
     backend::{
@@ -91,19 +91,19 @@ use self::{
 static SCROLLABLE_ID: LazyLock<Id> = LazyLock::new(|| Id::new("scrollable"));
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct CosmicStack(pub(super) IcedElement<CosmicStackInternal>);
+pub struct LingmoStack(pub(super) IcedElement<LingmoStackInternal>);
 
-impl fmt::Debug for CosmicStack {
+impl fmt::Debug for LingmoStack {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("CosmicStack")
+        f.debug_struct("LingmoStack")
             .field("internal", &self.0)
             .finish_non_exhaustive()
     }
 }
 
 #[derive(Debug)]
-pub struct CosmicStackInternal {
-    windows: Mutex<Vec<CosmicSurface>>,
+pub struct LingmoStackInternal {
+    windows: Mutex<Vec<LingmoSurface>>,
     active: AtomicUsize,
     activated: AtomicBool,
     group_focused: AtomicBool,
@@ -118,11 +118,11 @@ pub struct CosmicStackInternal {
     geometry: Mutex<Option<Rectangle<i32, Global>>>,
     mask: Mutex<Option<tiny_skia::Mask>>,
     tiled: AtomicBool,
-    theme: Mutex<cosmic::Theme>,
+    theme: Mutex<Lingmo::Theme>,
     appearance_conf: Mutex<AppearanceConfig>,
 }
 
-impl CosmicStackInternal {
+impl LingmoStackInternal {
     pub fn swap_focus(&self, focus: Option<Focus>) -> Option<Focus> {
         let value = focus.map_or(0, |x| x as u8);
         unsafe { Focus::from_u8(self.pointer_entered.swap(value, Ordering::SeqCst)) }
@@ -138,18 +138,18 @@ pub const TAB_HEIGHT: i32 = 24;
 #[derive(Debug, Clone)]
 pub enum MoveResult {
     Handled,
-    MoveOut(CosmicSurface, LoopHandle<'static, crate::state::State>),
+    MoveOut(LingmoSurface, LoopHandle<'static, crate::state::State>),
     Default,
 }
 
-impl CosmicStack {
-    pub fn new<I: Into<CosmicSurface>>(
+impl LingmoStack {
+    pub fn new<I: Into<LingmoSurface>>(
         windows: impl Iterator<Item = I>,
         handle: LoopHandle<'static, crate::state::State>,
-        mut theme: cosmic::Theme,
+        mut theme: Lingmo::Theme,
         appearance: AppearanceConfig,
-    ) -> CosmicStack {
-        theme.transparent = theme.cosmic().frosted_windows;
+    ) -> LingmoStack {
+        theme.transparent = theme.Lingmo().frosted_windows;
         let windows = windows.map(Into::into).collect::<Vec<_>>();
         assert!(!windows.is_empty());
 
@@ -160,8 +160,8 @@ impl CosmicStack {
         }
 
         let width = windows[0].geometry().size.w;
-        CosmicStack(IcedElement::new(
-            CosmicStackInternal {
+        LingmoStack(IcedElement::new(
+            LingmoStackInternal {
                 windows: Mutex::new(windows),
                 active: AtomicUsize::new(0),
                 activated: AtomicBool::new(false),
@@ -188,7 +188,7 @@ impl CosmicStack {
 
     pub fn add_window(
         &self,
-        window: impl Into<CosmicSurface>,
+        window: impl Into<LingmoSurface>,
         idx: Option<usize>,
         moved_into: Option<&Seat<State>>,
     ) {
@@ -227,7 +227,7 @@ impl CosmicStack {
         self.0.force_redraw()
     }
 
-    pub fn remove_window(&self, window: &CosmicSurface) {
+    pub fn remove_window(&self, window: &LingmoSurface) {
         self.0.with_program(|p| {
             let mut windows = p.windows.lock().unwrap();
             if windows.len() == 1 {
@@ -259,7 +259,7 @@ impl CosmicStack {
         self.0.force_redraw()
     }
 
-    pub fn remove_idx(&self, idx: usize) -> Option<CosmicSurface> {
+    pub fn remove_idx(&self, idx: usize) -> Option<LingmoSurface> {
         let window = self.0.with_program(|p| {
             let mut windows = p.windows.lock().unwrap();
             if windows.len() == 1 {
@@ -471,12 +471,12 @@ impl CosmicStack {
         result
     }
 
-    pub fn active(&self) -> CosmicSurface {
+    pub fn active(&self) -> LingmoSurface {
         self.0
             .with_program(|p| p.windows.lock().unwrap()[p.active.load(Ordering::SeqCst)].clone())
     }
 
-    pub fn has_active(&self, window: &CosmicSurface) -> bool {
+    pub fn has_active(&self, window: &LingmoSurface) -> bool {
         self.0
             .with_program(|p| &p.windows.lock().unwrap()[p.active.load(Ordering::SeqCst)] == window)
     }
@@ -488,7 +488,7 @@ impl CosmicStack {
 
     pub fn set_active<S>(&self, window: &S)
     where
-        CosmicSurface: PartialEq<S>,
+        LingmoSurface: PartialEq<S>,
     {
         self.0.with_program(|p| {
             if let Some(val) = p.windows.lock().unwrap().iter().position(|w| w == window) {
@@ -508,7 +508,7 @@ impl CosmicStack {
             .with_program(|p| p.tiled.store(tiled, Ordering::Release));
     }
 
-    pub fn surfaces(&self) -> impl Iterator<Item = CosmicSurface> {
+    pub fn surfaces(&self) -> impl Iterator<Item = LingmoSurface> {
         self.0.with_program(|p| {
             p.windows
                 .lock()
@@ -653,7 +653,7 @@ impl CosmicStack {
         scale: Scale<f64>,
         alpha: f32,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(CosmicStackRenderElement<R>),
+        push: &mut dyn FnMut(LingmoStackRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
@@ -663,8 +663,8 @@ impl CosmicStack {
             let windows = p.windows.lock().unwrap();
             let active = p.active.load(Ordering::SeqCst);
             let theme = p.theme.lock().unwrap();
-            let frosted = if theme.cosmic().frosted_windows {
-                (theme.cosmic().frosted as u8 + 1) as usize
+            let frosted = if theme.Lingmo().frosted_windows {
+                (theme.Lingmo().frosted as u8 + 1) as usize
             } else {
                 0
             };
@@ -693,7 +693,7 @@ impl CosmicStack {
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        C: From<CosmicStackRenderElement<R>>,
+        C: From<LingmoStackRenderElement<R>>,
     {
         self.0.with_program(|p| {
             let windows = p.windows.lock().unwrap();
@@ -713,7 +713,7 @@ impl CosmicStack {
             }
             let radii = if round {
                 theme
-                    .cosmic()
+                    .Lingmo()
                     .radius_s()
                     .map(|x| if x < 4.0 { x } else { x + 4.0 })
                     .map(|x| (x * scale as f32).round() as u8)
@@ -731,17 +731,17 @@ impl CosmicStack {
             geo.loc += location.to_f64().to_logical(output_scale);
 
             let window_key =
-                CosmicMappedKey(CosmicMappedKeyInner::Stack(Arc::downgrade(&self.0.0)));
+                LingmoMappedKey(LingmoMappedKeyInner::Stack(Arc::downgrade(&self.0.0)));
 
             Some(
-                CosmicStackRenderElement::Shadow(ShadowShader::element(
+                LingmoStackRenderElement::Shadow(ShadowShader::element(
                     renderer,
                     window_key,
                     geo.to_i32_round().as_local(),
                     radii,
                     if activated { alpha } else { alpha * 0.75 },
                     output_scale.x,
-                    theme.cosmic().is_dark,
+                    theme.Lingmo().is_dark,
                 ))
                 .into(),
             )
@@ -757,8 +757,8 @@ impl CosmicStack {
         alpha: f32,
         scanout_override: Option<bool>,
         scanout_node: Option<DrmNode>,
-        push_above: &mut dyn FnMut(CosmicStackRenderElement<R>),
-        push_below: &mut dyn FnMut(CosmicStackRenderElement<R>),
+        push_above: &mut dyn FnMut(LingmoStackRenderElement<R>),
+        push_below: &mut dyn FnMut(LingmoStackRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
@@ -778,8 +778,8 @@ impl CosmicStack {
         let window_loc = location + Point::from((0, (TAB_HEIGHT as f64 * scale.y) as i32));
         let frosted = self.0.with_program(|p| {
             let theme = p.theme.lock().unwrap();
-            if theme.cosmic().frosted_windows {
-                (theme.cosmic().frosted as u8 + 1) as usize
+            if theme.Lingmo().frosted_windows {
+                (theme.Lingmo().frosted as u8 + 1) as usize
             } else {
                 0
             }
@@ -794,7 +794,7 @@ impl CosmicStack {
             let round = (appearance.clip_tiled_windows || !tiled) && !maximized;
             round.then(|| {
                 theme
-                    .cosmic()
+                    .Lingmo()
                     .radius_s()
                     .map(|x| if x < 4.0 { x } else { x + 4.0 })
                     .map(|x| x.round() as u8)
@@ -815,11 +815,11 @@ impl CosmicStack {
             }
 
             let window_key =
-                CosmicMappedKey(CosmicMappedKeyInner::Stack(Arc::downgrade(&self.0.0)));
+                LingmoMappedKey(LingmoMappedKeyInner::Stack(Arc::downgrade(&self.0.0)));
 
             if !maximized {
-                let (r, g, b, a) = theme.cosmic().bg_divider().into_components();
-                push_above(CosmicStackRenderElement::Border(IndicatorShader::element(
+                let (r, g, b, a) = theme.Lingmo().bg_divider().into_components();
+                push_above(LingmoStackRenderElement::Border(IndicatorShader::element(
                     renderer,
                     Key::Window(Usage::Border, window_key.clone()),
                     geo.to_i32_round().as_local(),
@@ -858,8 +858,8 @@ impl CosmicStack {
         );
     }
 
-    pub(crate) fn set_theme(&self, mut theme: cosmic::Theme) {
-        theme.transparent = theme.cosmic().frosted_windows;
+    pub(crate) fn set_theme(&self, mut theme: Lingmo::Theme) {
+        theme.transparent = theme.Lingmo().frosted_windows;
         self.0.with_program(|p| {
             *p.theme.lock().unwrap() = theme.clone();
         });
@@ -987,7 +987,7 @@ impl CosmicStack {
                 .theme
                 .lock()
                 .unwrap()
-                .cosmic()
+                .Lingmo()
                 .radius_s()
                 .map(|x| if x < 4.0 { x } else { x + 4.0 })
                 .map(|val| val.round() as u8);
@@ -1060,7 +1060,7 @@ impl TabMessage for Message {
     }
 }
 
-impl Program for CosmicStackInternal {
+impl Program for LingmoStackInternal {
     type Message = Message;
 
     fn update(
@@ -1229,7 +1229,7 @@ impl Program for CosmicStackInternal {
         Task::none()
     }
 
-    fn view(&self) -> CosmicElement<'_, Self::Message> {
+    fn view(&self) -> LingmoElement<'_, Self::Message> {
         HOOKS.get().unwrap().stack_decorations.view(self)
     }
 
@@ -1247,7 +1247,7 @@ impl Program for CosmicStackInternal {
             );
 
             let mut paint = tiny_skia::Paint::default();
-            let (b, g, r, a) = theme.cosmic().accent_color().into_components();
+            let (b, g, r, a) = theme.Lingmo().accent_color().into_components();
             paint.set_color(tiny_skia::Color::from_rgba(r, g, b, a).unwrap());
 
             for rect in damage {
@@ -1273,8 +1273,8 @@ impl Program for CosmicStackInternal {
 #[derive(Debug)]
 pub struct DefaultDecorations;
 
-impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
-    fn view(&self, stack: &CosmicStackInternal) -> cosmic::Element<'_, Message> {
+impl Decorations<LingmoStackInternal, Message> for DefaultDecorations {
+    fn view(&self, stack: &LingmoStackInternal) -> Lingmo::Element<'_, Message> {
         let windows = stack.windows.lock().unwrap();
         if stack.geometry.lock().unwrap().is_none() {
             return iced_widget::row(Vec::new()).into();
@@ -1283,13 +1283,13 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
         let group_focused = stack.group_focused.load(Ordering::SeqCst);
 
         let elements = vec![
-            cosmic_widget::icon::from_name("window-stack-symbolic")
+            Lingmo_widget::icon::from_name("window-stack-symbolic")
                 .size(16)
                 .prefer_svg(true)
                 .icon()
                 .class(if group_focused {
                     theme::Svg::custom(|theme| iced_widget::svg::Style {
-                        color: Some(if theme.cosmic().is_dark {
+                        color: Some(if theme.Lingmo().is_dark {
                             Color::BLACK
                         } else {
                             Color::WHITE
@@ -1305,7 +1305,7 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
                 .on_press(Message::DragStart)
                 .on_right_press(Message::Menu)
                 .into(),
-            CosmicElement::new(
+            LingmoElement::new(
                 Tabs::new(
                     windows.iter().enumerate().map(|(i, w)| {
                         let user_data = w.user_data();
@@ -1353,7 +1353,7 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
                 .theme
                 .lock()
                 .unwrap()
-                .cosmic()
+                .Lingmo()
                 .radius_s()
                 .map(|x| if x < 4.0 { x } else { x + 4.0 });
             Radius::from([radii[0], radii[1], 0., 0.])
@@ -1366,28 +1366,28 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
             .apply(iced_widget::container)
             .align_y(Alignment::Center)
             .class(theme::Container::custom(move |theme| {
-                let cosmic_theme = theme.cosmic();
+                let Lingmo_theme = theme.Lingmo();
 
                 let mut background = if group_focused {
-                    cosmic_theme.accent_color()
+                    Lingmo_theme.accent_color()
                 } else {
-                    cosmic_theme.primary_container_color()
+                    Lingmo_theme.primary_container_color()
                 };
-                if cosmic_theme.frosted_windows {
-                    background.alpha = cosmic_theme.alpha_map.blurred_alpha(cosmic_theme.frosted);
+                if Lingmo_theme.frosted_windows {
+                    background.alpha = Lingmo_theme.alpha_map.blurred_alpha(Lingmo_theme.frosted);
                 }
 
                 iced_widget::container::Style {
                     snap: true,
                     icon_color: Some(
-                        cosmic_theme
-                            .background(cosmic_theme.frosted_windows)
+                        Lingmo_theme
+                            .background(Lingmo_theme.frosted_windows)
                             .on
                             .into(),
                     ),
                     text_color: Some(
-                        cosmic_theme
-                            .background(cosmic_theme.frosted_windows)
+                        Lingmo_theme
+                            .background(Lingmo_theme.frosted_windows)
                             .on
                             .into(),
                     ),
@@ -1404,7 +1404,7 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
     }
 }
 
-impl IsAlive for CosmicStack {
+impl IsAlive for LingmoStack {
     fn alive(&self) -> bool {
         self.0.with_program(|p| {
             p.override_alive.load(Ordering::SeqCst)
@@ -1413,7 +1413,7 @@ impl IsAlive for CosmicStack {
     }
 }
 
-impl SpaceElement for CosmicStack {
+impl SpaceElement for LingmoStack {
     fn bbox(&self) -> Rectangle<i32, Logical> {
         self.0.with_program(|p| {
             let mut bbox =
@@ -1522,7 +1522,7 @@ impl SpaceElement for CosmicStack {
     }
 }
 
-impl KeyboardTarget<State> for CosmicStack {
+impl KeyboardTarget<State> for LingmoStack {
     fn enter(
         &self,
         seat: &Seat<State>,
@@ -1596,7 +1596,7 @@ impl KeyboardTarget<State> for CosmicStack {
     }
 }
 
-impl PointerTarget<State> for CosmicStack {
+impl PointerTarget<State> for LingmoStack {
     fn enter(&self, seat: &Seat<State>, data: &mut State, event: &MotionEvent) {
         let mut event = event.clone();
         self.0.with_program(|p| {
@@ -1696,7 +1696,7 @@ impl PointerTarget<State> for CosmicStack {
                             Focus::ResizeRight => ResizeEdge::RIGHT,
                             Focus::Header => unreachable!(),
                         },
-                        state.common.config.cosmic_conf.edge_snap_threshold,
+                        state.common.config.Lingmo_conf.edge_snap_threshold,
                         false,
                     );
                     if let Some((grab, focus)) = res {
@@ -1841,7 +1841,7 @@ impl PointerTarget<State> for CosmicStack {
     }
 }
 
-impl TouchTarget<State> for CosmicStack {
+impl TouchTarget<State> for LingmoStack {
     fn down(&self, seat: &Seat<State>, data: &mut State, event: &DownEvent) {
         let mut event = event.clone();
         let active_window_geo = self.0.with_program(|p| {
@@ -1901,7 +1901,7 @@ impl TouchTarget<State> for CosmicStack {
     }
 }
 
-pub enum CosmicStackRenderElement<R: Renderer + ImportAll + ImportMem> {
+pub enum LingmoStackRenderElement<R: Renderer + ImportAll + ImportMem> {
     Header(IcedRenderElement<R>),
     Shadow(PixelShaderElement),
     Border(PixelShaderElement),
@@ -1909,7 +1909,7 @@ pub enum CosmicStackRenderElement<R: Renderer + ImportAll + ImportMem> {
 }
 
 impl<R: Renderer + ImportAll + ImportMem> From<IcedRenderElement<R>>
-    for CosmicStackRenderElement<R>
+    for LingmoStackRenderElement<R>
 {
     fn from(value: IcedRenderElement<R>) -> Self {
         Self::Header(value)
@@ -1917,69 +1917,69 @@ impl<R: Renderer + ImportAll + ImportMem> From<IcedRenderElement<R>>
 }
 
 impl<R: Renderer + ImportAll + ImportMem> From<SurfaceRenderElement<R>>
-    for CosmicStackRenderElement<R>
+    for LingmoStackRenderElement<R>
 {
     fn from(value: SurfaceRenderElement<R>) -> Self {
         Self::Window(value)
     }
 }
 
-impl<R> Element for CosmicStackRenderElement<R>
+impl<R> Element for LingmoStackRenderElement<R>
 where
     R: Renderer + ImportAll + ImportMem + AsGlowRenderer,
     R::TextureId: Send + 'static,
 {
     fn id(&self) -> &RendererId {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.id(),
-            CosmicStackRenderElement::Shadow(elem) => elem.id(),
-            CosmicStackRenderElement::Border(elem) => elem.id(),
-            CosmicStackRenderElement::Window(elem) => elem.id(),
+            LingmoStackRenderElement::Header(elem) => elem.id(),
+            LingmoStackRenderElement::Shadow(elem) => elem.id(),
+            LingmoStackRenderElement::Border(elem) => elem.id(),
+            LingmoStackRenderElement::Window(elem) => elem.id(),
         }
     }
 
     fn current_commit(&self) -> CommitCounter {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.current_commit(),
-            CosmicStackRenderElement::Shadow(elem) => elem.current_commit(),
-            CosmicStackRenderElement::Border(elem) => elem.current_commit(),
-            CosmicStackRenderElement::Window(elem) => elem.current_commit(),
+            LingmoStackRenderElement::Header(elem) => elem.current_commit(),
+            LingmoStackRenderElement::Shadow(elem) => elem.current_commit(),
+            LingmoStackRenderElement::Border(elem) => elem.current_commit(),
+            LingmoStackRenderElement::Window(elem) => elem.current_commit(),
         }
     }
 
     fn src(&self) -> Rectangle<f64, Buffer> {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.src(),
-            CosmicStackRenderElement::Shadow(elem) => elem.src(),
-            CosmicStackRenderElement::Border(elem) => elem.src(),
-            CosmicStackRenderElement::Window(elem) => elem.src(),
+            LingmoStackRenderElement::Header(elem) => elem.src(),
+            LingmoStackRenderElement::Shadow(elem) => elem.src(),
+            LingmoStackRenderElement::Border(elem) => elem.src(),
+            LingmoStackRenderElement::Window(elem) => elem.src(),
         }
     }
 
     fn geometry(&self, scale: Scale<f64>) -> Rectangle<i32, Physical> {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.geometry(scale),
-            CosmicStackRenderElement::Shadow(elem) => elem.geometry(scale),
-            CosmicStackRenderElement::Border(elem) => elem.geometry(scale),
-            CosmicStackRenderElement::Window(elem) => elem.geometry(scale),
+            LingmoStackRenderElement::Header(elem) => elem.geometry(scale),
+            LingmoStackRenderElement::Shadow(elem) => elem.geometry(scale),
+            LingmoStackRenderElement::Border(elem) => elem.geometry(scale),
+            LingmoStackRenderElement::Window(elem) => elem.geometry(scale),
         }
     }
 
     fn location(&self, scale: Scale<f64>) -> Point<i32, Physical> {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.location(scale),
-            CosmicStackRenderElement::Shadow(elem) => elem.location(scale),
-            CosmicStackRenderElement::Border(elem) => elem.location(scale),
-            CosmicStackRenderElement::Window(elem) => elem.location(scale),
+            LingmoStackRenderElement::Header(elem) => elem.location(scale),
+            LingmoStackRenderElement::Shadow(elem) => elem.location(scale),
+            LingmoStackRenderElement::Border(elem) => elem.location(scale),
+            LingmoStackRenderElement::Window(elem) => elem.location(scale),
         }
     }
 
     fn transform(&self) -> Transform {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.transform(),
-            CosmicStackRenderElement::Shadow(elem) => elem.transform(),
-            CosmicStackRenderElement::Border(elem) => elem.transform(),
-            CosmicStackRenderElement::Window(elem) => elem.transform(),
+            LingmoStackRenderElement::Header(elem) => elem.transform(),
+            LingmoStackRenderElement::Shadow(elem) => elem.transform(),
+            LingmoStackRenderElement::Border(elem) => elem.transform(),
+            LingmoStackRenderElement::Window(elem) => elem.transform(),
         }
     }
 
@@ -1989,51 +1989,51 @@ where
         commit: Option<CommitCounter>,
     ) -> DamageSet<i32, Physical> {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.damage_since(scale, commit),
-            CosmicStackRenderElement::Shadow(elem) => elem.damage_since(scale, commit),
-            CosmicStackRenderElement::Border(elem) => elem.damage_since(scale, commit),
-            CosmicStackRenderElement::Window(elem) => elem.damage_since(scale, commit),
+            LingmoStackRenderElement::Header(elem) => elem.damage_since(scale, commit),
+            LingmoStackRenderElement::Shadow(elem) => elem.damage_since(scale, commit),
+            LingmoStackRenderElement::Border(elem) => elem.damage_since(scale, commit),
+            LingmoStackRenderElement::Window(elem) => elem.damage_since(scale, commit),
         }
     }
 
     fn opaque_regions(&self, scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.opaque_regions(scale),
-            CosmicStackRenderElement::Shadow(elem) => elem.opaque_regions(scale),
-            CosmicStackRenderElement::Border(elem) => elem.opaque_regions(scale),
-            CosmicStackRenderElement::Window(elem) => elem.opaque_regions(scale),
+            LingmoStackRenderElement::Header(elem) => elem.opaque_regions(scale),
+            LingmoStackRenderElement::Shadow(elem) => elem.opaque_regions(scale),
+            LingmoStackRenderElement::Border(elem) => elem.opaque_regions(scale),
+            LingmoStackRenderElement::Window(elem) => elem.opaque_regions(scale),
         }
     }
 
     fn alpha(&self) -> f32 {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.alpha(),
-            CosmicStackRenderElement::Shadow(elem) => elem.alpha(),
-            CosmicStackRenderElement::Border(elem) => elem.alpha(),
-            CosmicStackRenderElement::Window(elem) => elem.alpha(),
+            LingmoStackRenderElement::Header(elem) => elem.alpha(),
+            LingmoStackRenderElement::Shadow(elem) => elem.alpha(),
+            LingmoStackRenderElement::Border(elem) => elem.alpha(),
+            LingmoStackRenderElement::Window(elem) => elem.alpha(),
         }
     }
 
     fn kind(&self) -> Kind {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.kind(),
-            CosmicStackRenderElement::Shadow(elem) => elem.kind(),
-            CosmicStackRenderElement::Border(elem) => elem.kind(),
-            CosmicStackRenderElement::Window(elem) => elem.kind(),
+            LingmoStackRenderElement::Header(elem) => elem.kind(),
+            LingmoStackRenderElement::Shadow(elem) => elem.kind(),
+            LingmoStackRenderElement::Border(elem) => elem.kind(),
+            LingmoStackRenderElement::Window(elem) => elem.kind(),
         }
     }
 
     fn is_framebuffer_effect(&self) -> bool {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.is_framebuffer_effect(),
-            CosmicStackRenderElement::Shadow(elem) => elem.is_framebuffer_effect(),
-            CosmicStackRenderElement::Border(elem) => elem.is_framebuffer_effect(),
-            CosmicStackRenderElement::Window(elem) => elem.is_framebuffer_effect(),
+            LingmoStackRenderElement::Header(elem) => elem.is_framebuffer_effect(),
+            LingmoStackRenderElement::Shadow(elem) => elem.is_framebuffer_effect(),
+            LingmoStackRenderElement::Border(elem) => elem.is_framebuffer_effect(),
+            LingmoStackRenderElement::Window(elem) => elem.is_framebuffer_effect(),
         }
     }
 }
 
-impl<R> RenderElement<R> for CosmicStackRenderElement<R>
+impl<R> RenderElement<R> for LingmoStackRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
@@ -2048,10 +2048,10 @@ where
         cache: Option<&UserDataMap>,
     ) -> Result<(), <R>::Error> {
         match self {
-            CosmicStackRenderElement::Header(elem) => {
+            LingmoStackRenderElement::Header(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            CosmicStackRenderElement::Shadow(elem) | CosmicStackRenderElement::Border(elem) => {
+            LingmoStackRenderElement::Shadow(elem) | LingmoStackRenderElement::Border(elem) => {
                 RenderElement::<GlowRenderer>::draw(
                     elem,
                     R::glow_frame_mut(frame),
@@ -2063,7 +2063,7 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            CosmicStackRenderElement::Window(elem) => {
+            LingmoStackRenderElement::Window(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
         }
@@ -2071,11 +2071,11 @@ where
 
     fn underlying_storage(&self, renderer: &mut R) -> Option<UnderlyingStorage<'_>> {
         match self {
-            CosmicStackRenderElement::Header(elem) => elem.underlying_storage(renderer),
-            CosmicStackRenderElement::Shadow(elem) | CosmicStackRenderElement::Border(elem) => {
+            LingmoStackRenderElement::Header(elem) => elem.underlying_storage(renderer),
+            LingmoStackRenderElement::Shadow(elem) | LingmoStackRenderElement::Border(elem) => {
                 elem.underlying_storage(renderer.glow_renderer_mut())
             }
-            CosmicStackRenderElement::Window(elem) => elem.underlying_storage(renderer),
+            LingmoStackRenderElement::Window(elem) => elem.underlying_storage(renderer),
         }
     }
 
@@ -2087,10 +2087,10 @@ where
         cache: &UserDataMap,
     ) -> Result<(), <R>::Error> {
         match self {
-            CosmicStackRenderElement::Header(elem) => {
+            LingmoStackRenderElement::Header(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            CosmicStackRenderElement::Shadow(elem) | CosmicStackRenderElement::Border(elem) => {
+            LingmoStackRenderElement::Shadow(elem) | LingmoStackRenderElement::Border(elem) => {
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem,
                     R::glow_frame_mut(frame),
@@ -2100,9 +2100,11 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            CosmicStackRenderElement::Window(elem) => {
+            LingmoStackRenderElement::Window(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
         }
     }
 }
+
+

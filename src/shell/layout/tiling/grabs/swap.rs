@@ -1,4 +1,4 @@
-use cosmic_settings_config::shortcuts;
+use Lingmo_settings_config::shortcuts;
 use smithay::{
     backend::input::{KeyState, Keycode},
     input::{
@@ -12,7 +12,7 @@ use smithay::{
 };
 
 use crate::{
-    config::key_bindings::cosmic_modifiers_from_smithay,
+    config::key_bindings::Lingmo_modifiers_from_smithay,
     input::InputBackendId,
     shell::{Trigger, layout::tiling::NodeDesc},
     state::State,
@@ -80,7 +80,7 @@ impl KeyboardGrab<State> for SwapWindowGrab {
             time,
             shortcuts::Binding {
                 modifiers: modifiers
-                    .map(cosmic_modifiers_from_smithay)
+                    .map(Lingmo_modifiers_from_smithay)
                     .unwrap_or_default(),
                 keycode: None,
                 key: Some(handle.keysym_handle(keycode).modified_sym()),
@@ -107,3 +107,4 @@ impl KeyboardGrab<State> for SwapWindowGrab {
 
     fn unset(&mut self, _state: &mut State) {}
 }
+

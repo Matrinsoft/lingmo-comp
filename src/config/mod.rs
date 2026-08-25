@@ -10,9 +10,9 @@ use crate::{
     },
 };
 use anyhow::Context;
-use cosmic_config::{ConfigGet, CosmicConfigEntry};
-use cosmic_settings_config::window_rules::ApplicationException;
-use cosmic_settings_config::{Shortcuts, shortcuts, window_rules};
+use Lingmo_config::{ConfigGet, LingmoConfigEntry};
+use Lingmo_settings_config::window_rules::ApplicationException;
+use Lingmo_settings_config::{Shortcuts, shortcuts, window_rules};
 use serde::{Deserialize, Serialize};
 use smithay::utils::{Clock, Monotonic};
 use smithay::wayland::xdg_activation::XdgActivationState;
@@ -43,10 +43,10 @@ mod input_config;
 pub mod key_bindings;
 mod types;
 
-use cosmic::config::CosmicTk;
-pub use cosmic_comp_config::EdidProduct;
-use cosmic_comp_config::{
-    ActivationPolicy, AppearanceConfig, CosmicCompConfig, KeyboardConfig, TileBehavior, XkbConfig,
+use Lingmo::config::LingmoTk;
+pub use lingmo_comp_config::EdidProduct;
+use lingmo_comp_config::{
+    ActivationPolicy, AppearanceConfig, LingmoCompConfig, KeyboardConfig, TileBehavior, XkbConfig,
     XwaylandDescaling, XwaylandEavesdropping, ZoomConfig,
     input::{DeviceState as InputDeviceState, InputConfig, TouchpadOverride},
     output::comp::{
@@ -60,16 +60,16 @@ use types::WlXkbConfig;
 #[derive(Debug)]
 pub struct Config {
     pub dynamic_conf: DynamicConfig,
-    pub cosmic_helper: cosmic_config::Config,
-    /// cosmic-config comp configuration for `com.system76.CosmicComp`
-    pub cosmic_conf: CosmicCompConfig,
-    /// cosmic-config context for `com.system76.CosmicSettings.Shortcuts`
-    pub settings_context: cosmic_config::Config,
-    /// Key bindings from `com.system76.CosmicSettings.Shortcuts`
+    pub Lingmo_helper: Lingmo_config::Config,
+    /// Lingmo-config comp configuration for `com.lingmoos.LingmoComp`
+    pub Lingmo_conf: LingmoCompConfig,
+    /// Lingmo-config context for `com.lingmoos.LingmoSettings.Shortcuts`
+    pub settings_context: Lingmo_config::Config,
+    /// Key bindings from `com.lingmoos.LingmoSettings.Shortcuts`
     pub shortcuts: Shortcuts,
-    // Tiling exceptions from `com.system76.CosmicSettings.WindowRules`
+    // Tiling exceptions from `com.lingmoos.LingmoSettings.WindowRules`
     pub tiling_exceptions: Vec<ApplicationException>,
-    /// System actions from `com.system76.CosmicSettings.Shortcuts`
+    /// System actions from `com.lingmoos.LingmoSettings.Shortcuts`
     pub system_actions: BTreeMap<shortcuts::action::System, String>,
 }
 
@@ -170,17 +170,17 @@ pub enum ColorFilter {
 
 impl Config {
     pub fn load(loop_handle: &LoopHandle<'_, State>) -> Config {
-        let config = cosmic_config::Config::new("com.system76.CosmicComp", 1).unwrap();
-        let source = cosmic_config::calloop::ConfigWatchSource::new(&config).unwrap();
+        let config = Lingmo_config::Config::new("com.lingmoos.LingmoComp", 1).unwrap();
+        let source = Lingmo_config::calloop::ConfigWatchSource::new(&config).unwrap();
         loop_handle
             .insert_source(source, |(config, keys), (), state| {
                 config_changed(config, keys, state);
             })
-            .expect("Failed to add cosmic-config to the event loop");
+            .expect("Failed to add Lingmo-config to the event loop");
         let xdg = xdg::BaseDirectories::new();
 
-        let cosmic_comp_config =
-            CosmicCompConfig::get_entry(&config).unwrap_or_else(|(errs, c)| {
+        let Lingmo_comp_config =
+            LingmoCompConfig::get_entry(&config).unwrap_or_else(|(errs, c)| {
                 if cfg!(debug_assertions) {
                     for err in errs {
                         warn!(?err, "");
@@ -190,10 +190,10 @@ impl Config {
             });
 
         // Listen for updates to the toolkit config
-        if let Ok(tk_config) = cosmic_config::Config::new("com.system76.CosmicTk", 1) {
-            fn handle_new_toolkit_config(config: CosmicTk, state: &mut State) {
-                if cosmic::icon_theme::default() != config.icon_theme {
-                    cosmic::icon_theme::set_default(config.icon_theme.clone());
+        if let Ok(tk_config) = Lingmo_config::Config::new("com.lingmoos.LingmoTk", 1) {
+            fn handle_new_toolkit_config(config: LingmoTk, state: &mut State) {
+                if Lingmo::icon_theme::default() != config.icon_theme {
+                    Lingmo::icon_theme::set_default(config.icon_theme.clone());
                     state.common.update_xwayland_settings();
                 }
 
@@ -205,7 +205,7 @@ impl Config {
                 );
             }
 
-            let config = CosmicTk::get_entry(&tk_config).unwrap_or_else(|(errs, c)| {
+            let config = LingmoTk::get_entry(&tk_config).unwrap_or_else(|(errs, c)| {
                 if cfg!(debug_assertions) {
                     for err in errs {
                         warn!(?err, "");
@@ -217,12 +217,12 @@ impl Config {
                 handle_new_toolkit_config(config, state);
             });
 
-            match cosmic_config::calloop::ConfigWatchSource::new(&tk_config) {
+            match Lingmo_config::calloop::ConfigWatchSource::new(&tk_config) {
                 Ok(source) => {
                     if let Err(err) =
                         loop_handle.insert_source(source, |(config, _keys), (), state| {
                             let config =
-                                CosmicTk::get_entry(&config).unwrap_or_else(|(errs, c)| {
+                                LingmoTk::get_entry(&config).unwrap_or_else(|(errs, c)| {
                                     if cfg!(debug_assertions) {
                                         for err in errs {
                                             warn!(?err, "");
@@ -233,23 +233,23 @@ impl Config {
                             handle_new_toolkit_config(config, state);
                         })
                     {
-                        warn!(?err, "Failed to watch com.system76.CosmicTk config");
+                        warn!(?err, "Failed to watch com.lingmoos.LingmoTk config");
                     }
                 }
                 Err(err) => warn!(
                     ?err,
-                    "failed to create config watch source for com.system76.CosmicTk"
+                    "failed to create config watch source for com.lingmoos.LingmoTk"
                 ),
             }
         }
 
-        // Source key bindings from com.system76.CosmicSettings.Shortcuts
+        // Source key bindings from com.lingmoos.LingmoSettings.Shortcuts
         let settings_context = shortcuts::context().expect("Failed to load shortcuts config");
         let system_actions = shortcuts::system_actions(&settings_context);
         let shortcuts = shortcuts::shortcuts(&settings_context);
 
         // Listen for updates to the keybindings config.
-        match cosmic_config::calloop::ConfigWatchSource::new(&settings_context) {
+        match Lingmo_config::calloop::ConfigWatchSource::new(&settings_context) {
             Ok(source) => {
                 if let Err(err) = loop_handle.insert_source(source, |(config, keys), (), state| {
                     for key in keys {
@@ -270,13 +270,13 @@ impl Config {
                 }) {
                     warn!(
                         ?err,
-                        "Failed to watch com.system76.CosmicSettings.Shortcuts config"
+                        "Failed to watch com.lingmoos.LingmoSettings.Shortcuts config"
                     );
                 }
             }
             Err(err) => warn!(
                 ?err,
-                "failed to create config watch source for com.system76.CosmicSettings.Shortcuts"
+                "failed to create config watch source for com.lingmoos.LingmoSettings.Shortcuts"
             ),
         };
 
@@ -284,7 +284,7 @@ impl Config {
             window_rules::context().expect("Failed to load window rules config");
         let tiling_exceptions = window_rules::tiling_exceptions(&window_rules_context);
 
-        match cosmic_config::calloop::ConfigWatchSource::new(&window_rules_context) {
+        match Lingmo_config::calloop::ConfigWatchSource::new(&window_rules_context) {
             Ok(source) => {
                 if let Err(err) = loop_handle.insert_source(source, |(config, keys), (), state| {
                     for key in keys {
@@ -302,13 +302,13 @@ impl Config {
                 }) {
                     warn!(
                         ?err,
-                        "Failed to watch com.system76.CosmicSettings.WindowRules config"
+                        "Failed to watch com.lingmoos.LingmoSettings.WindowRules config"
                     );
                 }
             }
             Err(err) => warn!(
                 ?err,
-                "failed to create config watch source for com.system76.CosmicSettings.WindowRules"
+                "failed to create config watch source for com.lingmoos.LingmoSettings.WindowRules"
             ),
         };
 
@@ -326,8 +326,8 @@ impl Config {
 
         Config {
             dynamic_conf: Self::load_dynamic(&xdg),
-            cosmic_conf: cosmic_comp_config,
-            cosmic_helper: config,
+            Lingmo_conf: Lingmo_comp_config,
+            Lingmo_helper: config,
             settings_context,
             shortcuts,
             system_actions,
@@ -336,13 +336,13 @@ impl Config {
     }
 
     fn load_dynamic(xdg: &xdg::BaseDirectories) -> DynamicConfig {
-        let output_path = xdg.place_state_file("cosmic-comp/outputs.ron").ok();
+        let output_path = xdg.place_state_file("lingmo-comp/outputs.ron").ok();
         let outputs = load_outputs(output_path.as_ref());
-        let numlock_path = xdg.place_state_file("cosmic-comp/numlock.ron").ok();
+        let numlock_path = xdg.place_state_file("lingmo-comp/numlock.ron").ok();
         let numlock = Self::load_numlock(&numlock_path);
 
         let filter_path = xdg
-            .place_state_file("cosmic-comp/a11y_screen_filter.ron")
+            .place_state_file("lingmo-comp/a11y_screen_filter.ron")
             .ok();
         let filter = Self::load_filter_state(&filter_path);
 
@@ -607,7 +607,7 @@ impl Config {
     }
 
     pub fn xkb_config(&self) -> XkbConfig {
-        self.cosmic_conf.xkb_config.clone()
+        self.Lingmo_conf.xkb_config.clone()
     }
 
     pub fn read_device(&self, device: &mut InputDevice) {
@@ -637,13 +637,13 @@ impl Config {
         let is_touchpad = device.config_tap_finger_count() > 0;
 
         let default_config = if is_touchpad {
-            &self.cosmic_conf.input_touchpad
+            &self.Lingmo_conf.input_touchpad
         } else {
-            &self.cosmic_conf.input_default
+            &self.Lingmo_conf.input_default
         };
 
-        let mut device_config = self.cosmic_conf.input_devices.get(&*device.name()).cloned();
-        if is_touchpad && self.cosmic_conf.input_touchpad_override == TouchpadOverride::ForceDisable
+        let mut device_config = self.Lingmo_conf.input_devices.get(&*device.name()).cloned();
+        if is_touchpad && self.Lingmo_conf.input_touchpad_override == TouchpadOverride::ForceDisable
         {
             device_config = Some({
                 let mut config = device_config.unwrap_or_default();
@@ -744,7 +744,7 @@ pub fn xkb_config_to_wl(config: &XkbConfig) -> WlXkbConfig<'_> {
 }
 
 fn get_config<T: Default + serde::de::DeserializeOwned>(
-    config: &cosmic_config::Config,
+    config: &Lingmo_config::Config,
     key: &str,
 ) -> T {
     config.get(key).unwrap_or_else(|err| {
@@ -785,7 +785,7 @@ pub fn change_modifier_state(
     input(smithay_input::KeyState::Released, scan_code);
 }
 
-fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut State) {
+fn config_changed(config: Lingmo_config::Config, keys: Vec<String>, state: &mut State) {
     for key in &keys {
         match key.as_str() {
             "xkb_config" => {
@@ -842,11 +842,11 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
                     let seat = state.common.shell.read().seats.last_active().clone();
                     state.broadcast_ei_keyboard_modifiers(&seat);
                 }
-                state.common.config.cosmic_conf.xkb_config = value;
+                state.common.config.Lingmo_conf.xkb_config = value;
             }
             "keyboard_config" => {
                 let value = get_config::<KeyboardConfig>(&config, "keyboard_config");
-                state.common.config.cosmic_conf.keyboard_config = value;
+                state.common.config.Lingmo_conf.keyboard_config = value;
                 let shell = state.common.shell.read();
                 let seat = shell.seats.last_active();
                 state.common.config.dynamic_conf.numlock_mut().last_state =
@@ -854,33 +854,33 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
             }
             "input_default" => {
                 let value = get_config::<InputConfig>(&config, "input_default");
-                state.common.config.cosmic_conf.input_default = value;
+                state.common.config.Lingmo_conf.input_default = value;
                 update_input(state);
             }
             "input_touchpad" => {
                 let value = get_config::<InputConfig>(&config, "input_touchpad");
-                state.common.config.cosmic_conf.input_touchpad = value;
+                state.common.config.Lingmo_conf.input_touchpad = value;
                 update_input(state);
             }
             "input_touchpad_override" => {
                 let value = get_config::<TouchpadOverride>(&config, "input_touchpad_override");
-                state.common.config.cosmic_conf.input_touchpad_override = value;
+                state.common.config.Lingmo_conf.input_touchpad_override = value;
                 update_input(state)
             }
             "input_devices" => {
                 let value = get_config::<HashMap<String, InputConfig>>(&config, "input_devices");
-                state.common.config.cosmic_conf.input_devices = value;
+                state.common.config.Lingmo_conf.input_devices = value;
                 update_input(state);
             }
             "workspaces" => {
-                state.common.config.cosmic_conf.workspaces =
+                state.common.config.Lingmo_conf.workspaces =
                     get_config::<WorkspaceConfig>(&config, "workspaces");
                 state.common.update_config();
             }
             "autotile" => {
                 let new = get_config::<bool>(&config, "autotile");
-                if new != state.common.config.cosmic_conf.autotile {
-                    state.common.config.cosmic_conf.autotile = new;
+                if new != state.common.config.Lingmo_conf.autotile {
+                    state.common.config.Lingmo_conf.autotile = new;
 
                     let mut shell = state.common.shell.write();
                     let shell_ref = &mut *shell;
@@ -893,8 +893,8 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
             }
             "autotile_behavior" => {
                 let new = get_config::<TileBehavior>(&config, "autotile_behavior");
-                if new != state.common.config.cosmic_conf.autotile_behavior {
-                    state.common.config.cosmic_conf.autotile_behavior = new;
+                if new != state.common.config.Lingmo_conf.autotile_behavior {
+                    state.common.config.Lingmo_conf.autotile_behavior = new;
 
                     let mut shell = state.common.shell.write();
                     let shell_ref = &mut *shell;
@@ -907,22 +907,22 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
             }
             "active_hint" => {
                 let new = get_config::<bool>(&config, "active_hint");
-                if new != state.common.config.cosmic_conf.active_hint {
-                    state.common.config.cosmic_conf.active_hint = new;
+                if new != state.common.config.Lingmo_conf.active_hint {
+                    state.common.config.Lingmo_conf.active_hint = new;
                     state.common.update_config();
                 }
             }
             "descale_xwayland" => {
                 let new = get_config::<XwaylandDescaling>(&config, "descale_xwayland");
-                if new != state.common.config.cosmic_conf.descale_xwayland {
-                    state.common.config.cosmic_conf.descale_xwayland = new;
+                if new != state.common.config.Lingmo_conf.descale_xwayland {
+                    state.common.config.Lingmo_conf.descale_xwayland = new;
                     state.common.update_xwayland_settings();
                 }
             }
             "xwayland_eavesdropping" => {
                 let new = get_config::<XwaylandEavesdropping>(&config, "xwayland_eavesdropping");
-                if new != state.common.config.cosmic_conf.xwayland_eavesdropping {
-                    state.common.config.cosmic_conf.xwayland_eavesdropping = new;
+                if new != state.common.config.Lingmo_conf.xwayland_eavesdropping {
+                    state.common.config.Lingmo_conf.xwayland_eavesdropping = new;
                     state
                         .common
                         .xwayland_reset_eavesdropping(SERIAL_COUNTER.next_serial());
@@ -930,39 +930,39 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
             }
             "focus_follows_cursor" => {
                 let new = get_config::<bool>(&config, "focus_follows_cursor");
-                if new != state.common.config.cosmic_conf.focus_follows_cursor {
-                    state.common.config.cosmic_conf.focus_follows_cursor = new;
+                if new != state.common.config.Lingmo_conf.focus_follows_cursor {
+                    state.common.config.Lingmo_conf.focus_follows_cursor = new;
                 }
             }
             "cursor_follows_focus" => {
                 let new = get_config::<bool>(&config, "cursor_follows_focus");
-                if new != state.common.config.cosmic_conf.cursor_follows_focus {
-                    state.common.config.cosmic_conf.cursor_follows_focus = new;
+                if new != state.common.config.Lingmo_conf.cursor_follows_focus {
+                    state.common.config.Lingmo_conf.cursor_follows_focus = new;
                 }
             }
             "focus_follows_cursor_delay" => {
                 let new = get_config::<u64>(&config, "focus_follows_cursor_delay");
-                if new != state.common.config.cosmic_conf.focus_follows_cursor_delay {
-                    state.common.config.cosmic_conf.focus_follows_cursor_delay = new;
+                if new != state.common.config.Lingmo_conf.focus_follows_cursor_delay {
+                    state.common.config.Lingmo_conf.focus_follows_cursor_delay = new;
                 }
             }
             "edge_snap_threshold" => {
                 let new = get_config::<u32>(&config, "edge_snap_threshold");
-                if new != state.common.config.cosmic_conf.edge_snap_threshold {
-                    state.common.config.cosmic_conf.edge_snap_threshold = new;
+                if new != state.common.config.Lingmo_conf.edge_snap_threshold {
+                    state.common.config.Lingmo_conf.edge_snap_threshold = new;
                 }
             }
             "accessibility_zoom" => {
                 let new = get_config::<ZoomConfig>(&config, "accessibility_zoom");
-                if new != state.common.config.cosmic_conf.accessibility_zoom {
-                    state.common.config.cosmic_conf.accessibility_zoom = new;
+                if new != state.common.config.Lingmo_conf.accessibility_zoom {
+                    state.common.config.Lingmo_conf.accessibility_zoom = new;
                     state.common.update_config();
                 }
             }
             "appearance_settings" => {
                 let new = get_config::<AppearanceConfig>(&config, "appearance_settings");
-                if new != state.common.config.cosmic_conf.appearance_settings {
-                    state.common.config.cosmic_conf.appearance_settings = new;
+                if new != state.common.config.Lingmo_conf.appearance_settings {
+                    state.common.config.Lingmo_conf.appearance_settings = new;
                     state.common.update_config();
                     for output in state.common.shell.read().outputs() {
                         state.backend.schedule_render(output);
@@ -971,8 +971,8 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
             }
             "cursor_hide_timeout" => {
                 let new = get_config::<Option<u32>>(&config, "cursor_hide_timeout");
-                if new != state.common.config.cosmic_conf.cursor_hide_timeout {
-                    state.common.config.cosmic_conf.cursor_hide_timeout = new;
+                if new != state.common.config.Lingmo_conf.cursor_hide_timeout {
+                    state.common.config.Lingmo_conf.cursor_hide_timeout = new;
                     let seats: Vec<_> = state.common.shell.read().seats.iter().cloned().collect();
                     let mut needs_render = false;
                     for seat in seats {
@@ -990,8 +990,8 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
             }
             "activation_policy" => {
                 let new = get_config::<ActivationPolicy>(&config, "activation_policy");
-                if new != state.common.config.cosmic_conf.activation_policy {
-                    state.common.config.cosmic_conf.activation_policy = new;
+                if new != state.common.config.Lingmo_conf.activation_policy {
+                    state.common.config.Lingmo_conf.activation_policy = new;
                 }
             }
             _ => {}
@@ -1012,3 +1012,6 @@ impl From<Output> for CompOutputInfo {
         })
     }
 }
+
+
+

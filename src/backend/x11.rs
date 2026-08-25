@@ -9,7 +9,7 @@ use crate::{
     wayland::protocols::drm::WlDrmState,
 };
 use anyhow::{Context, Result, anyhow};
-use cosmic_comp_config::output::comp::OutputConfig;
+use lingmo_comp_config::output::comp::OutputConfig;
 use smithay::{
     backend::{
         allocator::{
@@ -63,7 +63,7 @@ pub struct X11State {
 impl X11State {
     pub fn add_window(&mut self, handle: LoopHandle<'_, State>) -> Result<Output> {
         let window = WindowBuilder::new()
-            .title("COSMIC")
+            .title("Lingmo")
             .build(&self.handle)
             .with_context(|| "Failed to create window")?;
         let fourcc = window.format();
@@ -95,7 +95,7 @@ impl X11State {
         let props = PhysicalProperties {
             size: (0, 0).into(),
             subpixel: Subpixel::Unknown,
-            make: "COSMIC".to_string(),
+            make: "Lingmo".to_string(),
             model: name.clone(),
             serial_number: "Unknown".to_string(),
         };
@@ -548,3 +548,5 @@ impl State {
         }
     }
 }
+
+

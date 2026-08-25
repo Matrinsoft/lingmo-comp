@@ -6,8 +6,8 @@ use std::{
 
 use crate::{
     shell::{
-        CosmicSurface, CursorGeometry, SeatExt,
-        element::{CosmicMapped, CosmicStack, CosmicWindow},
+        LingmoSurface, CursorGeometry, SeatExt,
+        element::{LingmoMapped, LingmoStack, LingmoWindow},
         layout::tiling::ResizeForkTarget,
         zoom::ZoomFocusTarget,
     },
@@ -55,10 +55,10 @@ pub enum PointerFocusTarget {
     },
     X11Surface {
         surface: X11Surface,
-        toplevel: Option<CosmicSurface>,
+        toplevel: Option<LingmoSurface>,
     },
-    StackUI(CosmicStack),
-    WindowUI(CosmicWindow),
+    StackUI(LingmoStack),
+    WindowUI(LingmoWindow),
     ResizeFork(ResizeForkTarget),
     ZoomUI(ZoomFocusTarget),
 }
@@ -66,12 +66,12 @@ pub enum PointerFocusTarget {
 #[derive(Debug, Clone, PartialEq)]
 #[allow(clippy::large_enum_variant)]
 pub enum PointerFocusToplevel {
-    Surface(CosmicSurface),
+    Surface(LingmoSurface),
     Popup(PopupKind),
 }
 
-impl From<CosmicSurface> for PointerFocusToplevel {
-    fn from(value: CosmicSurface) -> Self {
+impl From<LingmoSurface> for PointerFocusToplevel {
+    fn from(value: LingmoSurface) -> Self {
         PointerFocusToplevel::Surface(value)
     }
 }
@@ -84,8 +84,8 @@ impl From<PopupKind> for PointerFocusToplevel {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum KeyboardFocusTarget {
-    Element(CosmicMapped),
-    Fullscreen(CosmicSurface),
+    Element(LingmoMapped),
+    Fullscreen(LingmoSurface),
     Group(WindowGroup),
     LayerSurface(LayerSurface),
     Popup(PopupKind),
@@ -165,7 +165,7 @@ impl PointerFocusTarget {
     }
 
     pub fn under_surface<P: Into<Point<f64, Logical>>>(
-        surface: &CosmicSurface,
+        surface: &LingmoSurface,
         point: P,
     ) -> Option<(Self, Point<i32, Logical>)> {
         match surface.0.underlying_surface() {
@@ -191,7 +191,7 @@ impl PointerFocusTarget {
         }
     }
 
-    pub fn toplevel(&self, shell: &Shell) -> Option<CosmicSurface> {
+    pub fn toplevel(&self, shell: &Shell) -> Option<LingmoSurface> {
         match &self {
             PointerFocusTarget::WlSurface {
                 toplevel: Some(PointerFocusToplevel::Surface(surface)),
@@ -309,16 +309,16 @@ impl KeyboardFocusTarget {
         }
     }
 
-    pub fn windows(&self) -> impl Iterator<Item = CosmicSurface> + '_ {
+    pub fn windows(&self) -> impl Iterator<Item = LingmoSurface> + '_ {
         match self {
             KeyboardFocusTarget::Element(mapped) => Box::new(mapped.windows().map(|(s, _)| s))
-                as Box<dyn Iterator<Item = CosmicSurface>>,
+                as Box<dyn Iterator<Item = LingmoSurface>>,
             KeyboardFocusTarget::Fullscreen(surface) => Box::new(std::iter::once(surface.clone())),
             _ => Box::new(std::iter::empty()),
         }
     }
 
-    pub fn active_window(&self) -> Option<CosmicSurface> {
+    pub fn active_window(&self) -> Option<LingmoSurface> {
         match self {
             KeyboardFocusTarget::Element(mapped) => Some(mapped.active_window()),
             KeyboardFocusTarget::Fullscreen(surface) => Some(surface.clone()),
@@ -348,7 +348,7 @@ impl KeyboardFocusTarget {
         } else if let KeyboardFocusTarget::Fullscreen(s) = self {
             s.has_surface(surface, WindowSurfaceType::ALL)
         } else if let Some(root) = WaylandFocus::wl_surface(self) {
-            CosmicSurface::surface_tree_offset(&root, surface).is_some()
+            LingmoSurface::surface_tree_offset(&root, surface).is_some()
         } else {
             false
         }
@@ -531,37 +531,37 @@ impl TouchTarget<State> for PointerFocusTarget {
     }
 }
 
-pub enum CosmicOfferData<S: Source> {
+pub enum LingmoOfferData<S: Source> {
     Wl(WlOfferData<S>),
     X11(XwmOfferData<S>),
 }
 
-impl<S: Source> OfferData for CosmicOfferData<S> {
+impl<S: Source> OfferData for LingmoOfferData<S> {
     fn disable(&self) {
         match self {
-            CosmicOfferData::Wl(data) => data.disable(),
-            CosmicOfferData::X11(data) => data.disable(),
+            LingmoOfferData::Wl(data) => data.disable(),
+            LingmoOfferData::X11(data) => data.disable(),
         }
     }
 
     fn drop(&self) {
         match self {
-            CosmicOfferData::Wl(data) => data.drop(),
-            CosmicOfferData::X11(data) => data.drop(),
+            LingmoOfferData::Wl(data) => data.drop(),
+            LingmoOfferData::X11(data) => data.drop(),
         }
     }
 
     fn validated(&self) -> bool {
         match self {
-            CosmicOfferData::Wl(data) => data.validated(),
-            CosmicOfferData::X11(data) => data.validated(),
+            LingmoOfferData::Wl(data) => data.validated(),
+            LingmoOfferData::X11(data) => data.validated(),
         }
     }
 }
 
 impl DndFocus<State> for PointerFocusTarget {
     type OfferData<S>
-        = CosmicOfferData<S>
+        = LingmoOfferData<S>
     where
         S: Source;
 
@@ -573,15 +573,15 @@ impl DndFocus<State> for PointerFocusTarget {
         seat: &Seat<State>,
         location: Point<f64, Logical>,
         serial: &Serial,
-    ) -> Option<CosmicOfferData<S>> {
+    ) -> Option<LingmoOfferData<S>> {
         match self {
             PointerFocusTarget::WlSurface { surface, .. } => {
                 DndFocus::enter(surface, data, dh, source, seat, location, serial)
-                    .map(CosmicOfferData::Wl)
+                    .map(LingmoOfferData::Wl)
             }
             PointerFocusTarget::X11Surface { surface, .. } => {
                 DndFocus::enter(surface, data, dh, source, seat, location, serial)
-                    .map(CosmicOfferData::X11)
+                    .map(LingmoOfferData::X11)
             }
             _ => None,
         }
@@ -590,7 +590,7 @@ impl DndFocus<State> for PointerFocusTarget {
     fn motion<S: Source>(
         &self,
         data: &mut State,
-        offer: Option<&mut CosmicOfferData<S>>,
+        offer: Option<&mut LingmoOfferData<S>>,
         seat: &Seat<State>,
         location: Point<f64, Logical>,
         time: u32,
@@ -598,7 +598,7 @@ impl DndFocus<State> for PointerFocusTarget {
         match self {
             PointerFocusTarget::WlSurface { surface, .. } => {
                 let offer = match offer {
-                    Some(CosmicOfferData::Wl(offer)) => Some(offer),
+                    Some(LingmoOfferData::Wl(offer)) => Some(offer),
                     None => None,
                     _ => return,
                 };
@@ -606,7 +606,7 @@ impl DndFocus<State> for PointerFocusTarget {
             }
             PointerFocusTarget::X11Surface { surface, .. } => {
                 let offer = match offer {
-                    Some(CosmicOfferData::X11(offer)) => Some(offer),
+                    Some(LingmoOfferData::X11(offer)) => Some(offer),
                     None => None,
                     _ => return,
                 };
@@ -619,13 +619,13 @@ impl DndFocus<State> for PointerFocusTarget {
     fn leave<S: Source>(
         &self,
         data: &mut State,
-        offer: Option<&mut CosmicOfferData<S>>,
+        offer: Option<&mut LingmoOfferData<S>>,
         seat: &Seat<State>,
     ) {
         match self {
             PointerFocusTarget::WlSurface { surface, .. } => {
                 let offer = match offer {
-                    Some(CosmicOfferData::Wl(offer)) => Some(offer),
+                    Some(LingmoOfferData::Wl(offer)) => Some(offer),
                     None => None,
                     _ => return,
                 };
@@ -633,7 +633,7 @@ impl DndFocus<State> for PointerFocusTarget {
             }
             PointerFocusTarget::X11Surface { surface, .. } => {
                 let offer = match offer {
-                    Some(CosmicOfferData::X11(offer)) => Some(offer),
+                    Some(LingmoOfferData::X11(offer)) => Some(offer),
                     None => None,
                     _ => return,
                 };
@@ -646,13 +646,13 @@ impl DndFocus<State> for PointerFocusTarget {
     fn drop<S: Source>(
         &self,
         data: &mut State,
-        offer: Option<&mut CosmicOfferData<S>>,
+        offer: Option<&mut LingmoOfferData<S>>,
         seat: &Seat<State>,
     ) {
         match self {
             PointerFocusTarget::WlSurface { surface, .. } => {
                 let offer = match offer {
-                    Some(CosmicOfferData::Wl(offer)) => Some(offer),
+                    Some(LingmoOfferData::Wl(offer)) => Some(offer),
                     None => None,
                     _ => return,
                 };
@@ -660,7 +660,7 @@ impl DndFocus<State> for PointerFocusTarget {
             }
             PointerFocusTarget::X11Surface { surface, .. } => {
                 let offer = match offer {
-                    Some(CosmicOfferData::X11(offer)) => Some(offer),
+                    Some(LingmoOfferData::X11(offer)) => Some(offer),
                     None => None,
                     _ => return,
                 };
@@ -813,14 +813,14 @@ impl From<LockSurface> for PointerFocusTarget {
     }
 }
 
-impl From<CosmicMapped> for KeyboardFocusTarget {
-    fn from(w: CosmicMapped) -> Self {
+impl From<LingmoMapped> for KeyboardFocusTarget {
+    fn from(w: LingmoMapped) -> Self {
         KeyboardFocusTarget::Element(w)
     }
 }
 
-impl From<CosmicSurface> for KeyboardFocusTarget {
-    fn from(s: CosmicSurface) -> Self {
+impl From<LingmoSurface> for KeyboardFocusTarget {
+    fn from(s: LingmoSurface) -> Self {
         KeyboardFocusTarget::Fullscreen(s)
     }
 }
@@ -848,3 +848,4 @@ impl From<LockSurface> for KeyboardFocusTarget {
         KeyboardFocusTarget::LockSurface(l)
     }
 }
+

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZcosmicWorkspaceHandleV2;
+use Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::ZLingmoWorkspaceHandleV2;
 
 use smithay::{
     output::Output,
@@ -52,7 +52,7 @@ pub struct WorkspaceDataInner {
     coordinates: Vec<u32>,
     states: Option<ext_workspace_handle_v1::State>,
     ext_id: Option<String>,
-    pub(super) cosmic_v2_handle: Option<Weak<ZcosmicWorkspaceHandleV2>>,
+    pub(super) Lingmo_v2_handle: Option<Weak<ZLingmoWorkspaceHandleV2>>,
 }
 
 pub struct WorkspaceData {
@@ -490,13 +490,14 @@ where
         instance.id(id);
     }
 
-    if let Some(cosmic_v2_handle) = handle_state
-        .cosmic_v2_handle
+    if let Some(Lingmo_v2_handle) = handle_state
+        .Lingmo_v2_handle
         .as_ref()
         .and_then(|x| x.upgrade().ok())
     {
-        changed |= super::cosmic_v2::send_workspace_to_client(&cosmic_v2_handle, workspace);
+        changed |= super::Lingmo_v2::send_workspace_to_client(&Lingmo_v2_handle, workspace);
     }
 
     changed
 }
+
