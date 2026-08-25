@@ -27,8 +27,8 @@ use crate::utils::prelude::{Global, OutputExt, RectGlobalExt};
 use super::workspace::{WorkspaceHandle, WorkspaceHandler, WorkspaceState};
 
 use cosmic_protocols::toplevel_info::v1::server::{
-    zLingmo_toplevel_handle_v1::{self, State as States, ZLingmoToplevelHandleV1},
-    zLingmo_toplevel_info_v1::{self, ZLingmoToplevelInfoV1},
+    zcosmic_toplevel_handle_v1::{self, State as States, ZCosmicToplevelHandleV1},
+    zcosmic_toplevel_info_v1::{self, ZCosmicToplevelInfoV1},
 };
 use tracing::error;
 
@@ -49,7 +49,7 @@ pub trait Window: IsAlive + Clone + PartialEq + Send {
 pub struct ToplevelInfoState<D, W: Window> {
     dh: DisplayHandle,
     pub(super) toplevels: Vec<W>,
-    instances: Vec<ZLingmoToplevelInfoV1>,
+    instances: Vec<ZCosmicToplevelInfoV1>,
     dirty: bool,
     last_dirty: bool,
     pub(in crate::wayland) foreign_toplevel_list: ForeignToplevelListState,
@@ -70,7 +70,7 @@ pub struct ToplevelInfoGlobalData {
 #[derive(Default)]
 pub(super) struct ToplevelStateInner {
     foreign_handle: Option<ForeignToplevelHandle>,
-    instances: Vec<(Weak<ZLingmoToplevelInfoV1>, ZLingmoToplevelHandleV1)>,
+    instances: Vec<(Weak<ZCosmicToplevelInfoV1>, ZCosmicToplevelHandleV1)>,
     outputs: Vec<Output>,
     workspaces: Vec<WorkspaceHandle>,
     pub(super) rectangles: Vec<(Weak<WlSurface>, Rectangle<i32, Logical>)>,
@@ -134,12 +134,12 @@ impl<W: Window> ToplevelHandleStateInner<W> {
     }
 }
 
-impl<D, W> GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData, D>
+impl<D, W> GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData, D>
     for ToplevelInfoState<D, W>
 where
-    D: GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData>
-        + Dispatch<ZLingmoToplevelInfoV1, ()>
-        + Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>>
+    D: GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData>
+        + Dispatch<ZCosmicToplevelInfoV1, ()>
+        + Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>>
         + ToplevelInfoHandler<Window = W>
         + 'static,
     W: Window + 'static,
@@ -148,7 +148,7 @@ where
         state: &mut D,
         dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZLingmoToplevelInfoV1>,
+        resource: New<ZCosmicToplevelInfoV1>,
         _global_data: &ToplevelInfoGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -164,11 +164,11 @@ where
     }
 }
 
-impl<D, W> Dispatch<ZLingmoToplevelInfoV1, (), D> for ToplevelInfoState<D, W>
+impl<D, W> Dispatch<ZCosmicToplevelInfoV1, (), D> for ToplevelInfoState<D, W>
 where
-    D: GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData>
-        + Dispatch<ZLingmoToplevelInfoV1, ()>
-        + Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>>
+    D: GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData>
+        + Dispatch<ZCosmicToplevelInfoV1, ()>
+        + Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>>
         + ToplevelInfoHandler<Window = W>
         + 'static,
     W: Window + 'static,
@@ -176,15 +176,15 @@ where
     fn request(
         state: &mut D,
         _client: &Client,
-        obj: &ZLingmoToplevelInfoV1,
-        request: zLingmo_toplevel_info_v1::Request,
+        obj: &ZCosmicToplevelInfoV1,
+        request: zcosmic_toplevel_info_v1::Request,
         _data: &(),
         _dh: &DisplayHandle,
         data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zLingmo_toplevel_info_v1::Request::GetLingmoToplevel {
-                Lingmo_toplevel,
+            zcosmic_toplevel_info_v1::Request::GetCosmicToplevel {
+                cosmic_toplevel,
                 foreign_toplevel,
             } => {
                 let toplevel_state = state.toplevel_info_state();
@@ -200,7 +200,7 @@ where
                         .map(|handle| handle.identifier())
                 }) {
                     let instance = data_init.init(
-                        Lingmo_toplevel,
+                        cosmic_toplevel,
                         ToplevelHandleStateInner::from_window(window),
                     );
                     window
@@ -212,14 +212,14 @@ where
                         .instances
                         .push((obj.downgrade(), instance));
                 } else {
-                    let _ = data_init.init(Lingmo_toplevel, ToplevelHandleStateInner::empty());
+                    let _ = data_init.init(cosmic_toplevel, ToplevelHandleStateInner::empty());
                     error!(
                         ?foreign_toplevel,
                         "Toplevel for foreign-toplevel-list not registered for Lingmo-toplevel-info."
                     );
                 }
             }
-            zLingmo_toplevel_info_v1::Request::Stop => {
+            zcosmic_toplevel_info_v1::Request::Stop => {
                 state
                     .toplevel_info_state_mut()
                     .instances
@@ -230,7 +230,7 @@ where
         }
     }
 
-    fn destroyed(state: &mut D, _client: ClientId, resource: &ZLingmoToplevelInfoV1, _data: &()) {
+    fn destroyed(state: &mut D, _client: ClientId, resource: &ZCosmicToplevelInfoV1, _data: &()) {
         state
             .toplevel_info_state_mut()
             .instances
@@ -238,11 +238,11 @@ where
     }
 }
 
-impl<D, W> Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>, D> for ToplevelInfoState<D, W>
+impl<D, W> Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>, D> for ToplevelInfoState<D, W>
 where
-    D: GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData>
-        + Dispatch<ZLingmoToplevelInfoV1, ()>
-        + Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>>
+    D: GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData>
+        + Dispatch<ZCosmicToplevelInfoV1, ()>
+        + Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>>
         + ToplevelInfoHandler<Window = W>
         + 'static,
     W: Window,
@@ -250,19 +250,19 @@ where
     fn request(
         _state: &mut D,
         _client: &Client,
-        _obj: &ZLingmoToplevelHandleV1,
-        request: zLingmo_toplevel_handle_v1::Request,
+        _obj: &ZCosmicToplevelHandleV1,
+        request: zcosmic_toplevel_handle_v1::Request,
         _data: &ToplevelHandleState<W>,
         _dh: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
     ) {
-        if let zLingmo_toplevel_handle_v1::Request::Destroy = request {}
+        if let zcosmic_toplevel_handle_v1::Request::Destroy = request {}
     }
 
     fn destroyed(
         state: &mut D,
         _client: ClientId,
-        resource: &ZLingmoToplevelHandleV1,
+        resource: &ZCosmicToplevelHandleV1,
         _data: &ToplevelHandleState<W>,
     ) {
         for toplevel in &state.toplevel_info_state_mut().toplevels {
@@ -303,11 +303,11 @@ pub fn toplevel_leave_workspace(toplevel: &impl Window, workspace: &WorkspaceHan
 
 impl<D, W> ToplevelInfoState<D, W>
 where
-    D: GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData>
+    D: GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData>
         + GlobalDispatch<ExtForeignToplevelListV1, ForeignToplevelListGlobalData>
         + Dispatch<ExtForeignToplevelHandleV1, ForeignToplevelHandle>
-        + Dispatch<ZLingmoToplevelInfoV1, ()>
-        + Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>>
+        + Dispatch<ZCosmicToplevelInfoV1, ()>
+        + Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>>
         + ForeignToplevelListHandler
         + ToplevelInfoHandler<Window = W>
         + 'static,
@@ -317,7 +317,7 @@ where
     where
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + Clone + 'static,
     {
-        let global = dh.create_global::<D, ZLingmoToplevelInfoV1, _>(
+        let global = dh.create_global::<D, ZCosmicToplevelInfoV1, _>(
             3,
             ToplevelInfoGlobalData {
                 filter: Box::new(client_filter.clone()),
@@ -363,7 +363,7 @@ where
             let mut state_inner = state.lock().unwrap();
             for (_info, handle) in &state_inner.instances {
                 // don't send events to stopped instances
-                if handle.version() < zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE
+                if handle.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
                     && self
                         .instances
                         .iter()
@@ -409,7 +409,7 @@ where
             } else {
                 for (_info, handle) in &state.instances {
                     // don't send events to stopped instances
-                    if handle.version() < zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE
+                    if handle.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
                         && self
                             .instances
                             .iter()
@@ -425,7 +425,7 @@ where
 
         if !dirty && self.last_dirty {
             for instance in &self.instances {
-                if instance.version() >= zLingmo_toplevel_info_v1::EVT_DONE_SINCE {
+                if instance.version() >= zcosmic_toplevel_info_v1::EVT_DONE_SINCE {
                     instance.done();
                 }
             }
@@ -446,13 +446,13 @@ where
 fn send_toplevel_to_client<D, W>(
     dh: &DisplayHandle,
     workspace_state: &WorkspaceState<D>,
-    info: &ZLingmoToplevelInfoV1,
+    info: &ZCosmicToplevelInfoV1,
     window: &W,
 ) -> bool
 where
-    D: GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData>
-        + Dispatch<ZLingmoToplevelInfoV1, ()>
-        + Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>>
+    D: GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData>
+        + Dispatch<ZCosmicToplevelInfoV1, ()>
+        + Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>>
         + ToplevelInfoHandler<Window = W>
         + 'static,
     W: Window + 'static,
@@ -466,10 +466,10 @@ where
     let (_info, instance) = match state.instances.iter().find(|(i, _)| i == info) {
         Some(i) => i,
         None => {
-            if info.version() < zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE {
+            if info.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
                 if let Ok(client) = dh.get_client(info.id()) {
                     if let Ok(toplevel_handle) = client
-                        .create_resource::<ZLingmoToplevelHandleV1, _, D>(
+                        .create_resource::<ZCosmicToplevelHandleV1, _, D>(
                             dh,
                             info.version(),
                             ToplevelHandleStateInner::from_window(window),
@@ -505,7 +505,7 @@ where
             || (states.contains(&States::Fullscreen) != window.is_fullscreen())
             || (states.contains(&States::Activated) != window.is_activated())
             || (states.contains(&States::Minimized) != window.is_minimized())
-            || (instance.version() >= zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE
+            || (instance.version() >= zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
                 && states.contains(&States::Sticky) != window.is_sticky())
     }) {
         let mut states = Vec::new();
@@ -521,7 +521,7 @@ where
         if window.is_minimized() {
             states.push(States::Minimized);
         }
-        if instance.version() >= zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE
+        if instance.version() >= zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
             && window.is_sticky()
         {
             states.push(States::Sticky);
@@ -562,7 +562,7 @@ where
 
     if let Some(title) = new_title {
         handle_state.title = title;
-        if instance.version() < zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE {
+        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
             instance.title(handle_state.title.clone());
         }
         if let Some(handle) = foreign_toplevel_handle {
@@ -573,7 +573,7 @@ where
 
     if let Some(app_id) = new_app_id {
         handle_state.app_id = app_id;
-        if instance.version() < zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE {
+        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
             instance.app_id(handle_state.app_id.clone());
         }
         if let Some(handle) = foreign_toplevel_handle {
@@ -601,7 +601,7 @@ where
         for output in &handle_state.outputs {
             let geometry = handle_state
                 .geometry
-                .filter(|_| instance.version() >= zLingmo_toplevel_handle_v1::EVT_GEOMETRY_SINCE)
+                .filter(|_| instance.version() >= zcosmic_toplevel_handle_v1::EVT_GEOMETRY_SINCE)
                 .filter(|geo| output.geometry().intersection(*geo).is_some())
                 .map(|geo| geo.to_local(output));
             for wl_output in output.client_outputs(&client) {
@@ -655,7 +655,7 @@ where
     }
 
     if changed {
-        if instance.version() < zLingmo_toplevel_info_v1::REQ_GET_Lingmo_TOPLEVEL_SINCE {
+        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
             instance.done();
         }
         if let Some(handle) = foreign_toplevel_handle {
@@ -666,7 +666,7 @@ where
     changed
 }
 
-pub fn window_from_handle<W: Window + 'static>(handle: ZLingmoToplevelHandleV1) -> Option<W> {
+pub fn window_from_handle<W: Window + 'static>(handle: ZCosmicToplevelHandleV1) -> Option<W> {
     handle
         .data::<ToplevelHandleState<W>>()
         .and_then(|state| state.lock().unwrap().window.clone())
@@ -705,13 +705,13 @@ where
 macro_rules! delegate_toplevel_info {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty, $window: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_info::v1::server::zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1: $crate::wayland::protocols::toplevel_info::ToplevelInfoGlobalData
+            cosmic_protocols::toplevel_info::v1::server::zcosmic_toplevel_info_v1::ZCosmicToplevelInfoV1: $crate::wayland::protocols::toplevel_info::ToplevelInfoGlobalData
         ] => $crate::wayland::protocols::toplevel_info::ToplevelInfoState<Self, $window>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_info::v1::server::zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1: ()
+            cosmic_protocols::toplevel_info::v1::server::zcosmic_toplevel_info_v1::ZCosmicToplevelInfoV1: ()
         ] => $crate::wayland::protocols::toplevel_info::ToplevelInfoState<Self, $window>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_info::v1::server::zLingmo_toplevel_handle_v1::ZLingmoToplevelHandleV1: $crate::wayland::protocols::toplevel_info::ToplevelHandleState<$window>
+            cosmic_protocols::toplevel_info::v1::server::zcosmic_toplevel_handle_v1::ZCosmicToplevelHandleV1: $crate::wayland::protocols::toplevel_info::ToplevelHandleState<$window>
         ] => $crate::wayland::protocols::toplevel_info::ToplevelInfoState<Self, $window>);
     };
 }

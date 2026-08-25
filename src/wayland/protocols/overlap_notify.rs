@@ -4,12 +4,12 @@ use std::{collections::HashMap, sync::Mutex};
 
 use cosmic_protocols::{
     overlap_notify::v1::server::{
-        zLingmo_overlap_notification_v1::ZLingmoOverlapNotificationV1,
-        zLingmo_overlap_notify_v1::{self, ZLingmoOverlapNotifyV1},
+        zcosmic_overlap_notification_v1::ZCosmicOverlapNotificationV1,
+        zcosmic_overlap_notify_v1::{self, ZCosmicOverlapNotifyV1},
     },
     toplevel_info::v1::server::{
-        zLingmo_toplevel_handle_v1::ZLingmoToplevelHandleV1,
-        zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1,
+        zcosmic_toplevel_handle_v1::ZCosmicToplevelHandleV1,
+        zcosmic_toplevel_info_v1::ZCosmicToplevelInfoV1,
     },
 };
 use smithay::{
@@ -46,21 +46,21 @@ use super::{
 
 #[derive(Debug)]
 pub struct OverlapNotifyState {
-    instances: Vec<ZLingmoOverlapNotifyV1>,
+    instances: Vec<ZCosmicOverlapNotifyV1>,
     global: GlobalId,
 }
 
 impl OverlapNotifyState {
     pub fn new<D, F>(dh: &DisplayHandle, client_filter: F) -> OverlapNotifyState
     where
-        D: GlobalDispatch<ZLingmoOverlapNotifyV1, OverlapNotifyGlobalData>
-            + Dispatch<ZLingmoOverlapNotifyV1, ()>
-            + Dispatch<ZLingmoOverlapNotificationV1, ()>
+        D: GlobalDispatch<ZCosmicOverlapNotifyV1, OverlapNotifyGlobalData>
+            + Dispatch<ZCosmicOverlapNotifyV1, ()>
+            + Dispatch<ZCosmicOverlapNotificationV1, ()>
             + OverlapNotifyHandler
             + 'static,
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + 'static,
     {
-        let global = dh.create_global::<D, ZLingmoOverlapNotifyV1, _>(
+        let global = dh.create_global::<D, ZCosmicOverlapNotifyV1, _>(
             1,
             OverlapNotifyGlobalData {
                 filter: Box::new(client_filter),
@@ -79,15 +79,15 @@ impl OverlapNotifyState {
     #[profiling::function]
     pub fn refresh<D, W>(state: &mut D)
     where
-        D: GlobalDispatch<ZLingmoOverlapNotifyV1, OverlapNotifyGlobalData>
+        D: GlobalDispatch<ZCosmicOverlapNotifyV1, OverlapNotifyGlobalData>
             + GlobalDispatch<ExtForeignToplevelListV1, ForeignToplevelListGlobalData>
             + Dispatch<ExtForeignToplevelHandleV1, ForeignToplevelHandle>
-            + Dispatch<ZLingmoOverlapNotifyV1, ()>
-            + Dispatch<ZLingmoOverlapNotificationV1, ()>
+            + Dispatch<ZCosmicOverlapNotifyV1, ()>
+            + Dispatch<ZCosmicOverlapNotificationV1, ()>
             + OverlapNotifyHandler
-            + GlobalDispatch<ZLingmoToplevelInfoV1, ToplevelInfoGlobalData>
-            + Dispatch<ZLingmoToplevelInfoV1, ()>
-            + Dispatch<ZLingmoToplevelHandleV1, ToplevelHandleState<W>>
+            + GlobalDispatch<ZCosmicToplevelInfoV1, ToplevelInfoGlobalData>
+            + Dispatch<ZCosmicToplevelInfoV1, ()>
+            + Dispatch<ZCosmicToplevelHandleV1, ToplevelHandleState<W>>
             + ForeignToplevelListHandler
             + ToplevelInfoHandler<Window = W>
             + 'static,
@@ -187,7 +187,7 @@ type LayerOverlapNotificationData = Mutex<LayerOverlapNotificationDataInternal>;
 
 #[derive(Debug, Default)]
 struct LayerOverlapNotificationDataInternal {
-    active_notifications: Vec<Weak<ZLingmoOverlapNotificationV1>>,
+    active_notifications: Vec<Weak<ZCosmicOverlapNotificationV1>>,
     last_snapshot: OverlapSnapshot,
 }
 
@@ -197,7 +197,7 @@ impl LayerOverlapNotificationDataInternal {
         !self.active_notifications.is_empty()
     }
 
-    pub fn add_notification(&mut self, new_notification: ZLingmoOverlapNotificationV1) {
+    pub fn add_notification(&mut self, new_notification: ZCosmicOverlapNotificationV1) {
         if let Some(client) = new_notification.client() {
             for (toplevel, overlap) in &self.last_snapshot.toplevel_overlaps {
                 if let Some(toplevel) = toplevel
@@ -376,11 +376,11 @@ impl From<ObjectId> for Identifier {
     }
 }
 
-impl<D> GlobalDispatch<ZLingmoOverlapNotifyV1, OverlapNotifyGlobalData, D> for OverlapNotifyState
+impl<D> GlobalDispatch<ZCosmicOverlapNotifyV1, OverlapNotifyGlobalData, D> for OverlapNotifyState
 where
-    D: GlobalDispatch<ZLingmoOverlapNotifyV1, OverlapNotifyGlobalData>
-        + Dispatch<ZLingmoOverlapNotifyV1, ()>
-        + Dispatch<ZLingmoOverlapNotificationV1, ()>
+    D: GlobalDispatch<ZCosmicOverlapNotifyV1, OverlapNotifyGlobalData>
+        + Dispatch<ZCosmicOverlapNotifyV1, ()>
+        + Dispatch<ZCosmicOverlapNotificationV1, ()>
         + OverlapNotifyHandler
         + 'static,
 {
@@ -388,7 +388,7 @@ where
         state: &mut D,
         _handle: &DisplayHandle,
         _client: &Client,
-        resource: smithay::reexports::wayland_server::New<ZLingmoOverlapNotifyV1>,
+        resource: smithay::reexports::wayland_server::New<ZCosmicOverlapNotifyV1>,
         _global_data: &OverlapNotifyGlobalData,
         data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
     ) {
@@ -401,24 +401,24 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoOverlapNotifyV1, (), D> for OverlapNotifyState
+impl<D> Dispatch<ZCosmicOverlapNotifyV1, (), D> for OverlapNotifyState
 where
-    D: GlobalDispatch<ZLingmoOverlapNotifyV1, OverlapNotifyGlobalData>
-        + Dispatch<ZLingmoOverlapNotifyV1, ()>
-        + Dispatch<ZLingmoOverlapNotificationV1, ()>
+    D: GlobalDispatch<ZCosmicOverlapNotifyV1, OverlapNotifyGlobalData>
+        + Dispatch<ZCosmicOverlapNotifyV1, ()>
+        + Dispatch<ZCosmicOverlapNotificationV1, ()>
         + OverlapNotifyHandler
         + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _resource: &ZLingmoOverlapNotifyV1,
-        request: <ZLingmoOverlapNotifyV1 as smithay::reexports::wayland_server::Resource>::Request,
+        _resource: &ZCosmicOverlapNotifyV1,
+        request: <ZCosmicOverlapNotifyV1 as smithay::reexports::wayland_server::Resource>::Request,
         _data: &(),
         _dhandle: &DisplayHandle,
         data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
     ) {
-        if let zLingmo_overlap_notify_v1::Request::NotifyOnOverlap {
+        if let zcosmic_overlap_notify_v1::Request::NotifyOnOverlap {
             overlap_notification,
             layer_surface,
         } = request
@@ -438,7 +438,7 @@ where
     fn destroyed(
         state: &mut D,
         _client: wayland_backend::server::ClientId,
-        resource: &ZLingmoOverlapNotifyV1,
+        resource: &ZCosmicOverlapNotifyV1,
         _data: &(),
     ) {
         let overlap_state = state.overlap_notify_state();
@@ -446,19 +446,19 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoOverlapNotificationV1, (), D> for OverlapNotifyState
+impl<D> Dispatch<ZCosmicOverlapNotificationV1, (), D> for OverlapNotifyState
 where
-    D: GlobalDispatch<ZLingmoOverlapNotifyV1, OverlapNotifyGlobalData>
-        + Dispatch<ZLingmoOverlapNotifyV1, ()>
-        + Dispatch<ZLingmoOverlapNotificationV1, ()>
+    D: GlobalDispatch<ZCosmicOverlapNotifyV1, OverlapNotifyGlobalData>
+        + Dispatch<ZCosmicOverlapNotifyV1, ()>
+        + Dispatch<ZCosmicOverlapNotificationV1, ()>
         + OverlapNotifyHandler
         + 'static,
 {
     fn request(
         _state: &mut D,
         _client: &Client,
-        _resource: &ZLingmoOverlapNotificationV1,
-        _request: <ZLingmoOverlapNotificationV1 as Resource>::Request,
+        _resource: &ZCosmicOverlapNotificationV1,
+        _request: <ZCosmicOverlapNotificationV1 as Resource>::Request,
         _data: &(),
         _dhandle: &DisplayHandle,
         _data_init: &mut smithay::reexports::wayland_server::DataInit<'_, D>,
@@ -470,13 +470,13 @@ where
 macro_rules! delegate_overlap_notify {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::overlap_notify::v1::server::zLingmo_overlap_notify_v1::ZLingmoOverlapNotifyV1: $crate::wayland::protocols::overlap_notify::OverlapNotifyGlobalData
+            cosmic_protocols::overlap_notify::v1::server::zcosmic_overlap_notify_v1::ZCosmicOverlapNotifyV1: $crate::wayland::protocols::overlap_notify::OverlapNotifyGlobalData
         ] => $crate::wayland::protocols::overlap_notify::OverlapNotifyState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::overlap_notify::v1::server::zLingmo_overlap_notify_v1::ZLingmoOverlapNotifyV1: ()
+            cosmic_protocols::overlap_notify::v1::server::zcosmic_overlap_notify_v1::ZCosmicOverlapNotifyV1: ()
         ] => $crate::wayland::protocols::overlap_notify::OverlapNotifyState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::overlap_notify::v1::server::zLingmo_overlap_notification_v1::ZLingmoOverlapNotificationV1: ()
+            cosmic_protocols::overlap_notify::v1::server::zcosmic_overlap_notification_v1::ZCosmicOverlapNotificationV1: ()
         ] => $crate::wayland::protocols::overlap_notify::OverlapNotifyState);
     };
 }

@@ -22,7 +22,7 @@ use cosmic_protocols::workspace::v2::server::{
 };
 
 mod cosmic_v2;
-pub use cosmic_v2::LingmoWorkspaceV2Data;
+pub use cosmic_v2::CosmicWorkspaceV2Data;
 mod ext;
 pub use ext::{WorkspaceData, WorkspaceGroupData, WorkspaceManagerData};
 
@@ -127,7 +127,7 @@ where
         + Dispatch<ExtWorkspaceHandleV1, WorkspaceData>
         + GlobalDispatch<ZCosmicWorkspaceManagerV2, WorkspaceGlobalData>
         + Dispatch<ZCosmicWorkspaceManagerV2, ()>
-        + Dispatch<ZCosmicWorkspaceHandleV2, LingmoWorkspaceV2Data>
+        + Dispatch<ZCosmicWorkspaceHandleV2, CosmicWorkspaceV2Data>
         + Sized
         + 'static,
 {
@@ -651,7 +651,7 @@ macro_rules! delegate_workspace {
             cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZCosmicWorkspaceManagerV2: ()
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZCosmicWorkspaceHandleV2: $crate::wayland::protocols::workspace::LingmoWorkspaceV2Data
+            cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZCosmicWorkspaceHandleV2: $crate::wayland::protocols::workspace::CosmicWorkspaceV2Data
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
     };
 }

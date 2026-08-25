@@ -17,22 +17,22 @@ use smithay::{
 use lingmo_comp_config::output::comp::OutputState as EnabledState;
 
 use cosmic_protocols::output_management::v1::server::{
-    zLingmo_output_configuration_head_v1::{self, ZLingmoOutputConfigurationHeadV1},
-    zcosmic_output_configuration_v1::{self, ZLingmoOutputConfigurationV1},
-    zLingmo_output_head_v1::{self, ZLingmoOutputHeadV1},
-    zLingmo_output_manager_v1::{self, ZLingmoOutputManagerV1},
+    zcosmic_output_configuration_head_v1::{self, ZCosmicOutputConfigurationHeadV1},
+    zcosmic_output_configuration_v1::{self, ZCosmicOutputConfigurationV1},
+    zcosmic_output_head_v1::{self, ZCosmicOutputHeadV1},
+    zcosmic_output_manager_v1::{self, ZCosmicOutputManagerV1},
 };
 
 use crate::wayland::protocols::output_configuration::*;
 
-impl<D> GlobalDispatch<ZLingmoOutputManagerV1, OutputMngrGlobalData, D>
+impl<D> GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData, D>
     for OutputConfigurationState<D>
 where
-    D: GlobalDispatch<ZLingmoOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZLingmoOutputManagerV1, ()>
-        + Dispatch<ZLingmoOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZLingmoOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZLingmoOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+    D: GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZCosmicOutputManagerV1, ()>
+        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
@@ -40,7 +40,7 @@ where
         _state: &mut D,
         _dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZLingmoOutputManagerV1>,
+        resource: New<ZCosmicOutputManagerV1>,
         _global_data: &OutputMngrGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -52,7 +52,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoOutputManagerV1, (), D> for OutputConfigurationState<D>
+impl<D> Dispatch<ZCosmicOutputManagerV1, (), D> for OutputConfigurationState<D>
 where
     D: GlobalDispatch<ZwlrOutputManagerV1, OutputMngrGlobalData>
         + Dispatch<ZwlrOutputManagerV1, ()>
@@ -60,25 +60,25 @@ where
         + Dispatch<ZwlrOutputModeV1, Mode>
         + Dispatch<ZwlrOutputConfigurationV1, PendingConfiguration>
         + Dispatch<ZwlrOutputConfigurationHeadV1, PendingOutputConfiguration>
-        + GlobalDispatch<ZLingmoOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZLingmoOutputManagerV1, ()>
-        + Dispatch<ZLingmoOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZLingmoOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZLingmoOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+        + GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZCosmicOutputManagerV1, ()>
+        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _obj: &ZLingmoOutputManagerV1,
-        request: zLingmo_output_manager_v1::Request,
+        _obj: &ZCosmicOutputManagerV1,
+        request: zcosmic_output_manager_v1::Request,
         _data: &(),
         dh: &DisplayHandle,
         data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zLingmo_output_manager_v1::Request::GetHead { extended, head } => {
+            zcosmic_output_manager_v1::Request::GetHead { extended, head } => {
                 let inner = state.output_configuration_state();
                 if let Some(mngr) = inner
                     .instances
@@ -100,18 +100,18 @@ where
                     }
                 }
             }
-            zLingmo_output_manager_v1::Request::GetConfiguration { extended, config } => {
+            zcosmic_output_manager_v1::Request::GetConfiguration { extended, config } => {
                 let pending = config.data::<PendingConfiguration>().unwrap();
                 let obj = data_init.init(extended, config.downgrade());
                 pending.lock().unwrap().extension_obj = Some(obj);
             }
-            zLingmo_output_manager_v1::Request::GetConfigurationHead {
+            zcosmic_output_manager_v1::Request::GetConfigurationHead {
                 extended,
                 config_head,
             } => {
                 data_init.init(extended, config_head.downgrade());
             }
-            zLingmo_output_manager_v1::Request::SetXwaylandPrimary { head } => {
+            zcosmic_output_manager_v1::Request::SetXwaylandPrimary { head } => {
                 let Some(head) = head else {
                     state.request_xwayland_primary(None);
                     return;
@@ -135,20 +135,20 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoOutputHeadV1, Weak<ZwlrOutputHeadV1>, D> for OutputConfigurationState<D>
+impl<D> Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>, D> for OutputConfigurationState<D>
 where
     D: OutputConfigurationHandler + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        obj: &ZLingmoOutputHeadV1,
-        request: zLingmo_output_head_v1::Request,
+        obj: &ZCosmicOutputHeadV1,
+        request: zcosmic_output_head_v1::Request,
         _data: &Weak<ZwlrOutputHeadV1>,
         _dh: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
     ) {
-        if let zLingmo_output_head_v1::Request::Release = request {
+        if let zcosmic_output_head_v1::Request::Release = request {
             let inner = state.output_configuration_state();
             if let Some(head) = inner
                 .instances
@@ -162,7 +162,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>, D>
+impl<D> Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>, D>
     for OutputConfigurationState<D>
 where
     D: GlobalDispatch<ZwlrOutputManagerV1, OutputMngrGlobalData>
@@ -171,18 +171,18 @@ where
         + Dispatch<ZwlrOutputModeV1, Mode>
         + Dispatch<ZwlrOutputConfigurationV1, PendingConfiguration>
         + Dispatch<ZwlrOutputConfigurationHeadV1, PendingOutputConfiguration>
-        + GlobalDispatch<ZLingmoOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZLingmoOutputManagerV1, ()>
-        + Dispatch<ZLingmoOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZLingmoOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZLingmoOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+        + GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZCosmicOutputManagerV1, ()>
+        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
     fn request(
         _state: &mut D,
         _client: &Client,
-        extension_obj: &ZLingmoOutputConfigurationV1,
+        extension_obj: &ZCosmicOutputConfigurationV1,
         request: zcosmic_output_configuration_v1::Request,
         obj: &Weak<ZwlrOutputConfigurationV1>,
         _dh: &DisplayHandle,
@@ -251,7 +251,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>, D>
+impl<D> Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>, D>
     for OutputConfigurationState<D>
 where
     D: GlobalDispatch<ZwlrOutputManagerV1, OutputMngrGlobalData>
@@ -266,14 +266,14 @@ where
     fn request(
         _state: &mut D,
         _client: &Client,
-        _extended_obj: &ZLingmoOutputConfigurationHeadV1,
-        request: zLingmo_output_configuration_head_v1::Request,
+        _extended_obj: &ZCosmicOutputConfigurationHeadV1,
+        request: zcosmic_output_configuration_head_v1::Request,
         obj: &Weak<ZwlrOutputConfigurationHeadV1>,
         _dh: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zLingmo_output_configuration_head_v1::Request::SetScale1000 { scale_1000 } => {
+            zcosmic_output_configuration_head_v1::Request::SetScale1000 { scale_1000 } => {
                 if let Ok(obj) = obj.upgrade() {
                     let data = obj.data::<PendingOutputConfiguration>().unwrap();
                     let mut pending = data.lock().unwrap();
@@ -287,7 +287,7 @@ where
                     pending.scale = Some((scale_1000 as f64) / 1000.0);
                 }
             }
-            zLingmo_output_configuration_head_v1::Request::SetAdaptiveSyncExt { state } => {
+            zcosmic_output_configuration_head_v1::Request::SetAdaptiveSyncExt { state } => {
                 if let Ok(obj) = obj.upgrade() {
                     let data = obj.data::<PendingOutputConfiguration>().unwrap();
                     let mut pending = data.lock().unwrap();
@@ -299,10 +299,10 @@ where
                         return;
                     }
                     pending.adaptive_sync = match state.into_result() {
-                        Ok(zLingmo_output_head_v1::AdaptiveSyncStateExt::Always) => {
+                        Ok(zcosmic_output_head_v1::AdaptiveSyncStateExt::Always) => {
                             Some(AdaptiveSync::Force)
                         }
-                        Ok(zLingmo_output_head_v1::AdaptiveSyncStateExt::Automatic) => {
+                        Ok(zcosmic_output_head_v1::AdaptiveSyncStateExt::Automatic) => {
                             Some(AdaptiveSync::Enabled)
                         }
                         _ => Some(AdaptiveSync::Disabled),

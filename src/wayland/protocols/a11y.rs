@@ -17,7 +17,7 @@ pub trait A11yHandler {
 #[derive(Debug)]
 pub struct A11yState {
     global: GlobalId,
-    instances: Vec<cosmic_a11y_manager_v1::LingmoA11yManagerV1>,
+    instances: Vec<cosmic_a11y_manager_v1::CosmicA11yManagerV1>,
 
     magnifier_state: bool,
     screen_inverted: bool,
@@ -58,10 +58,10 @@ fn color_filter_to_protocol(filter: Option<ColorFilter>) -> cosmic_a11y_manager_
 impl A11yState {
     pub fn new<D, F>(dh: &DisplayHandle, client_filter: F) -> A11yState
     where
-        D: GlobalDispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData> + 'static,
+        D: GlobalDispatch<cosmic_a11y_manager_v1::CosmicA11yManagerV1, A11yGlobalData> + 'static,
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + 'static,
     {
-        let global = dh.create_global::<D, cosmic_a11y_manager_v1::LingmoA11yManagerV1, _>(
+        let global = dh.create_global::<D, cosmic_a11y_manager_v1::CosmicA11yManagerV1, _>(
             2,
             A11yGlobalData {
                 filter: Box::new(client_filter),
@@ -127,10 +127,10 @@ pub struct A11yGlobalData {
     filter: Box<dyn for<'a> Fn(&'a Client) -> bool + Send + Sync>,
 }
 
-impl<D> GlobalDispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData, D> for A11yState
+impl<D> GlobalDispatch<cosmic_a11y_manager_v1::CosmicA11yManagerV1, A11yGlobalData, D> for A11yState
 where
-    D: GlobalDispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData>
-        + Dispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, ()>
+    D: GlobalDispatch<cosmic_a11y_manager_v1::CosmicA11yManagerV1, A11yGlobalData>
+        + Dispatch<cosmic_a11y_manager_v1::CosmicA11yManagerV1, ()>
         + A11yHandler
         + 'static,
 {
@@ -138,7 +138,7 @@ where
         state: &mut D,
         _handle: &DisplayHandle,
         _client: &Client,
-        resource: New<cosmic_a11y_manager_v1::LingmoA11yManagerV1>,
+        resource: New<cosmic_a11y_manager_v1::CosmicA11yManagerV1>,
         _global_data: &A11yGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -170,15 +170,15 @@ where
     }
 }
 
-impl<D> Dispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, (), D> for A11yState
+impl<D> Dispatch<cosmic_a11y_manager_v1::CosmicA11yManagerV1, (), D> for A11yState
 where
-    D: Dispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, ()> + A11yHandler + 'static,
+    D: Dispatch<cosmic_a11y_manager_v1::CosmicA11yManagerV1, ()> + A11yHandler + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _resource: &cosmic_a11y_manager_v1::LingmoA11yManagerV1,
-        request: <cosmic_a11y_manager_v1::LingmoA11yManagerV1 as smithay::reexports::wayland_server::Resource>::Request,
+        _resource: &cosmic_a11y_manager_v1::CosmicA11yManagerV1,
+        request: <cosmic_a11y_manager_v1::CosmicA11yManagerV1 as smithay::reexports::wayland_server::Resource>::Request,
         _data: &(),
         _dhandle: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
@@ -217,7 +217,7 @@ where
     fn destroyed(
         state: &mut D,
         _client: wayland_backend::server::ClientId,
-        resource: &cosmic_a11y_manager_v1::LingmoA11yManagerV1,
+        resource: &cosmic_a11y_manager_v1::CosmicA11yManagerV1,
         _data: &(),
     ) {
         state.a11y_state().instances.retain(|i| i != resource);
@@ -227,10 +227,10 @@ where
 macro_rules! delegate_a11y {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1::LingmoA11yManagerV1: $crate::wayland::protocols::a11y::A11yGlobalData
+            cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1::CosmicA11yManagerV1: $crate::wayland::protocols::a11y::A11yGlobalData
         ] => $crate::wayland::protocols::a11y::A11yState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1::LingmoA11yManagerV1: ()
+            cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1::CosmicA11yManagerV1: ()
         ] => $crate::wayland::protocols::a11y::A11yState);
     };
 }

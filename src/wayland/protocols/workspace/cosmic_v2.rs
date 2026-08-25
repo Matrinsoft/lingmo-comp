@@ -18,15 +18,15 @@ use super::{
 };
 
 #[derive(Default)]
-pub struct LingmoWorkspaceV2DataInner {
+pub struct CosmicWorkspaceV2DataInner {
     capabilities: Option<zcosmic_workspace_handle_v2::WorkspaceCapabilities>,
     tiling: Option<zcosmic_workspace_handle_v2::TilingState>,
     states: Option<zcosmic_workspace_handle_v2::State>,
 }
 
-pub struct LingmoWorkspaceV2Data {
+pub struct CosmicWorkspaceV2Data {
     workspace: Weak<ExtWorkspaceHandleV1>,
-    inner: Mutex<LingmoWorkspaceV2DataInner>,
+    inner: Mutex<CosmicWorkspaceV2DataInner>,
 }
 
 impl<D> GlobalDispatch<ZCosmicWorkspaceManagerV2, WorkspaceGlobalData, D> for WorkspaceState<D>
@@ -63,15 +63,15 @@ where
         data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zcosmic_workspace_manager_v2::Request::GetLingmoWorkspace {
-                Lingmo_workspace,
+            zcosmic_workspace_manager_v2::Request::GetCosmicWorkspace {
+                cosmic_workspace,
                 workspace,
             } => {
-                let Lingmo_workspace = data_init.init(
-                    Lingmo_workspace,
-                    LingmoWorkspaceV2Data {
+                let cosmic_workspace = data_init.init(
+                    cosmic_workspace,
+                    CosmicWorkspaceV2Data {
                         workspace: workspace.downgrade(),
-                        inner: Mutex::new(LingmoWorkspaceV2DataInner::default()),
+                        inner: Mutex::new(CosmicWorkspaceV2DataInner::default()),
                     },
                 );
                 if let Some(data) = workspace.data::<WorkspaceData>() {
@@ -87,7 +87,7 @@ where
                         );
                         return;
                     }
-                    inner.cosmic_v2_handle = Some(Lingmo_workspace.downgrade());
+                    inner.cosmic_v2_handle = Some(cosmic_workspace.downgrade());
                     if let Some(workspace) = state
                         .workspace_state()
                         .groups
@@ -96,7 +96,7 @@ where
                         .find(|w| w.ext_instances.contains(&workspace))
                         && let Ok(ext_mngr) = data.manager.upgrade()
                     {
-                        send_workspace_to_client(&Lingmo_workspace, workspace);
+                        send_workspace_to_client(&cosmic_workspace, workspace);
                         ext_mngr.done();
                     }
                 }
@@ -107,7 +107,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicWorkspaceHandleV2, LingmoWorkspaceV2Data, D> for WorkspaceState<D>
+impl<D> Dispatch<ZCosmicWorkspaceHandleV2, CosmicWorkspaceV2Data, D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
@@ -116,7 +116,7 @@ where
         _client: &Client,
         _obj: &ZCosmicWorkspaceHandleV2,
         request: zcosmic_workspace_handle_v2::Request,
-        data: &LingmoWorkspaceV2Data,
+        data: &CosmicWorkspaceV2Data,
         _dh: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
     ) {
@@ -255,7 +255,7 @@ pub fn send_workspace_to_client(
     let mut changed = false;
 
     let mut handle_state = instance
-        .data::<LingmoWorkspaceV2Data>()
+        .data::<CosmicWorkspaceV2Data>()
         .unwrap()
         .inner
         .lock()

@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use anyhow::Context;
-use cosmic_config::{ConfigGet, LingmoConfigEntry};
+use cosmic_config::{ConfigGet, CosmicConfigEntry};
 use cosmic_settings_config::window_rules::ApplicationException;
 use cosmic_settings_config::{Shortcuts, shortcuts, window_rules};
 use serde::{Deserialize, Serialize};
@@ -46,7 +46,7 @@ mod types;
 use Lingmo::config::LingmoTk;
 pub use lingmo_comp_config::EdidProduct;
 use lingmo_comp_config::{
-    ActivationPolicy, AppearanceConfig, LingmoCompConfig, KeyboardConfig, TileBehavior, XkbConfig,
+    ActivationPolicy, AppearanceConfig, CosmicCompConfig, KeyboardConfig, TileBehavior, XkbConfig,
     XwaylandDescaling, XwaylandEavesdropping, ZoomConfig,
     input::{DeviceState as InputDeviceState, InputConfig, TouchpadOverride},
     output::comp::{
@@ -62,7 +62,7 @@ pub struct Config {
     pub dynamic_conf: DynamicConfig,
     pub Lingmo_helper: cosmic_config::Config,
     /// Lingmo-config comp configuration for `com.lingmoos.LingmoComp`
-    pub Lingmo_conf: LingmoCompConfig,
+    pub Lingmo_conf: CosmicCompConfig,
     /// Lingmo-config context for `com.lingmoos.LingmoSettings.Shortcuts`
     pub settings_context: cosmic_config::Config,
     /// Key bindings from `com.lingmoos.LingmoSettings.Shortcuts`
@@ -180,7 +180,7 @@ impl Config {
         let xdg = xdg::BaseDirectories::new();
 
         let Lingmo_comp_config =
-            LingmoCompConfig::get_entry(&config).unwrap_or_else(|(errs, c)| {
+            CosmicCompConfig::get_entry(&config).unwrap_or_else(|(errs, c)| {
                 if cfg!(debug_assertions) {
                     for err in errs {
                         warn!(?err, "");

@@ -3,8 +3,8 @@ use super::{
 };
 use crate::shell::element::surface::WeakLingmoSurface;
 use cosmic_protocols::image_capture_source::v1::server::{
-    zLingmo_workspace_image_capture_source_manager_v1::{
-        Request as LingmoWorkspaceSourceRequest, ZLingmoWorkspaceImageCaptureSourceManagerV1,
+    zcosmic_workspace_image_capture_source_manager_v1::{
+        Request as CosmicWorkspaceSourceRequest, ZCosmicWorkspaceImageCaptureSourceManagerV1,
     },
 };
 use smithay::reexports::wayland_protocols::ext::image_capture_source::v1::server::{
@@ -51,9 +51,9 @@ impl LingmoImageCaptureSourceState {
     pub fn new<D, F>(display: &DisplayHandle, client_filter: F) -> LingmoImageCaptureSourceState
     where
         D: GlobalDispatch<
-                ZLingmoWorkspaceImageCaptureSourceManagerV1,
+                ZCosmicWorkspaceImageCaptureSourceManagerV1,
                 WorkspaceImageCaptureSourceManagerGlobalData,
-            > + Dispatch<ZLingmoWorkspaceImageCaptureSourceManagerV1, CaptureSourceManagerData>
+            > + Dispatch<ZCosmicWorkspaceImageCaptureSourceManagerV1, CaptureSourceManagerData>
             + Dispatch<ExtImageCaptureSourceV1, ImageCaptureSourceData>
             + WorkspaceHandler
             + 'static,
@@ -61,7 +61,7 @@ impl LingmoImageCaptureSourceState {
     {
         LingmoImageCaptureSourceState {
             workspace_source_global: display
-                .create_global::<D, ZLingmoWorkspaceImageCaptureSourceManagerV1, _>(
+                .create_global::<D, ZCosmicWorkspaceImageCaptureSourceManagerV1, _>(
                     1,
                     WorkspaceImageCaptureSourceManagerGlobalData {
                         filter: Box::new(client_filter.clone()),
@@ -77,10 +77,10 @@ impl LingmoImageCaptureSourceState {
 
 pub struct CaptureSourceManagerData;
 
-impl<D> GlobalDispatch2<ZLingmoWorkspaceImageCaptureSourceManagerV1, D>
+impl<D> GlobalDispatch2<ZCosmicWorkspaceImageCaptureSourceManagerV1, D>
     for WorkspaceImageCaptureSourceManagerGlobalData
 where
-    D: Dispatch<ZLingmoWorkspaceImageCaptureSourceManagerV1, CaptureSourceManagerData>
+    D: Dispatch<ZCosmicWorkspaceImageCaptureSourceManagerV1, CaptureSourceManagerData>
         + Dispatch<ExtImageCaptureSourceV1, ImageCaptureSourceData>
         + 'static,
 {
@@ -89,7 +89,7 @@ where
         _state: &mut D,
         _handle: &DisplayHandle,
         _client: &Client,
-        resource: New<ZLingmoWorkspaceImageCaptureSourceManagerV1>,
+        resource: New<ZCosmicWorkspaceImageCaptureSourceManagerV1>,
         data_init: &mut DataInit<'_, D>,
     ) {
         data_init.init(resource, CaptureSourceManagerData);
@@ -100,7 +100,7 @@ where
     }
 }
 
-impl<D> Dispatch2<ZLingmoWorkspaceImageCaptureSourceManagerV1, D> for CaptureSourceManagerData
+impl<D> Dispatch2<ZCosmicWorkspaceImageCaptureSourceManagerV1, D> for CaptureSourceManagerData
 where
     D: Dispatch<ExtImageCaptureSourceV1, ImageCaptureSourceData> + WorkspaceHandler + 'static,
 {
@@ -108,12 +108,12 @@ where
         &self,
         state: &mut D,
         _client: &Client,
-        _resource: &ZLingmoWorkspaceImageCaptureSourceManagerV1,
-        request: <ZLingmoWorkspaceImageCaptureSourceManagerV1 as Resource>::Request,
+        _resource: &ZCosmicWorkspaceImageCaptureSourceManagerV1,
+        request: <ZCosmicWorkspaceImageCaptureSourceManagerV1 as Resource>::Request,
         _dhandle: &DisplayHandle,
         data_init: &mut DataInit<'_, D>,
     ) {
-        if let LingmoWorkspaceSourceRequest::CreateSource {
+        if let CosmicWorkspaceSourceRequest::CreateSource {
             source: source_handle,
             output,
         } = request

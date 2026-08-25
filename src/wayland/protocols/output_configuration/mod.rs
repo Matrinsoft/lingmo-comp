@@ -3,10 +3,10 @@
 use calloop::LoopHandle;
 use lingmo_comp_config::output::comp::AdaptiveSync;
 use cosmic_protocols::output_management::v1::server::{
-    zLingmo_output_configuration_head_v1::ZLingmoOutputConfigurationHeadV1,
-    zcosmic_output_configuration_v1::ZLingmoOutputConfigurationV1,
-    zLingmo_output_head_v1::{self, ZLingmoOutputHeadV1},
-    zLingmo_output_manager_v1::ZLingmoOutputManagerV1,
+    zcosmic_output_configuration_head_v1::ZCosmicOutputConfigurationHeadV1,
+    zcosmic_output_configuration_v1::ZCosmicOutputConfigurationV1,
+    zcosmic_output_head_v1::{self, ZCosmicOutputHeadV1},
+    zcosmic_output_manager_v1::ZCosmicOutputManagerV1,
 };
 use smithay::{
     backend::drm::VrrSupport,
@@ -73,7 +73,7 @@ struct OutputMngrInstance {
 #[derive(Debug)]
 struct OutputHeadInstance {
     obj: ZwlrOutputHeadV1,
-    extension_obj: Option<ZLingmoOutputHeadV1>,
+    extension_obj: Option<ZCosmicOutputHeadV1>,
     output: Output,
     modes: Vec<ZwlrOutputModeV1>,
     finished: bool,
@@ -81,7 +81,7 @@ struct OutputHeadInstance {
 
 #[derive(Debug, Default)]
 pub struct PendingConfigurationInner {
-    extension_obj: Option<ZLingmoOutputConfigurationV1>,
+    extension_obj: Option<ZCosmicOutputConfigurationV1>,
     serial: u32,
     used: bool,
     heads: Vec<(ZwlrOutputHeadV1, Option<ZwlrOutputConfigurationHeadV1>)>,
@@ -165,11 +165,11 @@ where
         + Dispatch<ZwlrOutputModeV1, Mode>
         + Dispatch<ZwlrOutputConfigurationV1, PendingConfiguration>
         + Dispatch<ZwlrOutputConfigurationHeadV1, PendingOutputConfiguration>
-        + GlobalDispatch<ZLingmoOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZLingmoOutputManagerV1, ()>
-        + Dispatch<ZLingmoOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZLingmoOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZLingmoOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+        + GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZCosmicOutputManagerV1, ()>
+        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
@@ -188,7 +188,7 @@ where
             },
         );
 
-        let extension_global = dh.create_global::<D, ZLingmoOutputManagerV1, _>(
+        let extension_global = dh.create_global::<D, ZCosmicOutputManagerV1, _>(
             3,
             OutputMngrGlobalData {
                 filter: Box::new(client_filter),
@@ -465,15 +465,15 @@ where
 
             extension_obj.mirroring(output.mirroring().map(|o| o.name()));
 
-            if extension_obj.version() >= zLingmo_output_head_v1::EVT_ADAPTIVE_SYNC_EXT_SINCE {
+            if extension_obj.version() >= zcosmic_output_head_v1::EVT_ADAPTIVE_SYNC_EXT_SINCE {
                 extension_obj.adaptive_sync_ext(match output.adaptive_sync() {
                     AdaptiveSync::Disabled => {
-                        zLingmo_output_head_v1::AdaptiveSyncStateExt::Disabled
+                        zcosmic_output_head_v1::AdaptiveSyncStateExt::Disabled
                     }
                     AdaptiveSync::Enabled => {
-                        zLingmo_output_head_v1::AdaptiveSyncStateExt::Automatic
+                        zcosmic_output_head_v1::AdaptiveSyncStateExt::Automatic
                     }
-                    AdaptiveSync::Force => zLingmo_output_head_v1::AdaptiveSyncStateExt::Always,
+                    AdaptiveSync::Force => zcosmic_output_head_v1::AdaptiveSyncStateExt::Always,
                 });
 
                 extension_obj.adaptive_sync_available(
@@ -482,13 +482,13 @@ where
                         .unwrap_or(VrrSupport::NotSupported)
                     {
                         VrrSupport::NotSupported => {
-                            zLingmo_output_head_v1::AdaptiveSyncAvailability::Unsupported
+                            zcosmic_output_head_v1::AdaptiveSyncAvailability::Unsupported
                         }
                         VrrSupport::RequiresModeset => {
-                            zLingmo_output_head_v1::AdaptiveSyncAvailability::RequiresModeset
+                            zcosmic_output_head_v1::AdaptiveSyncAvailability::RequiresModeset
                         }
                         VrrSupport::Supported => {
-                            zLingmo_output_head_v1::AdaptiveSyncAvailability::Supported
+                            zcosmic_output_head_v1::AdaptiveSyncAvailability::Supported
                         }
                     },
                 );
@@ -510,7 +510,7 @@ where
 
     if let Some(extension_obj) = instance.extension_obj.as_ref()
         && inner.enabled
-        && extension_obj.version() >= zLingmo_output_head_v1::EVT_XWAYLAND_PRIMARY_SINCE
+        && extension_obj.version() >= zcosmic_output_head_v1::EVT_XWAYLAND_PRIMARY_SINCE
     {
         extension_obj.xwayland_primary(output.config().xwayland_primary as u32);
     }
@@ -537,19 +537,19 @@ macro_rules! delegate_output_configuration {
             smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1: $crate::wayland::protocols::output_configuration::PendingOutputConfiguration
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zLingmo_output_manager_v1::ZLingmoOutputManagerV1: $crate::wayland::protocols::output_configuration::OutputMngrGlobalData
+            cosmic_protocols::output_management::v1::server::zcosmic_output_manager_v1::ZCosmicOutputManagerV1: $crate::wayland::protocols::output_configuration::OutputMngrGlobalData
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zLingmo_output_manager_v1::ZLingmoOutputManagerV1: ()
+            cosmic_protocols::output_management::v1::server::zcosmic_output_manager_v1::ZCosmicOutputManagerV1: ()
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zLingmo_output_head_v1::ZLingmoOutputHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_head_v1::ZwlrOutputHeadV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_head_v1::ZCosmicOutputHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_head_v1::ZwlrOutputHeadV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_v1::ZLingmoOutputConfigurationV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_v1::ZwlrOutputConfigurationV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_v1::ZCosmicOutputConfigurationV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_v1::ZwlrOutputConfigurationV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zLingmo_output_configuration_head_v1::ZLingmoOutputConfigurationHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_head_v1::ZCosmicOutputConfigurationHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
     };
 }
