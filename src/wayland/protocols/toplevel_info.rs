@@ -363,7 +363,7 @@ where
             let mut state_inner = state.lock().unwrap();
             for (_info, handle) in &state_inner.instances {
                 // don't send events to stopped instances
-                if handle.version() < zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE
+                if handle.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
                     && self
                         .instances
                         .iter()
@@ -409,7 +409,7 @@ where
             } else {
                 for (_info, handle) in &state.instances {
                     // don't send events to stopped instances
-                    if handle.version() < zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE
+                    if handle.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
                         && self
                             .instances
                             .iter()
@@ -466,7 +466,7 @@ where
     let (_info, instance) = match state.instances.iter().find(|(i, _)| i == info) {
         Some(i) => i,
         None => {
-            if info.version() < zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE {
+            if info.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
                 if let Ok(client) = dh.get_client(info.id()) {
                     if let Ok(toplevel_handle) = client
                         .create_resource::<ZcosmicToplevelHandleV1, _, D>(
@@ -505,7 +505,7 @@ where
             || (states.contains(&States::Fullscreen) != window.is_fullscreen())
             || (states.contains(&States::Activated) != window.is_activated())
             || (states.contains(&States::Minimized) != window.is_minimized())
-            || (instance.version() >= zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE
+            || (instance.version() >= zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
                 && states.contains(&States::Sticky) != window.is_sticky())
     }) {
         let mut states = Vec::new();
@@ -521,7 +521,7 @@ where
         if window.is_minimized() {
             states.push(States::Minimized);
         }
-        if instance.version() >= zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE
+        if instance.version() >= zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE
             && window.is_sticky()
         {
             states.push(States::Sticky);
@@ -562,7 +562,7 @@ where
 
     if let Some(title) = new_title {
         handle_state.title = title;
-        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE {
+        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
             instance.title(handle_state.title.clone());
         }
         if let Some(handle) = foreign_toplevel_handle {
@@ -573,7 +573,7 @@ where
 
     if let Some(app_id) = new_app_id {
         handle_state.app_id = app_id;
-        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE {
+        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
             instance.app_id(handle_state.app_id.clone());
         }
         if let Some(handle) = foreign_toplevel_handle {
@@ -655,7 +655,7 @@ where
     }
 
     if changed {
-        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_LINGMO_TOPLEVEL_SINCE {
+        if instance.version() < zcosmic_toplevel_info_v1::REQ_GET_COSMIC_TOPLEVEL_SINCE {
             instance.done();
         }
         if let Some(handle) = foreign_toplevel_handle {

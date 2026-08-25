@@ -4990,7 +4990,7 @@ impl Shell {
         xdg_activation_state: &XdgActivationState,
         workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
     ) {
-        let mut container = cosmic::config::LINGMO_TK.write().unwrap();
+        let mut container = cosmic::config::COSMIC_TK.write().unwrap();
         if *container != toolkit {
             *container = toolkit;
             drop(container);
