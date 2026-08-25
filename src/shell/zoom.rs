@@ -1,7 +1,7 @@
 use std::{sync::Mutex, time::Instant};
 
 use calloop::LoopHandle;
-use Lingmo::{
+use cosmic::{
     Apply,
     iced::{Alignment, Background, Border, Length, alignment::Vertical, widget as iced_widget},
     theme,
@@ -72,7 +72,7 @@ impl OutputZoomState {
         increment: u32,
         movement: ZoomMovement,
         loop_handle: LoopHandle<'static, State>,
-        mut theme: Lingmo::Theme,
+        mut theme: cosmic::Theme,
     ) -> OutputZoomState {
         theme.transparent = theme.Lingmo().frosted_system_interface;
         let cursor_position = seat.get_pointer().unwrap().current_location().as_global();
@@ -466,7 +466,7 @@ impl ZoomProgram {
 impl Program for ZoomProgram {
     type Message = ZoomMessage;
 
-    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
+    fn view(&self) -> cosmic::Element<'_, Self::Message> {
         widget::row::with_children(vec![
             widget::button::icon(Named::new("list-remove-symbolic").size(16).prefer_svg(true))
                 .on_press(ZoomMessage::Decrease)

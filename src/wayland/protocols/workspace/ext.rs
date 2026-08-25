@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZCosmicWorkspaceHandleV2;
+use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZcosmicWorkspaceHandleV2;
 
 use smithay::{
     output::Output,
@@ -52,7 +52,7 @@ pub struct WorkspaceDataInner {
     coordinates: Vec<u32>,
     states: Option<ext_workspace_handle_v1::State>,
     ext_id: Option<String>,
-    pub(super) cosmic_v2_handle: Option<Weak<ZCosmicWorkspaceHandleV2>>,
+    pub(super) cosmic_v2_handle: Option<Weak<ZcosmicWorkspaceHandleV2>>,
 }
 
 pub struct WorkspaceData {

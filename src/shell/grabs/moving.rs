@@ -5,8 +5,8 @@ use crate::{
         BackdropShader, IndicatorShader, Key, Usage, cursor::CursorState, element::AsGlowRenderer,
     },
     shell::{
-        LingmoMapped, LingmoSurface, Direction, ManagedLayer,
-        element::{LingmoMappedRenderElement, stack_hover::StackHover},
+        CosmicMapped, CosmicSurface, Direction, ManagedLayer,
+        element::{CosmicMappedRenderElement, stack_hover::StackHover},
         focus::target::{KeyboardFocusTarget, PointerFocusTarget},
         layout::floating::TiledCorners,
     },
@@ -15,7 +15,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use Lingmo::theme::LingmoTheme;
+use cosmic::theme::CosmicTheme;
 use smallvec::SmallVec;
 use smithay::{
     backend::{
@@ -54,7 +54,7 @@ pub type SeatMoveGrabState = Mutex<Option<MoveGrabState>>;
 const RESCALE_ANIMATION_DURATION: f64 = 150.0;
 
 pub struct MoveGrabState {
-    window: LingmoMapped,
+    window: CosmicMapped,
     window_offset: Point<i32, Logical>,
     indicator_thickness: u8,
     start: Instant,
@@ -71,13 +71,13 @@ impl MoveGrabState {
         &self,
         renderer: &mut R,
         output: &Output,
-        theme: &LingmoTheme,
+        theme: &CosmicTheme,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
+        push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer + ImportAll + ImportMem,
         R::TextureId: Send + Clone + 'static,
-        LingmoMappedRenderElement<R>: RenderElement<R>,
+        CosmicMappedRenderElement<R>: RenderElement<R>,
     {
         let scale = if self.previous == ManagedLayer::Tiling {
             0.6 + ((1.0
@@ -167,16 +167,16 @@ impl MoveGrabState {
         }
 
         let map_window_element = |elem| match elem {
-            LingmoMappedRenderElement::Stack(stack) => {
-                LingmoMappedRenderElement::GrabbedStack(RescaleRenderElement::from_element(
+            CosmicMappedRenderElement::Stack(stack) => {
+                CosmicMappedRenderElement::GrabbedStack(RescaleRenderElement::from_element(
                     stack,
                     render_location
                         .to_physical_precise_round(output.current_scale().fractional_scale()),
                     scale,
                 ))
             }
-            LingmoMappedRenderElement::Window(window) => {
-                LingmoMappedRenderElement::GrabbedWindow(RescaleRenderElement::from_element(
+            CosmicMappedRenderElement::Window(window) => {
+                CosmicMappedRenderElement::GrabbedWindow(RescaleRenderElement::from_element(
                     window,
                     render_location
                         .to_physical_precise_round(output.current_scale().fractional_scale()),
@@ -186,7 +186,7 @@ impl MoveGrabState {
             x => x,
         };
 
-        let mut lower_elements = SmallVec::<[LingmoMappedRenderElement<R>; 4]>::new_const();
+        let mut lower_elements = SmallVec::<[CosmicMappedRenderElement<R>; 4]>::new_const();
         self.window.push_render_elements(
             renderer,
             (render_location - self.window.geometry().loc).to_physical_precise_round(output_scale),
@@ -262,11 +262,11 @@ impl MoveGrabState {
         }
     }
 
-    pub fn element(&self) -> LingmoMapped {
+    pub fn element(&self) -> CosmicMapped {
         self.window.clone()
     }
 
-    pub fn window(&self) -> LingmoSurface {
+    pub fn window(&self) -> CosmicSurface {
         self.window.active_window()
     }
 }
@@ -355,7 +355,7 @@ impl SnappingZone {
 }
 
 pub struct MoveGrab {
-    window: LingmoMapped,
+    window: CosmicMapped,
     start_data: GrabStartData,
     seat: Seat<State>,
     cursor_output: Output,
@@ -718,7 +718,7 @@ impl TouchGrab<State> for MoveGrab {
 impl MoveGrab {
     pub fn new(
         start_data: GrabStartData,
-        window: LingmoMapped,
+        window: CosmicMapped,
         seat: &Seat<State>,
         initial_window_location: Point<i32, Global>,
         cursor_output: Output,
@@ -800,7 +800,7 @@ impl Drop for MoveGrab {
         let cursor_output = self.cursor_output.clone();
 
         let _ = self.evlh.0.insert_idle(move |state| {
-            let position: Option<(LingmoMapped, Point<i32, Global>)> = if let Some(grab_state) =
+            let position: Option<(CosmicMapped, Point<i32, Global>)> = if let Some(grab_state) =
                 seat.user_data()
                     .get::<SeatMoveGrabState>()
                     .and_then(|s| s.lock().unwrap().take())

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::{
-    shell::{LingmoSurface, PendingWindow, focus::target::KeyboardFocusTarget, grabs::ReleaseMode},
+    shell::{CosmicSurface, PendingWindow, focus::target::KeyboardFocusTarget, grabs::ReleaseMode},
     utils::prelude::*,
 };
 use smithay::desktop::layer_map_for_output;
@@ -45,7 +45,7 @@ impl XdgShellHandler for State {
         let seat = shell.seats.last_active().clone();
 
         if !shell.pending_windows.iter().any(|w| w.surface == surface) {
-            let surface = LingmoSurface::from(surface);
+            let surface = CosmicSurface::from(surface);
             shell.pending_windows.push(PendingWindow {
                 surface,
                 seat,

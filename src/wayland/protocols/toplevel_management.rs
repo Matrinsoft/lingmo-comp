@@ -11,9 +11,9 @@ use smithay::{
     utils::{Logical, Rectangle},
 };
 
-pub use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZCosmicToplevelManagementCapabilitiesV1 as ManagementCapabilities;
+pub use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplevelManagementCapabilitiesV1 as ManagementCapabilities;
 use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::{
-    self, ZCosmicToplevelManagerV1,
+    self, ZcosmicToplevelManagerV1,
 };
 
 use super::{
@@ -23,7 +23,7 @@ use super::{
 
 #[derive(Debug)]
 pub struct ToplevelManagementState {
-    instances: Vec<ZCosmicToplevelManagerV1>,
+    instances: Vec<ZcosmicToplevelManagerV1>,
     capabilities: Vec<ManagementCapabilities>,
     global: GlobalId,
 }
@@ -108,14 +108,14 @@ impl ToplevelManagementState {
         client_filter: F,
     ) -> ToplevelManagementState
     where
-        D: GlobalDispatch<ZCosmicToplevelManagerV1, ToplevelManagerGlobalData>
-            + Dispatch<ZCosmicToplevelManagerV1, ()>
+        D: GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData>
+            + Dispatch<ZcosmicToplevelManagerV1, ()>
             + ToplevelManagementHandler
             + 'static,
         <D as ToplevelInfoHandler>::Window: ManagementWindow,
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + 'static,
     {
-        let global = dh.create_global::<D, ZCosmicToplevelManagerV1, _>(
+        let global = dh.create_global::<D, ZcosmicToplevelManagerV1, _>(
             4,
             ToplevelManagerGlobalData {
                 filter: Box::new(client_filter),
@@ -133,11 +133,11 @@ impl ToplevelManagementState {
     }
 }
 
-impl<D> GlobalDispatch<ZCosmicToplevelManagerV1, ToplevelManagerGlobalData, D>
+impl<D> GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData, D>
     for ToplevelManagementState
 where
-    D: GlobalDispatch<ZCosmicToplevelManagerV1, ToplevelManagerGlobalData>
-        + Dispatch<ZCosmicToplevelManagerV1, ()>
+    D: GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData>
+        + Dispatch<ZcosmicToplevelManagerV1, ()>
         + ToplevelManagementHandler
         + 'static,
     <D as ToplevelInfoHandler>::Window: ManagementWindow,
@@ -146,7 +146,7 @@ where
         state: &mut D,
         _dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZCosmicToplevelManagerV1>,
+        resource: New<ZcosmicToplevelManagerV1>,
         _global_data: &ToplevelManagerGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -167,10 +167,10 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicToplevelManagerV1, (), D> for ToplevelManagementState
+impl<D> Dispatch<ZcosmicToplevelManagerV1, (), D> for ToplevelManagementState
 where
-    D: GlobalDispatch<ZCosmicToplevelManagerV1, ToplevelManagerGlobalData>
-        + Dispatch<ZCosmicToplevelManagerV1, ()>
+    D: GlobalDispatch<ZcosmicToplevelManagerV1, ToplevelManagerGlobalData>
+        + Dispatch<ZcosmicToplevelManagerV1, ()>
         + ToplevelManagementHandler
         + 'static,
     <D as ToplevelInfoHandler>::Window: ManagementWindow,
@@ -178,7 +178,7 @@ where
     fn request(
         state: &mut D,
         _client: &Client,
-        _obj: &ZCosmicToplevelManagerV1,
+        _obj: &ZcosmicToplevelManagerV1,
         request: zcosmic_toplevel_manager_v1::Request,
         _data: &(),
         dh: &DisplayHandle,
@@ -266,7 +266,7 @@ where
         }
     }
 
-    fn destroyed(state: &mut D, client: ClientId, resource: &ZCosmicToplevelManagerV1, _data: &()) {
+    fn destroyed(state: &mut D, client: ClientId, resource: &ZcosmicToplevelManagerV1, _data: &()) {
         let mng_state = state.toplevel_management_state();
         mng_state.instances.retain(|i| i != resource);
         if !mng_state
@@ -292,10 +292,10 @@ where
 macro_rules! delegate_toplevel_management {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZCosmicToplevelManagerV1: $crate::wayland::protocols::toplevel_management::ToplevelManagerGlobalData
+            cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplevelManagerV1: $crate::wayland::protocols::toplevel_management::ToplevelManagerGlobalData
         ] => $crate::wayland::protocols::toplevel_management::ToplevelManagementState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZCosmicToplevelManagerV1: ()
+            cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplevelManagerV1: ()
         ] => $crate::wayland::protocols::toplevel_management::ToplevelManagementState);
     };
 }

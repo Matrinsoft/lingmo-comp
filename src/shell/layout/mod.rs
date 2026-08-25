@@ -9,12 +9,12 @@ use smithay::{
 };
 use tracing::warn;
 
-use super::LingmoSurface;
+use super::CosmicSurface;
 
 pub mod floating;
 pub mod tiling;
 
-pub fn is_dialog(window: &LingmoSurface) -> bool {
+pub fn is_dialog(window: &CosmicSurface) -> bool {
     // Check "window type"
     match window.0.underlying_surface() {
         WindowSurface::Wayland(toplevel) => {
@@ -89,7 +89,7 @@ impl TilingExceptions {
     }
 }
 
-pub fn has_floating_exception(exceptions: &TilingExceptions, window: &LingmoSurface) -> bool {
+pub fn has_floating_exception(exceptions: &TilingExceptions, window: &CosmicSurface) -> bool {
     // else take a look at our exceptions
     let appid_matches = exceptions.app_ids.matches(&window.app_id());
     let title_matches = exceptions.titles.matches(&window.title());

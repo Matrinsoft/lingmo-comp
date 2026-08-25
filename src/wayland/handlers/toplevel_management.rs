@@ -10,7 +10,7 @@ use smithay::{
 };
 
 use crate::{
-    shell::{LingmoSurface, Shell, WorkspaceDelta, focus::target::KeyboardFocusTarget},
+    shell::{CosmicSurface, Shell, WorkspaceDelta, focus::target::KeyboardFocusTarget},
     utils::prelude::*,
     wayland::protocols::{
         toplevel_info::ToplevelInfoHandler,
@@ -261,13 +261,13 @@ impl ToplevelManagementHandler for State {
     }
 }
 
-impl ManagementWindow for LingmoSurface {
+impl ManagementWindow for CosmicSurface {
     fn close(&self) {
-        LingmoSurface::close(self)
+        CosmicSurface::close(self)
     }
 }
 
-pub fn minimize_rectangle(output: &Output, window: &LingmoSurface) -> Rectangle<i32, Local> {
+pub fn minimize_rectangle(output: &Output, window: &CosmicSurface) -> Rectangle<i32, Local> {
     toplevel_rectangle_for(window)
         .find_map(|(surface, relative)| {
             let map = layer_map_for_output(output);

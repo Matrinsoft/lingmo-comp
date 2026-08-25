@@ -10,7 +10,7 @@ use crate::{
     config::{CompOutputConfig, Config, ScreenFilter},
     dbus::DBusState,
     input::{PointerFocusState, gestures::GestureState},
-    shell::{LingmoSurface, SeatExt, Shell, grabs::SeatMoveGrabState},
+    shell::{CosmicSurface, SeatExt, Shell, grabs::SeatMoveGrabState},
     utils::prelude::OutputExt,
     wayland::{
         handlers::{data_device::get_dnd_icon, image_copy_capture::SessionHolder},
@@ -271,7 +271,7 @@ pub struct Common {
     >,
 
     pub kiosk_child: Option<Child>,
-    pub theme: Lingmo::Theme,
+    pub theme: cosmic::Theme,
 
     // wayland state
     pub compositor_state: CompositorState,
@@ -311,7 +311,7 @@ pub struct Common {
     // shell-related wayland state
     pub xdg_shell_state: XdgShellState,
     pub layer_shell_state: WlrLayerShellState,
-    pub toplevel_info_state: ToplevelInfoState<State, LingmoSurface>,
+    pub toplevel_info_state: ToplevelInfoState<State, CosmicSurface>,
     pub toplevel_management_state: ToplevelManagementState,
     pub xdg_activation_state: XdgActivationState,
     pub xdg_foreign_state: XdgForeignState,
@@ -784,7 +784,7 @@ impl State {
                 ei_pointer_buttons: std::collections::HashMap::new(),
 
                 kiosk_child: None,
-                theme: Lingmo::theme::system_preference(),
+                theme: cosmic::Theme::system_preference(),
 
                 compositor_state,
                 corner_radius_state,

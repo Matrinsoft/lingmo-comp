@@ -43,7 +43,7 @@ mod input_config;
 pub mod key_bindings;
 mod types;
 
-use Lingmo::config::LingmoTk;
+use cosmic::config::LingmoTk;
 pub use lingmo_comp_config::EdidProduct;
 use lingmo_comp_config::{
     ActivationPolicy, AppearanceConfig, CosmicCompConfig, KeyboardConfig, TileBehavior, XkbConfig,

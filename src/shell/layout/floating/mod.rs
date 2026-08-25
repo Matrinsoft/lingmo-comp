@@ -28,12 +28,12 @@ use smithay::{
 use crate::{
     backend::render::{IndicatorShader, Key, Usage, element::AsGlowRenderer},
     shell::{
-        LingmoSurface, Direction, ManagedLayer, MoveResult, ResizeMode,
+        CosmicSurface, Direction, ManagedLayer, MoveResult, ResizeMode,
         element::{
-            LingmoMapped, LingmoMappedRenderElement, LingmoWindow, MaximizedState,
+            CosmicMapped, CosmicMappedRenderElement, CosmicWindow, MaximizedState,
             resize_indicator::ResizeIndicator,
-            stack::{LingmoStackRenderElement, MoveResult as StackMoveResult, TAB_HEIGHT},
-            window::LingmoWindowRenderElement,
+            stack::{CosmicStackRenderElement, MoveResult as StackMoveResult, TAB_HEIGHT},
+            window::CosmicWindowRenderElement,
         },
         focus::{
             FocusStackMut,
@@ -54,13 +54,13 @@ pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(320);
 
 #[derive(Debug, Default)]
 pub struct FloatingLayout {
-    pub(crate) space: Space<LingmoMapped>,
+    pub(crate) space: Space<CosmicMapped>,
     last_output_size: Size<i32, Local>,
-    spawn_order: Vec<LingmoMapped>,
-    animations: HashMap<LingmoMapped, Animation>,
-    hovered_stack: Option<(LingmoMapped, Rectangle<i32, Local>)>,
+    spawn_order: Vec<CosmicMapped>,
+    animations: HashMap<CosmicMapped, Animation>,
+    hovered_stack: Option<(CosmicMapped, Rectangle<i32, Local>)>,
     dirty: AtomicBool,
-    pub theme: Lingmo::Theme,
+    pub theme: cosmic::Theme,
     pub appearance: AppearanceConfig,
 }
 
@@ -267,7 +267,7 @@ impl TiledCorners {
 
 impl FloatingLayout {
     pub fn new(
-        theme: Lingmo::Theme,
+        theme: cosmic::Theme,
         appearance: AppearanceConfig,
         output: &Output,
     ) -> FloatingLayout {
@@ -340,7 +340,7 @@ impl FloatingLayout {
 
     pub fn map(
         &mut self,
-        mapped: impl Into<LingmoMapped>,
+        mapped: impl Into<CosmicMapped>,
         position: impl Into<Option<Point<i32, Local>>>,
     ) {
         let mapped = mapped.into();
@@ -351,7 +351,7 @@ impl FloatingLayout {
 
     pub fn map_maximized(
         &mut self,
-        mapped: LingmoMapped,
+        mapped: CosmicMapped,
         previous_geometry: Rectangle<i32, Local>,
         animate: bool,
     ) {
@@ -408,7 +408,7 @@ impl FloatingLayout {
 
     pub(in crate::shell) fn map_internal(
         &mut self,
-        mapped: LingmoMapped,
+        mapped: CosmicMapped,
         position: Option<Point<i32, Local>>,
         size: Option<Size<i32, Logical>>,
         prev: Option<Rectangle<i32, Local>>,
@@ -623,7 +623,7 @@ impl FloatingLayout {
 
     pub fn remap_minimized(
         &mut self,
-        mapped: LingmoMapped,
+        mapped: CosmicMapped,
         from: Rectangle<i32, Local>,
         position: Point<i32, Local>,
     ) {
@@ -664,7 +664,7 @@ impl FloatingLayout {
 
     pub fn unmap(
         &mut self,
-        window: &LingmoMapped,
+        window: &CosmicMapped,
         to: Option<Rectangle<i32, Local>>,
     ) -> Option<Rectangle<i32, Local>> {
         let mut mapped_geometry = self.space.element_geometry(window).map(RectExt::as_local)?;
@@ -716,9 +716,9 @@ impl FloatingLayout {
 
     pub fn drop_window(
         &mut self,
-        window: LingmoMapped,
+        window: CosmicMapped,
         position: Point<i32, Local>,
-    ) -> (LingmoMapped, Point<i32, Local>) {
+    ) -> (CosmicMapped, Point<i32, Local>) {
         if self
             .hovered_stack
             .as_ref()
@@ -739,7 +739,7 @@ impl FloatingLayout {
         }
     }
 
-    pub fn element_geometry(&self, elem: &LingmoMapped) -> Option<Rectangle<i32, Local>> {
+    pub fn element_geometry(&self, elem: &CosmicMapped) -> Option<Rectangle<i32, Local>> {
         self.space.element_geometry(elem).map(RectExt::as_local)
     }
 
@@ -911,7 +911,7 @@ impl FloatingLayout {
 
     pub fn resize_request(
         &mut self,
-        mapped: &LingmoMapped,
+        mapped: &CosmicMapped,
         seat: &Seat<State>,
         start_data: GrabStartData,
         edges: ResizeEdge,
@@ -1029,7 +1029,7 @@ impl FloatingLayout {
 
     pub fn toggle_stacking(
         &mut self,
-        mapped: &LingmoMapped,
+        mapped: &CosmicMapped,
         mut focus_stack: FocusStackMut,
     ) -> Option<KeyboardFocusTarget> {
         if !self.space.elements().any(|m| m == mapped) {
@@ -1078,7 +1078,7 @@ impl FloatingLayout {
                 other.try_force_undecorated(false);
                 other.set_tiled(false);
                 let focused = other == focused;
-                let window = LingmoMapped::from(LingmoWindow::new(
+                let window = CosmicMapped::from(CosmicWindow::new(
                     other,
                     handle.clone(),
                     self.theme.clone(),
@@ -1127,14 +1127,14 @@ impl FloatingLayout {
         direction: Direction,
         seat: &Seat<State>,
         layer: ManagedLayer,
-        theme: &Lingmo::Theme,
-        element: &LingmoMapped,
+        theme: &cosmic::Theme,
+        element: &CosmicMapped,
     ) -> MoveResult {
         match element.handle_move(direction) {
             StackMoveResult::Handled => MoveResult::Done,
             StackMoveResult::MoveOut(surface, loop_handle) => {
-                let mapped: LingmoMapped =
-                    LingmoWindow::new(surface, loop_handle, theme.clone(), self.appearance).into();
+                let mapped: CosmicMapped =
+                    CosmicWindow::new(surface, loop_handle, theme.clone(), self.appearance).into();
                 let output = seat.active_output();
                 let pos = self.space.element_geometry(element).unwrap().loc
                     + match direction {
@@ -1295,7 +1295,7 @@ impl FloatingLayout {
         direction: Direction,
         seat: &Seat<State>,
         layer: ManagedLayer,
-        theme: Lingmo::Theme,
+        theme: cosmic::Theme,
     ) -> MoveResult {
         let Some(target) = seat.get_keyboard().unwrap().current_focus() else {
             return MoveResult::None;
@@ -1322,11 +1322,11 @@ impl FloatingLayout {
         self.move_element(direction, seat, layer, &theme, &focused.clone())
     }
 
-    pub fn mapped(&self) -> impl Iterator<Item = &LingmoMapped> {
+    pub fn mapped(&self) -> impl Iterator<Item = &CosmicMapped> {
         self.space.elements().rev()
     }
 
-    pub fn windows(&self) -> impl Iterator<Item = LingmoSurface> + '_ {
+    pub fn windows(&self) -> impl Iterator<Item = CosmicSurface> + '_ {
         self.mapped().flat_map(|e| e.windows().map(|(w, _)| w))
     }
 
@@ -1444,13 +1444,13 @@ impl FloatingLayout {
         renderer: &mut R,
         alpha: f32,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
+        push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoMappedRenderElement<R>: RenderElement<R>,
-        LingmoWindowRenderElement<R>: RenderElement<R>,
-        LingmoStackRenderElement<R>: RenderElement<R>,
+        CosmicMappedRenderElement<R>: RenderElement<R>,
+        CosmicWindowRenderElement<R>: RenderElement<R>,
+        CosmicStackRenderElement<R>: RenderElement<R>,
     {
         let output = self.space.outputs().next().unwrap();
         let output_scale = output.current_scale().fractional_scale();
@@ -1486,19 +1486,19 @@ impl FloatingLayout {
     pub fn render<R>(
         &self,
         renderer: &mut R,
-        focused: Option<&LingmoMapped>,
+        focused: Option<&CosmicMapped>,
         mut resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
         alpha: f32,
-        theme: &Lingmo::theme::LingmoTheme,
+        theme: &cosmic::Theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
+        push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoMappedRenderElement<R>: RenderElement<R>,
-        LingmoWindowRenderElement<R>: RenderElement<R>,
-        LingmoStackRenderElement<R>: RenderElement<R>,
+        CosmicMappedRenderElement<R>: RenderElement<R>,
+        CosmicWindowRenderElement<R>: RenderElement<R>,
+        CosmicStackRenderElement<R>: RenderElement<R>,
     {
         let output = self.space.outputs().next().unwrap();
         let output_geometry = {
@@ -1541,8 +1541,8 @@ impl FloatingLayout {
                 };
 
                 Some(move |element| match element {
-                    LingmoMappedRenderElement::Stack(elem) => {
-                        LingmoMappedRenderElement::MovingStack({
+                    CosmicMappedRenderElement::Stack(elem) => {
+                        CosmicMappedRenderElement::MovingStack({
                             let rescaled = RescaleRenderElement::from_element(
                                 elem,
                                 original_geo
@@ -1561,8 +1561,8 @@ impl FloatingLayout {
                             )
                         })
                     }
-                    LingmoMappedRenderElement::Window(elem) => {
-                        LingmoMappedRenderElement::MovingWindow({
+                    CosmicMappedRenderElement::Window(elem) => {
+                        CosmicMappedRenderElement::MovingWindow({
                             let rescaled = RescaleRenderElement::from_element(
                                 elem,
                                 original_geo
@@ -1606,7 +1606,7 @@ impl FloatingLayout {
                             .to_physical_precise_round(output_scale),
                         output_scale.into(),
                         alpha * mode.alpha().unwrap_or(1.0),
-                        &mut |elem| push(LingmoMappedRenderElement::Window(elem.into())),
+                        &mut |elem| push(CosmicMappedRenderElement::Window(elem.into())),
                         None,
                     );
                 }
@@ -1669,7 +1669,7 @@ impl FloatingLayout {
         }
     }
 
-    pub fn snap_to_corner(&self, mapped: &LingmoMapped, corners: &TiledCorners) {
+    pub fn snap_to_corner(&self, mapped: &CosmicMapped, corners: &TiledCorners) {
         *mapped.floating_tiled.lock().unwrap() = Some(*corners);
         mapped.set_tiled(true);
         let snapped_geo = self.snapped_geometry(corners);

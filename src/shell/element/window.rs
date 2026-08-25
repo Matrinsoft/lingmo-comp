@@ -5,7 +5,7 @@ use crate::{
     },
     hooks::{Decorations, HOOKS},
     shell::{
-        element::{LingmoMappedKey, LingmoMappedKeyInner},
+        element::{CosmicMappedKey, CosmicMappedKeyInner},
         focus::target::PointerFocusTarget,
         grabs::{ReleaseMode, ResizeEdge},
     },
@@ -16,7 +16,7 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use Lingmo::iced::{Color, Task};
+use cosmic::iced::{Color, Task};
 use lingmo_comp_config::AppearanceConfig;
 use smithay::{
     backend::{
@@ -64,31 +64,31 @@ use std::{
 };
 use wayland_backend::server::ObjectId;
 
-use super::LingmoSurface;
+use super::CosmicSurface;
 
 pub const SSD_HEIGHT: i32 = 36;
 pub const RESIZE_BORDER: i32 = 10;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct LingmoWindow(pub(super) IcedElement<LingmoWindowInternal>);
+pub struct CosmicWindow(pub(super) IcedElement<CosmicWindowInternal>);
 
-impl fmt::Debug for LingmoWindow {
+impl fmt::Debug for CosmicWindow {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("LingmoWindow")
+        f.debug_struct("CosmicWindow")
             .field("internal", &self.0)
             .finish_non_exhaustive()
     }
 }
 
 #[derive(Debug)]
-pub struct LingmoWindowInternal {
-    pub(super) window: LingmoSurface,
+pub struct CosmicWindowInternal {
+    pub(super) window: CosmicSurface,
     activated: AtomicBool,
     /// TODO: This needs to be per seat
     pointer_entered: AtomicU8,
     last_title: Mutex<String>,
     tiled: AtomicBool,
-    theme: Mutex<Lingmo::Theme>,
+    theme: Mutex<cosmic::Theme>,
     appearance_conf: Mutex<AppearanceConfig>,
 }
 
@@ -108,7 +108,7 @@ pub enum Focus {
 
 impl Focus {
     pub fn under(
-        surface: &LingmoSurface,
+        surface: &CosmicSurface,
         header_height: i32,
         location: Point<f64, Logical>,
     ) -> Option<Focus> {
@@ -161,7 +161,7 @@ impl Focus {
     }
 }
 
-impl LingmoWindowInternal {
+impl CosmicWindowInternal {
     pub fn swap_focus(&self, focus: Option<Focus>) -> Option<Focus> {
         let value = focus.map_or(0, |x| x as u8);
         unsafe { Focus::from_u8(self.pointer_entered.swap(value, Ordering::SeqCst)) }
@@ -186,13 +186,13 @@ impl LingmoWindowInternal {
     }
 }
 
-impl LingmoWindow {
+impl CosmicWindow {
     pub fn new(
-        window: impl Into<LingmoSurface>,
+        window: impl Into<CosmicSurface>,
         handle: LoopHandle<'static, crate::state::State>,
-        mut theme: Lingmo::Theme,
+        mut theme: cosmic::Theme,
         appearance: AppearanceConfig,
-    ) -> LingmoWindow {
+    ) -> CosmicWindow {
         let window = window.into();
         let width = window.geometry().size.w;
         let last_title = window.title();
@@ -202,8 +202,8 @@ impl LingmoWindow {
             window.set_tiled(true);
         }
 
-        LingmoWindow(IcedElement::new(
-            LingmoWindowInternal {
+        CosmicWindow(IcedElement::new(
+            CosmicWindowInternal {
                 window,
                 activated: AtomicBool::new(false),
                 pointer_entered: AtomicU8::new(0),
@@ -261,7 +261,7 @@ impl LingmoWindow {
         }
     }
 
-    pub fn surface(&self) -> LingmoSurface {
+    pub fn surface(&self) -> CosmicSurface {
         self.0.with_program(|p| p.window.clone())
     }
 
@@ -329,7 +329,7 @@ impl LingmoWindow {
         })
     }
 
-    pub fn contains_surface(&self, window: &LingmoSurface) -> bool {
+    pub fn contains_surface(&self, window: &CosmicSurface) -> bool {
         self.0.with_program(|p| &p.window == window)
     }
 
@@ -353,7 +353,7 @@ impl LingmoWindow {
         scale: Scale<f64>,
         alpha: f32,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(LingmoWindowRenderElement<R>),
+        push: &mut dyn FnMut(CosmicWindowRenderElement<R>),
     ) where
         R: Renderer + AsGlowRenderer + ImportAll + ImportMem,
         R::TextureId: Send + Clone + 'static,
@@ -398,7 +398,7 @@ impl LingmoWindow {
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        C: From<LingmoWindowRenderElement<R>>,
+        C: From<CosmicWindowRenderElement<R>>,
     {
         self.0.with_program(|p| {
             let has_ssd = p.has_ssd(false);
@@ -449,10 +449,10 @@ impl LingmoWindow {
             }
 
             let window_key =
-                LingmoMappedKey(LingmoMappedKeyInner::Window(Arc::downgrade(&self.0.0)));
+                CosmicMappedKey(CosmicMappedKeyInner::Window(Arc::downgrade(&self.0.0)));
 
             Some(
-                LingmoWindowRenderElement::Shadow(ShadowShader::element(
+                CosmicWindowRenderElement::Shadow(ShadowShader::element(
                     renderer,
                     window_key,
                     geo.to_i32_round().as_local(),
@@ -475,8 +475,8 @@ impl LingmoWindow {
         alpha: f32,
         scanout_override: Option<bool>,
         scanout_node: Option<DrmNode>,
-        push_above: &mut dyn FnMut(LingmoWindowRenderElement<R>),
-        push_below: &mut dyn FnMut(LingmoWindowRenderElement<R>),
+        push_above: &mut dyn FnMut(CosmicWindowRenderElement<R>),
+        push_below: &mut dyn FnMut(CosmicWindowRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
@@ -532,10 +532,10 @@ impl LingmoWindow {
 
         if (has_ssd || clip) && !is_maximized {
             let window_key =
-                LingmoMappedKey(LingmoMappedKeyInner::Window(Arc::downgrade(&self.0.0)));
+                CosmicMappedKey(CosmicMappedKeyInner::Window(Arc::downgrade(&self.0.0)));
 
             let (r, g, b, a) = bg_divider.into_components();
-            let elem = LingmoWindowRenderElement::Border(IndicatorShader::element(
+            let elem = CosmicWindowRenderElement::Border(IndicatorShader::element(
                 renderer,
                 Key::Window(Usage::Border, window_key.clone()),
                 geo.to_i32_round().as_local(),
@@ -594,7 +594,7 @@ impl LingmoWindow {
         }
     }
 
-    pub(crate) fn set_theme(&self, mut theme: Lingmo::Theme) {
+    pub(crate) fn set_theme(&self, mut theme: cosmic::Theme) {
         theme.transparent = theme.Lingmo().frosted_windows;
         self.0.with_program(|p| {
             *p.theme.lock().unwrap() = theme.clone();
@@ -720,7 +720,7 @@ pub enum Message {
     Menu,
 }
 
-impl Program for LingmoWindowInternal {
+impl Program for CosmicWindowInternal {
     type Message = Message;
 
     fn update(
@@ -829,7 +829,7 @@ impl Program for LingmoWindowInternal {
         Task::none()
     }
 
-    fn background_color(&self, theme: &Lingmo::Theme) -> Color {
+    fn background_color(&self, theme: &cosmic::Theme) -> Color {
         if self.window.is_maximized(false) {
             theme
                 .Lingmo()
@@ -841,7 +841,7 @@ impl Program for LingmoWindowInternal {
         }
     }
 
-    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
+    fn view(&self) -> cosmic::Element<'_, Self::Message> {
         HOOKS.get().unwrap().window_decorations.view(self)
     }
 }
@@ -849,12 +849,12 @@ impl Program for LingmoWindowInternal {
 #[derive(Debug)]
 pub struct DefaultDecorations;
 
-impl Decorations<LingmoWindowInternal, Message> for DefaultDecorations {
-    fn view(&self, win: &LingmoWindowInternal) -> Lingmo::Element<'_, Message> {
+impl Decorations<CosmicWindowInternal, Message> for DefaultDecorations {
+    fn view(&self, win: &CosmicWindowInternal) -> cosmic::Element<'_, Message> {
         let sharp_corners = win.window.is_maximized(false)
             || (win.is_tiled() && !win.appearance_conf.lock().unwrap().clip_tiled_windows);
 
-        let mut header = Lingmo::widget::header_bar()
+        let mut header = cosmic::widget::header_bar()
             .title(win.last_title.lock().unwrap().clone())
             .on_drag(Message::DragStart)
             .on_close(Message::Close)
@@ -864,10 +864,10 @@ impl Decorations<LingmoWindowInternal, Message> for DefaultDecorations {
             .is_ssd(true)
             .sharp_corners(sharp_corners);
 
-        if Lingmo::config::show_minimize() {
+        if cosmic::config::show_minimize() {
             header = header.on_minimize(Message::Minimize)
         }
-        if Lingmo::config::show_maximize() {
+        if cosmic::config::show_maximize() {
             header = header.on_maximize(Message::Maximize)
         }
 
@@ -875,13 +875,13 @@ impl Decorations<LingmoWindowInternal, Message> for DefaultDecorations {
     }
 }
 
-impl IsAlive for LingmoWindow {
+impl IsAlive for CosmicWindow {
     fn alive(&self) -> bool {
         self.0.with_program(|p| p.window.alive())
     }
 }
 
-impl SpaceElement for LingmoWindow {
+impl SpaceElement for CosmicWindow {
     fn bbox(&self) -> Rectangle<i32, Logical> {
         self.0.with_program(|p| {
             let mut bbox = SpaceElement::bbox(&p.window);
@@ -963,7 +963,7 @@ impl SpaceElement for LingmoWindow {
     }
 }
 
-impl KeyboardTarget<State> for LingmoWindow {
+impl KeyboardTarget<State> for CosmicWindow {
     fn enter(
         &self,
         seat: &Seat<State>,
@@ -1002,7 +1002,7 @@ impl KeyboardTarget<State> for LingmoWindow {
     }
 }
 
-impl PointerTarget<State> for LingmoWindow {
+impl PointerTarget<State> for CosmicWindow {
     fn enter(&self, seat: &Seat<State>, data: &mut State, event: &MotionEvent) {
         let mut event = event.clone();
         self.0.with_program(|p| {
@@ -1198,7 +1198,7 @@ impl PointerTarget<State> for LingmoWindow {
     }
 }
 
-impl TouchTarget<State> for LingmoWindow {
+impl TouchTarget<State> for CosmicWindow {
     fn down(&self, seat: &Seat<State>, data: &mut State, event: &DownEvent) {
         let mut event = event.clone();
         self.0.with_program(|p| {
@@ -1238,7 +1238,7 @@ impl TouchTarget<State> for LingmoWindow {
     }
 }
 
-impl WaylandFocus for LingmoWindow {
+impl WaylandFocus for CosmicWindow {
     fn wl_surface(&self) -> Option<Cow<'_, WlSurface>> {
         self.0.with_program(|p| {
             p.window
@@ -1252,7 +1252,7 @@ impl WaylandFocus for LingmoWindow {
     }
 }
 
-pub enum LingmoWindowRenderElement<R: AsGlowRenderer + ImportAll + ImportMem> {
+pub enum CosmicWindowRenderElement<R: AsGlowRenderer + ImportAll + ImportMem> {
     Header(IcedRenderElement<R>),
     Shadow(PixelShaderElement),
     Border(PixelShaderElement),
@@ -1260,7 +1260,7 @@ pub enum LingmoWindowRenderElement<R: AsGlowRenderer + ImportAll + ImportMem> {
 }
 
 impl<R: AsGlowRenderer + ImportAll + ImportMem> From<IcedRenderElement<R>>
-    for LingmoWindowRenderElement<R>
+    for CosmicWindowRenderElement<R>
 {
     fn from(value: IcedRenderElement<R>) -> Self {
         Self::Header(value)
@@ -1268,69 +1268,69 @@ impl<R: AsGlowRenderer + ImportAll + ImportMem> From<IcedRenderElement<R>>
 }
 
 impl<R: AsGlowRenderer + ImportAll + ImportMem> From<SurfaceRenderElement<R>>
-    for LingmoWindowRenderElement<R>
+    for CosmicWindowRenderElement<R>
 {
     fn from(value: SurfaceRenderElement<R>) -> Self {
         Self::Window(value)
     }
 }
 
-impl<R> Element for LingmoWindowRenderElement<R>
+impl<R> Element for CosmicWindowRenderElement<R>
 where
     R: Renderer + ImportAll + ImportMem + AsGlowRenderer,
     R::TextureId: Send + 'static,
 {
     fn id(&self) -> &RendererId {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.id(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.id(),
-            LingmoWindowRenderElement::Border(elem) => elem.id(),
-            LingmoWindowRenderElement::Window(elem) => elem.id(),
+            CosmicWindowRenderElement::Header(elem) => elem.id(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.id(),
+            CosmicWindowRenderElement::Border(elem) => elem.id(),
+            CosmicWindowRenderElement::Window(elem) => elem.id(),
         }
     }
 
     fn current_commit(&self) -> CommitCounter {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.current_commit(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.current_commit(),
-            LingmoWindowRenderElement::Border(elem) => elem.current_commit(),
-            LingmoWindowRenderElement::Window(elem) => elem.current_commit(),
+            CosmicWindowRenderElement::Header(elem) => elem.current_commit(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.current_commit(),
+            CosmicWindowRenderElement::Border(elem) => elem.current_commit(),
+            CosmicWindowRenderElement::Window(elem) => elem.current_commit(),
         }
     }
 
     fn src(&self) -> Rectangle<f64, Buffer> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.src(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.src(),
-            LingmoWindowRenderElement::Border(elem) => elem.src(),
-            LingmoWindowRenderElement::Window(elem) => elem.src(),
+            CosmicWindowRenderElement::Header(elem) => elem.src(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.src(),
+            CosmicWindowRenderElement::Border(elem) => elem.src(),
+            CosmicWindowRenderElement::Window(elem) => elem.src(),
         }
     }
 
     fn geometry(&self, scale: Scale<f64>) -> Rectangle<i32, Physical> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.geometry(scale),
-            LingmoWindowRenderElement::Shadow(elem) => elem.geometry(scale),
-            LingmoWindowRenderElement::Border(elem) => elem.geometry(scale),
-            LingmoWindowRenderElement::Window(elem) => elem.geometry(scale),
+            CosmicWindowRenderElement::Header(elem) => elem.geometry(scale),
+            CosmicWindowRenderElement::Shadow(elem) => elem.geometry(scale),
+            CosmicWindowRenderElement::Border(elem) => elem.geometry(scale),
+            CosmicWindowRenderElement::Window(elem) => elem.geometry(scale),
         }
     }
 
     fn location(&self, scale: Scale<f64>) -> Point<i32, Physical> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.location(scale),
-            LingmoWindowRenderElement::Shadow(elem) => elem.location(scale),
-            LingmoWindowRenderElement::Border(elem) => elem.location(scale),
-            LingmoWindowRenderElement::Window(elem) => elem.location(scale),
+            CosmicWindowRenderElement::Header(elem) => elem.location(scale),
+            CosmicWindowRenderElement::Shadow(elem) => elem.location(scale),
+            CosmicWindowRenderElement::Border(elem) => elem.location(scale),
+            CosmicWindowRenderElement::Window(elem) => elem.location(scale),
         }
     }
 
     fn transform(&self) -> Transform {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.transform(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.transform(),
-            LingmoWindowRenderElement::Border(elem) => elem.transform(),
-            LingmoWindowRenderElement::Window(elem) => elem.transform(),
+            CosmicWindowRenderElement::Header(elem) => elem.transform(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.transform(),
+            CosmicWindowRenderElement::Border(elem) => elem.transform(),
+            CosmicWindowRenderElement::Window(elem) => elem.transform(),
         }
     }
 
@@ -1340,51 +1340,51 @@ where
         commit: Option<CommitCounter>,
     ) -> DamageSet<i32, Physical> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.damage_since(scale, commit),
-            LingmoWindowRenderElement::Shadow(elem) => elem.damage_since(scale, commit),
-            LingmoWindowRenderElement::Border(elem) => elem.damage_since(scale, commit),
-            LingmoWindowRenderElement::Window(elem) => elem.damage_since(scale, commit),
+            CosmicWindowRenderElement::Header(elem) => elem.damage_since(scale, commit),
+            CosmicWindowRenderElement::Shadow(elem) => elem.damage_since(scale, commit),
+            CosmicWindowRenderElement::Border(elem) => elem.damage_since(scale, commit),
+            CosmicWindowRenderElement::Window(elem) => elem.damage_since(scale, commit),
         }
     }
 
     fn opaque_regions(&self, scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.opaque_regions(scale),
-            LingmoWindowRenderElement::Shadow(elem) => elem.opaque_regions(scale),
-            LingmoWindowRenderElement::Border(elem) => elem.opaque_regions(scale),
-            LingmoWindowRenderElement::Window(elem) => elem.opaque_regions(scale),
+            CosmicWindowRenderElement::Header(elem) => elem.opaque_regions(scale),
+            CosmicWindowRenderElement::Shadow(elem) => elem.opaque_regions(scale),
+            CosmicWindowRenderElement::Border(elem) => elem.opaque_regions(scale),
+            CosmicWindowRenderElement::Window(elem) => elem.opaque_regions(scale),
         }
     }
 
     fn alpha(&self) -> f32 {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.alpha(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.alpha(),
-            LingmoWindowRenderElement::Border(elem) => elem.alpha(),
-            LingmoWindowRenderElement::Window(elem) => elem.alpha(),
+            CosmicWindowRenderElement::Header(elem) => elem.alpha(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.alpha(),
+            CosmicWindowRenderElement::Border(elem) => elem.alpha(),
+            CosmicWindowRenderElement::Window(elem) => elem.alpha(),
         }
     }
 
     fn kind(&self) -> Kind {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.kind(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.kind(),
-            LingmoWindowRenderElement::Border(elem) => elem.kind(),
-            LingmoWindowRenderElement::Window(elem) => elem.kind(),
+            CosmicWindowRenderElement::Header(elem) => elem.kind(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.kind(),
+            CosmicWindowRenderElement::Border(elem) => elem.kind(),
+            CosmicWindowRenderElement::Window(elem) => elem.kind(),
         }
     }
 
     fn is_framebuffer_effect(&self) -> bool {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.is_framebuffer_effect(),
-            LingmoWindowRenderElement::Shadow(elem) => elem.is_framebuffer_effect(),
-            LingmoWindowRenderElement::Border(elem) => elem.is_framebuffer_effect(),
-            LingmoWindowRenderElement::Window(elem) => elem.is_framebuffer_effect(),
+            CosmicWindowRenderElement::Header(elem) => elem.is_framebuffer_effect(),
+            CosmicWindowRenderElement::Shadow(elem) => elem.is_framebuffer_effect(),
+            CosmicWindowRenderElement::Border(elem) => elem.is_framebuffer_effect(),
+            CosmicWindowRenderElement::Window(elem) => elem.is_framebuffer_effect(),
         }
     }
 }
 
-impl<R> RenderElement<R> for LingmoWindowRenderElement<R>
+impl<R> RenderElement<R> for CosmicWindowRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
@@ -1399,10 +1399,10 @@ where
         cache: Option<&UserDataMap>,
     ) -> Result<(), <R>::Error> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => {
+            CosmicWindowRenderElement::Header(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoWindowRenderElement::Shadow(elem) | LingmoWindowRenderElement::Border(elem) => {
+            CosmicWindowRenderElement::Shadow(elem) | CosmicWindowRenderElement::Border(elem) => {
                 RenderElement::<GlowRenderer>::draw(
                     elem,
                     R::glow_frame_mut(frame),
@@ -1414,7 +1414,7 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            LingmoWindowRenderElement::Window(elem) => {
+            CosmicWindowRenderElement::Window(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
         }
@@ -1422,11 +1422,11 @@ where
 
     fn underlying_storage(&self, renderer: &mut R) -> Option<UnderlyingStorage<'_>> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => elem.underlying_storage(renderer),
-            LingmoWindowRenderElement::Shadow(elem) | LingmoWindowRenderElement::Border(elem) => {
+            CosmicWindowRenderElement::Header(elem) => elem.underlying_storage(renderer),
+            CosmicWindowRenderElement::Shadow(elem) | CosmicWindowRenderElement::Border(elem) => {
                 elem.underlying_storage(renderer.glow_renderer_mut())
             }
-            LingmoWindowRenderElement::Window(elem) => elem.underlying_storage(renderer),
+            CosmicWindowRenderElement::Window(elem) => elem.underlying_storage(renderer),
         }
     }
 
@@ -1438,10 +1438,10 @@ where
         cache: &UserDataMap,
     ) -> Result<(), <R>::Error> {
         match self {
-            LingmoWindowRenderElement::Header(elem) => {
+            CosmicWindowRenderElement::Header(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoWindowRenderElement::Shadow(elem) | LingmoWindowRenderElement::Border(elem) => {
+            CosmicWindowRenderElement::Shadow(elem) | CosmicWindowRenderElement::Border(elem) => {
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem,
                     R::glow_frame_mut(frame),
@@ -1451,7 +1451,7 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            LingmoWindowRenderElement::Window(elem) => {
+            CosmicWindowRenderElement::Window(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
         }

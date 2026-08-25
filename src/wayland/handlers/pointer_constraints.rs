@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::{shell::LingmoSurface, state::State, utils::prelude::*};
+use crate::{shell::CosmicSurface, state::State, utils::prelude::*};
 use smithay::{
     input::pointer::PointerHandle,
     reexports::wayland_server::protocol::wl_surface::WlSurface,
@@ -36,7 +36,7 @@ impl PointerConstraintsHandler for State {
                     surface_location = Some(target_loc);
                     true
                 } else {
-                    LingmoSurface::surface_tree_offset(surface, &under_surface).is_some_and(
+                    CosmicSurface::surface_tree_offset(surface, &under_surface).is_some_and(
                         |offset| {
                             surface_location = Some(target_loc - offset.to_f64().as_global());
                             true

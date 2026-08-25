@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use cosmic_protocols::workspace::v2::server::{
-    zcosmic_workspace_handle_v2::{self, ZCosmicWorkspaceHandleV2},
-    zcosmic_workspace_manager_v2::{self, ZCosmicWorkspaceManagerV2},
+    zcosmic_workspace_handle_v2::{self, ZcosmicWorkspaceHandleV2},
+    zcosmic_workspace_manager_v2::{self, ZcosmicWorkspaceManagerV2},
 };
 use smithay::reexports::{
     wayland_protocols::ext::workspace::v1::server::ext_workspace_handle_v1::ExtWorkspaceHandleV1,
@@ -29,7 +29,7 @@ pub struct CosmicWorkspaceV2Data {
     inner: Mutex<CosmicWorkspaceV2DataInner>,
 }
 
-impl<D> GlobalDispatch<ZCosmicWorkspaceManagerV2, WorkspaceGlobalData, D> for WorkspaceState<D>
+impl<D> GlobalDispatch<ZcosmicWorkspaceManagerV2, WorkspaceGlobalData, D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
@@ -37,7 +37,7 @@ where
         _state: &mut D,
         _dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZCosmicWorkspaceManagerV2>,
+        resource: New<ZcosmicWorkspaceManagerV2>,
         _global_data: &WorkspaceGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -49,14 +49,14 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicWorkspaceManagerV2, (), D> for WorkspaceState<D>
+impl<D> Dispatch<ZcosmicWorkspaceManagerV2, (), D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        obj: &ZCosmicWorkspaceManagerV2,
+        obj: &ZcosmicWorkspaceManagerV2,
         request: zcosmic_workspace_manager_v2::Request,
         _data: &(),
         _dh: &DisplayHandle,
@@ -107,14 +107,14 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicWorkspaceHandleV2, CosmicWorkspaceV2Data, D> for WorkspaceState<D>
+impl<D> Dispatch<ZcosmicWorkspaceHandleV2, CosmicWorkspaceV2Data, D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _obj: &ZCosmicWorkspaceHandleV2,
+        _obj: &ZcosmicWorkspaceHandleV2,
         request: zcosmic_workspace_handle_v2::Request,
         data: &CosmicWorkspaceV2Data,
         _dh: &DisplayHandle,
@@ -249,7 +249,7 @@ where
 }
 
 pub fn send_workspace_to_client(
-    instance: &ZCosmicWorkspaceHandleV2,
+    instance: &ZcosmicWorkspaceHandleV2,
     workspace: &Workspace,
 ) -> bool {
     let mut changed = false;

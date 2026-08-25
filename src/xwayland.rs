@@ -9,7 +9,7 @@ use std::{
 use crate::{
     backend::render::cursor::{Cursor, load_cursor_env, load_cursor_theme},
     shell::{
-        LingmoSurface, PendingWindow, Shell, focus::target::KeyboardFocusTarget, grabs::ReleaseMode,
+        CosmicSurface, PendingWindow, Shell, focus::target::KeyboardFocusTarget, grabs::ReleaseMode,
     },
     state::State,
     utils::prelude::*,
@@ -818,7 +818,7 @@ impl XwmHandler for State {
             pending.fullscreen = fullscreen;
             pending.maximized = maximized;
         } else {
-            let surface = LingmoSurface::from(window);
+            let surface = CosmicSurface::from(window);
             shell.pending_windows.push(PendingWindow {
                 surface,
                 seat,

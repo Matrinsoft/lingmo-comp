@@ -3,10 +3,10 @@
 use calloop::LoopHandle;
 use lingmo_comp_config::output::comp::AdaptiveSync;
 use cosmic_protocols::output_management::v1::server::{
-    zcosmic_output_configuration_head_v1::ZCosmicOutputConfigurationHeadV1,
-    zcosmic_output_configuration_v1::ZCosmicOutputConfigurationV1,
-    zcosmic_output_head_v1::{self, ZCosmicOutputHeadV1},
-    zcosmic_output_manager_v1::ZCosmicOutputManagerV1,
+    zcosmic_output_configuration_head_v1::ZcosmicOutputConfigurationHeadV1,
+    zcosmic_output_configuration_v1::ZcosmicOutputConfigurationV1,
+    zcosmic_output_head_v1::{self, ZcosmicOutputHeadV1},
+    zcosmic_output_manager_v1::ZcosmicOutputManagerV1,
 };
 use smithay::{
     backend::drm::VrrSupport,
@@ -73,7 +73,7 @@ struct OutputMngrInstance {
 #[derive(Debug)]
 struct OutputHeadInstance {
     obj: ZwlrOutputHeadV1,
-    extension_obj: Option<ZCosmicOutputHeadV1>,
+    extension_obj: Option<ZcosmicOutputHeadV1>,
     output: Output,
     modes: Vec<ZwlrOutputModeV1>,
     finished: bool,
@@ -81,7 +81,7 @@ struct OutputHeadInstance {
 
 #[derive(Debug, Default)]
 pub struct PendingConfigurationInner {
-    extension_obj: Option<ZCosmicOutputConfigurationV1>,
+    extension_obj: Option<ZcosmicOutputConfigurationV1>,
     serial: u32,
     used: bool,
     heads: Vec<(ZwlrOutputHeadV1, Option<ZwlrOutputConfigurationHeadV1>)>,
@@ -165,11 +165,11 @@ where
         + Dispatch<ZwlrOutputModeV1, Mode>
         + Dispatch<ZwlrOutputConfigurationV1, PendingConfiguration>
         + Dispatch<ZwlrOutputConfigurationHeadV1, PendingOutputConfiguration>
-        + GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZCosmicOutputManagerV1, ()>
-        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+        + GlobalDispatch<ZcosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZcosmicOutputManagerV1, ()>
+        + Dispatch<ZcosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZcosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZcosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
@@ -188,7 +188,7 @@ where
             },
         );
 
-        let extension_global = dh.create_global::<D, ZCosmicOutputManagerV1, _>(
+        let extension_global = dh.create_global::<D, ZcosmicOutputManagerV1, _>(
             3,
             OutputMngrGlobalData {
                 filter: Box::new(client_filter),
@@ -537,19 +537,19 @@ macro_rules! delegate_output_configuration {
             smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1: $crate::wayland::protocols::output_configuration::PendingOutputConfiguration
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zcosmic_output_manager_v1::ZCosmicOutputManagerV1: $crate::wayland::protocols::output_configuration::OutputMngrGlobalData
+            cosmic_protocols::output_management::v1::server::zcosmic_output_manager_v1::ZcosmicOutputManagerV1: $crate::wayland::protocols::output_configuration::OutputMngrGlobalData
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zcosmic_output_manager_v1::ZCosmicOutputManagerV1: ()
+            cosmic_protocols::output_management::v1::server::zcosmic_output_manager_v1::ZcosmicOutputManagerV1: ()
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zcosmic_output_head_v1::ZCosmicOutputHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_head_v1::ZwlrOutputHeadV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_head_v1::ZcosmicOutputHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_head_v1::ZwlrOutputHeadV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_v1::ZCosmicOutputConfigurationV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_v1::ZwlrOutputConfigurationV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_v1::ZcosmicOutputConfigurationV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_v1::ZwlrOutputConfigurationV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_head_v1::ZCosmicOutputConfigurationHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_head_v1::ZcosmicOutputConfigurationHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
     };
 }

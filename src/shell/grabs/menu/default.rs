@@ -8,8 +8,8 @@ use crate::{
     config::Config,
     fl,
     shell::{
-        LingmoSurface, PointGlobalExt, Shell,
-        element::{LingmoMapped, LingmoWindow},
+        CosmicSurface, PointGlobalExt, Shell,
+        element::{CosmicMapped, CosmicWindow},
         grabs::ReleaseMode,
     },
     state::State,
@@ -19,7 +19,7 @@ use crate::{
 
 use super::{Item, ResizeEdge};
 
-fn toggle_stacking(state: &mut State, mapped: &LingmoMapped) {
+fn toggle_stacking(state: &mut State, mapped: &CosmicMapped) {
     let mut shell = state.common.shell.write();
     let seat = shell.seats.last_active().clone();
     if let Some(new_focus) = shell.toggle_stacking(&seat, mapped) {
@@ -56,7 +56,7 @@ fn next_workspace(
         .map(|space| (current_handle, space.handle))
 }
 
-fn move_fullscreen_prev_workspace(state: &mut State, surface: &LingmoSurface) {
+fn move_fullscreen_prev_workspace(state: &mut State, surface: &CosmicSurface) {
     let mut shell = state.common.shell.write();
     let Some(wl_surface) = surface.wl_surface() else {
         return;
@@ -82,7 +82,7 @@ fn move_fullscreen_prev_workspace(state: &mut State, surface: &LingmoSurface) {
     }
 }
 
-fn move_fullscreen_next_workspace(state: &mut State, surface: &LingmoSurface) {
+fn move_fullscreen_next_workspace(state: &mut State, surface: &CosmicSurface) {
     let mut shell = state.common.shell.write();
     let Some(wl_surface) = surface.wl_surface() else {
         return;
@@ -108,7 +108,7 @@ fn move_fullscreen_next_workspace(state: &mut State, surface: &LingmoSurface) {
     }
 }
 
-fn move_element_prev_workspace(state: &mut State, mapped: &LingmoMapped) {
+fn move_element_prev_workspace(state: &mut State, mapped: &CosmicMapped) {
     let mut shell = state.common.shell.write();
     let window = mapped.active_window();
     let Some(wl_surface) = window.wl_surface() else {
@@ -134,7 +134,7 @@ fn move_element_prev_workspace(state: &mut State, mapped: &LingmoMapped) {
     }
 }
 
-fn move_element_next_workspace(state: &mut State, mapped: &LingmoMapped) {
+fn move_element_next_workspace(state: &mut State, mapped: &CosmicMapped) {
     let mut shell = state.common.shell.write();
     let window = mapped.active_window();
     let Some(wl_surface) = window.wl_surface() else {
@@ -161,8 +161,8 @@ fn move_element_next_workspace(state: &mut State, mapped: &LingmoMapped) {
 }
 
 pub fn tab_items(
-    stack: &LingmoMapped,
-    tab: &LingmoSurface,
+    stack: &CosmicMapped,
+    tab: &CosmicSurface,
     is_tiled: bool,
     config: &Config,
 ) -> impl Iterator<Item = Item> {
@@ -177,7 +177,7 @@ pub fn tab_items(
             let surface = unstack_clone_tab.clone();
             let _ = handle.insert_idle(move |state| {
                 mapped.stack_ref().unwrap().remove_window(&surface);
-                let mapped: LingmoMapped = LingmoWindow::new(
+                let mapped: CosmicMapped = CosmicWindow::new(
                     surface,
                     state.common.event_loop_handle.clone(),
                     state.common.theme.clone(),
@@ -223,7 +223,7 @@ pub fn tab_items(
 }
 
 pub fn window_items(
-    window: &LingmoMapped,
+    window: &CosmicMapped,
     is_tiled: bool,
     is_stacked: bool,
     is_sticky: bool,
@@ -565,7 +565,7 @@ pub fn window_items(
     .flatten()
 }
 
-pub fn fullscreen_items(window: &LingmoSurface, config: &Config) -> impl Iterator<Item = Item> {
+pub fn fullscreen_items(window: &CosmicSurface, config: &Config) -> impl Iterator<Item = Item> {
     let minimize_clone = window.clone();
     let fullscreen_clone = window.clone();
     let move_prev_clone = window.clone();

@@ -25,7 +25,7 @@ use smithay::{
 };
 
 use crate::{
-    shell::{LingmoMapped, ManagedLayer},
+    shell::{CosmicMapped, ManagedLayer},
     state::State,
     utils::prelude::Global,
 };
@@ -475,7 +475,7 @@ pub enum MoveGrab {
 impl MoveGrab {
     pub fn new(
         start_data: GrabStartData,
-        window: LingmoMapped,
+        window: CosmicMapped,
         seat: &Seat<State>,
         initial_window_location: Point<i32, Global>,
         cursor_output: Output,

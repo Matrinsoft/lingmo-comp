@@ -3,7 +3,7 @@ use crate::{
         kms::render::gles::GbmGlowBackend,
         render::{GlMultiError, wayland::SurfaceRenderElement},
     },
-    shell::{LingmoMappedRenderElement, WorkspaceRenderElement},
+    shell::{CosmicMappedRenderElement, WorkspaceRenderElement},
     utils::iced::IcedRenderElement,
 };
 
@@ -36,14 +36,14 @@ pub enum LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     Workspace(
         RelocateRenderElement<CropRenderElement<RescaleRenderElement<WorkspaceRenderElement<R>>>>,
     ),
     Cursor(RescaleRenderElement<RelocateRenderElement<CursorRenderElement<R>>>),
     Dnd(SurfaceRenderElement<R>),
-    MoveGrab(RescaleRenderElement<LingmoMappedRenderElement<R>>),
+    MoveGrab(RescaleRenderElement<CosmicMappedRenderElement<R>>),
     Postprocess(
         CropRenderElement<RelocateRenderElement<RescaleRenderElement<TextureShaderElement>>>,
     ),
@@ -57,7 +57,7 @@ impl<R> Element for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     fn id(&self) -> &Id {
         match self {
@@ -222,7 +222,7 @@ impl<R> RenderElement<R> for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     fn draw(
         &self,
@@ -338,7 +338,7 @@ impl<R> From<CropRenderElement<RescaleRenderElement<WorkspaceRenderElement<R>>>>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: CropRenderElement<RescaleRenderElement<WorkspaceRenderElement<R>>>) -> Self {
         Self::Workspace(RelocateRenderElement::from_element(
@@ -353,7 +353,7 @@ impl<R> From<IcedRenderElement<R>> for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(value: IcedRenderElement<R>) -> Self {
         Self::Zoom(value)
@@ -364,7 +364,7 @@ impl<R> From<DamageElement> for LingmoElement<R>
 where
     R: Renderer + ImportAll + ImportMem + AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(value: DamageElement) -> Self {
         Self::Damage(value)
@@ -376,7 +376,7 @@ impl<R> From<TextureRenderElement<GlesTexture>> for LingmoElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: TextureRenderElement<GlesTexture>) -> Self {
         Self::Egui(elem)

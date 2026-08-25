@@ -27,9 +27,9 @@ use crate::{
     },
     config::ScreenFilter,
     shell::{
-        LingmoMappedRenderElement, OutputId, OverviewMode, SeatExt, Trigger, WorkspaceDelta,
+        CosmicMappedRenderElement, OutputId, OverviewMode, SeatExt, Trigger, WorkspaceDelta,
         WorkspaceRenderElement,
-        element::LingmoMappedKey,
+        element::CosmicMappedKey,
         focus::{FocusTarget, Stage, render_input_order, target::WindowGroup},
         grabs::{SeatMenuGrabState, SeatMoveGrabState},
         layout::tiling::ANIMATION_DURATION,
@@ -49,7 +49,7 @@ use crate::{
     },
 };
 
-use Lingmo::Theme;
+use cosmic::Theme;
 use smithay::{
     backend::{
         allocator::Fourcc,
@@ -149,7 +149,7 @@ pub enum Usage {
 pub enum Key {
     Static(WeakId),
     Group(Weak<()>),
-    Window(Usage, LingmoMappedKey),
+    Window(Usage, CosmicMappedKey),
 }
 impl std::hash::Hash for Key {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -491,7 +491,7 @@ pub fn cursor_elements<'a, 'frame, R>(
 ) where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
 {
     let scale = output.current_scale().fractional_scale();
     let (focal_point, zoom_scale) = zoom_state
@@ -619,7 +619,7 @@ pub fn output_elements<R>(
 where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
     #[cfg(feature = "debug")]
@@ -718,7 +718,7 @@ pub fn workspace_elements<R>(
 where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
     let mut elements = Vec::<LingmoElement<R>>::new();
@@ -1245,7 +1245,7 @@ where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
     LingmoElement<R>: RenderElement<R>,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
     let shell_ref = shell.read();
@@ -1554,7 +1554,7 @@ where
     R: AsGlowRenderer,
     R::TextureId: Send + Clone + 'static,
     LingmoElement<R>: RenderElement<R>,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    CosmicMappedRenderElement<R>: RenderElement<R>,
     WorkspaceRenderElement<R>: RenderElement<R>,
 {
     let mut elements: Vec<LingmoElement<R>> = if let Some(additional_damage) = additional_damage {

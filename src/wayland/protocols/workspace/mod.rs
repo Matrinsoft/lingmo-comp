@@ -17,8 +17,8 @@ use smithay::{
 use wayland_backend::protocol::WEnum;
 
 use cosmic_protocols::workspace::v2::server::{
-    zcosmic_workspace_handle_v2::{self, ZCosmicWorkspaceHandleV2},
-    zcosmic_workspace_manager_v2::ZCosmicWorkspaceManagerV2,
+    zcosmic_workspace_handle_v2::{self, ZcosmicWorkspaceHandleV2},
+    zcosmic_workspace_manager_v2::ZcosmicWorkspaceManagerV2,
 };
 
 mod cosmic_v2;
@@ -125,9 +125,9 @@ where
         + Dispatch<ExtWorkspaceManagerV1, WorkspaceManagerData>
         + Dispatch<ExtWorkspaceGroupHandleV1, WorkspaceGroupData>
         + Dispatch<ExtWorkspaceHandleV1, WorkspaceData>
-        + GlobalDispatch<ZCosmicWorkspaceManagerV2, WorkspaceGlobalData>
-        + Dispatch<ZCosmicWorkspaceManagerV2, ()>
-        + Dispatch<ZCosmicWorkspaceHandleV2, CosmicWorkspaceV2Data>
+        + GlobalDispatch<ZcosmicWorkspaceManagerV2, WorkspaceGlobalData>
+        + Dispatch<ZcosmicWorkspaceManagerV2, ()>
+        + Dispatch<ZcosmicWorkspaceHandleV2, CosmicWorkspaceV2Data>
         + Sized
         + 'static,
 {
@@ -192,7 +192,7 @@ where
             },
         );
 
-        let cosmic_v2_global = dh.create_global::<D, ZCosmicWorkspaceManagerV2, _>(
+        let cosmic_v2_global = dh.create_global::<D, ZcosmicWorkspaceManagerV2, _>(
             2,
             WorkspaceGlobalData {
                 filter: Box::new(client_filter.clone()),
@@ -645,13 +645,13 @@ macro_rules! delegate_workspace {
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
 
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-        cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZCosmicWorkspaceManagerV2: $crate::wayland::protocols::workspace::WorkspaceGlobalData
+        cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZcosmicWorkspaceManagerV2: $crate::wayland::protocols::workspace::WorkspaceGlobalData
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZCosmicWorkspaceManagerV2: ()
+            cosmic_protocols::workspace::v2::server::zcosmic_workspace_manager_v2::ZcosmicWorkspaceManagerV2: ()
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZCosmicWorkspaceHandleV2: $crate::wayland::protocols::workspace::CosmicWorkspaceV2Data
+            cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::ZcosmicWorkspaceHandleV2: $crate::wayland::protocols::workspace::CosmicWorkspaceV2Data
         ] => $crate::wayland::protocols::workspace::WorkspaceState<Self>);
     };
 }

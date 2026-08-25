@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::shell::element::stack::{
-    LingmoStackInternal, DefaultDecorations as DefaultStackDecorations, Message as StackMessage,
+    CosmicStackInternal, DefaultDecorations as DefaultStackDecorations, Message as StackMessage,
 };
 use crate::shell::element::window::{
-    LingmoWindowInternal, DefaultDecorations as DefaultWindowDecorations, Message as WindowMessage,
+    CosmicWindowInternal, DefaultDecorations as DefaultWindowDecorations, Message as WindowMessage,
 };
 use std::sync::{Arc, OnceLock};
 
@@ -13,21 +13,21 @@ use std::sync::{Arc, OnceLock};
 #[derive(Default, Debug, Clone)]
 pub struct Hooks {
     pub window_decorations:
-        Option<Arc<dyn Decorations<LingmoWindowInternal, WindowMessage> + Send + Sync>>,
+        Option<Arc<dyn Decorations<CosmicWindowInternal, WindowMessage> + Send + Sync>>,
     pub stack_decorations:
-        Option<Arc<dyn Decorations<LingmoStackInternal, StackMessage> + Send + Sync>>,
+        Option<Arc<dyn Decorations<CosmicStackInternal, StackMessage> + Send + Sync>>,
 }
 
 pub static HOOKS: OnceLock<Hooks> = OnceLock::new();
 
 pub trait Decorations<Internal, Message>: std::fmt::Debug {
-    fn view(&self, state: &Internal) -> Lingmo::Element<'_, Message>;
+    fn view(&self, state: &Internal) -> cosmic::Element<'_, Message>;
 }
 
-impl Decorations<LingmoWindowInternal, WindowMessage>
-    for Option<Arc<dyn Decorations<LingmoWindowInternal, WindowMessage> + Send + Sync>>
+impl Decorations<CosmicWindowInternal, WindowMessage>
+    for Option<Arc<dyn Decorations<CosmicWindowInternal, WindowMessage> + Send + Sync>>
 {
-    fn view(&self, window: &LingmoWindowInternal) -> Lingmo::Element<'_, WindowMessage> {
+    fn view(&self, window: &CosmicWindowInternal) -> cosmic::Element<'_, WindowMessage> {
         match self {
             None => DefaultWindowDecorations.view(window),
             Some(deco) => deco.view(window),
@@ -35,10 +35,10 @@ impl Decorations<LingmoWindowInternal, WindowMessage>
     }
 }
 
-impl Decorations<LingmoStackInternal, StackMessage>
-    for Option<Arc<dyn Decorations<LingmoStackInternal, StackMessage> + Send + Sync>>
+impl Decorations<CosmicStackInternal, StackMessage>
+    for Option<Arc<dyn Decorations<CosmicStackInternal, StackMessage> + Send + Sync>>
 {
-    fn view(&self, window: &LingmoStackInternal) -> Lingmo::Element<'_, StackMessage> {
+    fn view(&self, window: &CosmicStackInternal) -> cosmic::Element<'_, StackMessage> {
         match self {
             None => DefaultStackDecorations.view(window),
             Some(deco) => deco.view(window),

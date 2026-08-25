@@ -9,7 +9,7 @@ use crate::{
 };
 
 use calloop::LoopHandle;
-use Lingmo::{
+use cosmic::{
     Apply,
     iced::{
         Alignment,
@@ -47,7 +47,7 @@ impl ResizeIndicator {
         direction: ResizeDirection,
         config: &Config,
         evlh: LoopHandle<'static, crate::state::State>,
-        mut theme: Lingmo::Theme,
+        mut theme: cosmic::Theme,
     ) -> ResizeIndicator {
         theme.transparent = theme.Lingmo().frosted_system_interface;
         let direction = Arc::new(Mutex::new(direction));
@@ -252,7 +252,7 @@ pub struct ResizeIndicatorInternal {
 impl Program for ResizeIndicatorInternal {
     type Message = ();
 
-    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
+    fn view(&self) -> cosmic::Element<'_, Self::Message> {
         row(vec![
             text::heading(&self.shortcut1).into(),
             text::body(fl!("grow-window")).into(),
@@ -302,7 +302,7 @@ pub struct ResizeIndicatorArrow {
 impl Program for ResizeIndicatorArrow {
     type Message = ();
 
-    fn view(&self) -> Lingmo::Element<'_, Self::Message> {
+    fn view(&self) -> cosmic::Element<'_, Self::Message> {
         from_name(
             if *self.direction.lock().unwrap() == ResizeDirection::Outwards {
                 self.icon_outwards

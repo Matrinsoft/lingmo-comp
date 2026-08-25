@@ -6,8 +6,8 @@ use std::{
 
 use crate::{
     shell::{
-        LingmoSurface, CursorGeometry, SeatExt,
-        element::{LingmoMapped, LingmoStack, LingmoWindow},
+        CosmicSurface, CursorGeometry, SeatExt,
+        element::{CosmicMapped, CosmicStack, CosmicWindow},
         layout::tiling::ResizeForkTarget,
         zoom::ZoomFocusTarget,
     },
@@ -55,10 +55,10 @@ pub enum PointerFocusTarget {
     },
     X11Surface {
         surface: X11Surface,
-        toplevel: Option<LingmoSurface>,
+        toplevel: Option<CosmicSurface>,
     },
-    StackUI(LingmoStack),
-    WindowUI(LingmoWindow),
+    StackUI(CosmicStack),
+    WindowUI(CosmicWindow),
     ResizeFork(ResizeForkTarget),
     ZoomUI(ZoomFocusTarget),
 }
@@ -66,12 +66,12 @@ pub enum PointerFocusTarget {
 #[derive(Debug, Clone, PartialEq)]
 #[allow(clippy::large_enum_variant)]
 pub enum PointerFocusToplevel {
-    Surface(LingmoSurface),
+    Surface(CosmicSurface),
     Popup(PopupKind),
 }
 
-impl From<LingmoSurface> for PointerFocusToplevel {
-    fn from(value: LingmoSurface) -> Self {
+impl From<CosmicSurface> for PointerFocusToplevel {
+    fn from(value: CosmicSurface) -> Self {
         PointerFocusToplevel::Surface(value)
     }
 }
@@ -84,8 +84,8 @@ impl From<PopupKind> for PointerFocusToplevel {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum KeyboardFocusTarget {
-    Element(LingmoMapped),
-    Fullscreen(LingmoSurface),
+    Element(CosmicMapped),
+    Fullscreen(CosmicSurface),
     Group(WindowGroup),
     LayerSurface(LayerSurface),
     Popup(PopupKind),
@@ -165,7 +165,7 @@ impl PointerFocusTarget {
     }
 
     pub fn under_surface<P: Into<Point<f64, Logical>>>(
-        surface: &LingmoSurface,
+        surface: &CosmicSurface,
         point: P,
     ) -> Option<(Self, Point<i32, Logical>)> {
         match surface.0.underlying_surface() {
@@ -191,7 +191,7 @@ impl PointerFocusTarget {
         }
     }
 
-    pub fn toplevel(&self, shell: &Shell) -> Option<LingmoSurface> {
+    pub fn toplevel(&self, shell: &Shell) -> Option<CosmicSurface> {
         match &self {
             PointerFocusTarget::WlSurface {
                 toplevel: Some(PointerFocusToplevel::Surface(surface)),
@@ -309,16 +309,16 @@ impl KeyboardFocusTarget {
         }
     }
 
-    pub fn windows(&self) -> impl Iterator<Item = LingmoSurface> + '_ {
+    pub fn windows(&self) -> impl Iterator<Item = CosmicSurface> + '_ {
         match self {
             KeyboardFocusTarget::Element(mapped) => Box::new(mapped.windows().map(|(s, _)| s))
-                as Box<dyn Iterator<Item = LingmoSurface>>,
+                as Box<dyn Iterator<Item = CosmicSurface>>,
             KeyboardFocusTarget::Fullscreen(surface) => Box::new(std::iter::once(surface.clone())),
             _ => Box::new(std::iter::empty()),
         }
     }
 
-    pub fn active_window(&self) -> Option<LingmoSurface> {
+    pub fn active_window(&self) -> Option<CosmicSurface> {
         match self {
             KeyboardFocusTarget::Element(mapped) => Some(mapped.active_window()),
             KeyboardFocusTarget::Fullscreen(surface) => Some(surface.clone()),
@@ -348,7 +348,7 @@ impl KeyboardFocusTarget {
         } else if let KeyboardFocusTarget::Fullscreen(s) = self {
             s.has_surface(surface, WindowSurfaceType::ALL)
         } else if let Some(root) = WaylandFocus::wl_surface(self) {
-            LingmoSurface::surface_tree_offset(&root, surface).is_some()
+            CosmicSurface::surface_tree_offset(&root, surface).is_some()
         } else {
             false
         }
@@ -813,14 +813,14 @@ impl From<LockSurface> for PointerFocusTarget {
     }
 }
 
-impl From<LingmoMapped> for KeyboardFocusTarget {
-    fn from(w: LingmoMapped) -> Self {
+impl From<CosmicMapped> for KeyboardFocusTarget {
+    fn from(w: CosmicMapped) -> Self {
         KeyboardFocusTarget::Element(w)
     }
 }
 
-impl From<LingmoSurface> for KeyboardFocusTarget {
-    fn from(s: LingmoSurface) -> Self {
+impl From<CosmicSurface> for KeyboardFocusTarget {
+    fn from(s: CosmicSurface) -> Self {
         KeyboardFocusTarget::Fullscreen(s)
     }
 }

@@ -17,22 +17,22 @@ use smithay::{
 use lingmo_comp_config::output::comp::OutputState as EnabledState;
 
 use cosmic_protocols::output_management::v1::server::{
-    zcosmic_output_configuration_head_v1::{self, ZCosmicOutputConfigurationHeadV1},
-    zcosmic_output_configuration_v1::{self, ZCosmicOutputConfigurationV1},
-    zcosmic_output_head_v1::{self, ZCosmicOutputHeadV1},
-    zcosmic_output_manager_v1::{self, ZCosmicOutputManagerV1},
+    zcosmic_output_configuration_head_v1::{self, ZcosmicOutputConfigurationHeadV1},
+    zcosmic_output_configuration_v1::{self, ZcosmicOutputConfigurationV1},
+    zcosmic_output_head_v1::{self, ZcosmicOutputHeadV1},
+    zcosmic_output_manager_v1::{self, ZcosmicOutputManagerV1},
 };
 
 use crate::wayland::protocols::output_configuration::*;
 
-impl<D> GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData, D>
+impl<D> GlobalDispatch<ZcosmicOutputManagerV1, OutputMngrGlobalData, D>
     for OutputConfigurationState<D>
 where
-    D: GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZCosmicOutputManagerV1, ()>
-        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+    D: GlobalDispatch<ZcosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZcosmicOutputManagerV1, ()>
+        + Dispatch<ZcosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZcosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZcosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
@@ -40,7 +40,7 @@ where
         _state: &mut D,
         _dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZCosmicOutputManagerV1>,
+        resource: New<ZcosmicOutputManagerV1>,
         _global_data: &OutputMngrGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -52,7 +52,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicOutputManagerV1, (), D> for OutputConfigurationState<D>
+impl<D> Dispatch<ZcosmicOutputManagerV1, (), D> for OutputConfigurationState<D>
 where
     D: GlobalDispatch<ZwlrOutputManagerV1, OutputMngrGlobalData>
         + Dispatch<ZwlrOutputManagerV1, ()>
@@ -60,18 +60,18 @@ where
         + Dispatch<ZwlrOutputModeV1, Mode>
         + Dispatch<ZwlrOutputConfigurationV1, PendingConfiguration>
         + Dispatch<ZwlrOutputConfigurationHeadV1, PendingOutputConfiguration>
-        + GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZCosmicOutputManagerV1, ()>
-        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+        + GlobalDispatch<ZcosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZcosmicOutputManagerV1, ()>
+        + Dispatch<ZcosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZcosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZcosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _obj: &ZCosmicOutputManagerV1,
+        _obj: &ZcosmicOutputManagerV1,
         request: zcosmic_output_manager_v1::Request,
         _data: &(),
         dh: &DisplayHandle,
@@ -135,14 +135,14 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>, D> for OutputConfigurationState<D>
+impl<D> Dispatch<ZcosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>, D> for OutputConfigurationState<D>
 where
     D: OutputConfigurationHandler + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        obj: &ZCosmicOutputHeadV1,
+        obj: &ZcosmicOutputHeadV1,
         request: zcosmic_output_head_v1::Request,
         _data: &Weak<ZwlrOutputHeadV1>,
         _dh: &DisplayHandle,
@@ -162,7 +162,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>, D>
+impl<D> Dispatch<ZcosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>, D>
     for OutputConfigurationState<D>
 where
     D: GlobalDispatch<ZwlrOutputManagerV1, OutputMngrGlobalData>
@@ -171,18 +171,18 @@ where
         + Dispatch<ZwlrOutputModeV1, Mode>
         + Dispatch<ZwlrOutputConfigurationV1, PendingConfiguration>
         + Dispatch<ZwlrOutputConfigurationHeadV1, PendingOutputConfiguration>
-        + GlobalDispatch<ZCosmicOutputManagerV1, OutputMngrGlobalData>
-        + Dispatch<ZCosmicOutputManagerV1, ()>
-        + Dispatch<ZCosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
-        + Dispatch<ZCosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
-        + Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
+        + GlobalDispatch<ZcosmicOutputManagerV1, OutputMngrGlobalData>
+        + Dispatch<ZcosmicOutputManagerV1, ()>
+        + Dispatch<ZcosmicOutputHeadV1, Weak<ZwlrOutputHeadV1>>
+        + Dispatch<ZcosmicOutputConfigurationV1, Weak<ZwlrOutputConfigurationV1>>
+        + Dispatch<ZcosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>>
         + OutputConfigurationHandler
         + 'static,
 {
     fn request(
         _state: &mut D,
         _client: &Client,
-        extension_obj: &ZCosmicOutputConfigurationV1,
+        extension_obj: &ZcosmicOutputConfigurationV1,
         request: zcosmic_output_configuration_v1::Request,
         obj: &Weak<ZwlrOutputConfigurationV1>,
         _dh: &DisplayHandle,
@@ -251,7 +251,7 @@ where
     }
 }
 
-impl<D> Dispatch<ZCosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>, D>
+impl<D> Dispatch<ZcosmicOutputConfigurationHeadV1, Weak<ZwlrOutputConfigurationHeadV1>, D>
     for OutputConfigurationState<D>
 where
     D: GlobalDispatch<ZwlrOutputManagerV1, OutputMngrGlobalData>
@@ -266,7 +266,7 @@ where
     fn request(
         _state: &mut D,
         _client: &Client,
-        _extended_obj: &ZCosmicOutputConfigurationHeadV1,
+        _extended_obj: &ZcosmicOutputConfigurationHeadV1,
         request: zcosmic_output_configuration_head_v1::Request,
         obj: &Weak<ZwlrOutputConfigurationHeadV1>,
         _dh: &DisplayHandle,
