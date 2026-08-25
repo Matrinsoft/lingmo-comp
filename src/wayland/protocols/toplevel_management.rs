@@ -11,7 +11,7 @@ use smithay::{
     utils::{Logical, Rectangle},
 };
 
-pub use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplevelManagementCapabilitiesV1 as ManagementCapabilities;
+pub use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::ZcosmicToplelevelManagementCapabilitiesV1 as ManagementCapabilities;
 use cosmic_protocols::toplevel_management::v1::server::zcosmic_toplevel_manager_v1::{
     self, ZcosmicToplevelManagerV1,
 };
@@ -300,4 +300,3 @@ macro_rules! delegate_toplevel_management {
     };
 }
 pub(crate) use delegate_toplevel_management;
-

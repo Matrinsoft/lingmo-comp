@@ -22,10 +22,10 @@ pub fn init_logger() -> Result<()> {
                 "warn"
             })
         })
-        .add_directive(Directive::from_str("Lingmo_text=error").unwrap())
+        .add_directive(Directive::from_str("cosmic_text=error").unwrap())
         .add_directive(Directive::from_str("calloop=error").unwrap())
         .add_directive(Directive::from_str(&format!("smithay={level}")).unwrap())
-        .add_directive(Directive::from_str(&format!("Lingmo_comp={level}")).unwrap());
+        .add_directive(Directive::from_str(&format!("cosmic_comp={level}")).unwrap());
 
     let fmt_layer = fmt::layer().compact();
 
@@ -55,4 +55,3 @@ pub fn init_logger() -> Result<()> {
 
     Ok(())
 }
-

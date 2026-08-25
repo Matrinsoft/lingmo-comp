@@ -12,7 +12,7 @@ use crate::{
 };
 
 use anyhow::{Context, Result};
-use lingmo_comp_config::output::comp::{AdaptiveSync, OutputConfig, OutputState};
+use cosmic_comp_config::output::comp::{AdaptiveSync, OutputConfig, OutputState};
 use smithay::{
     backend::{
         allocator::{
@@ -196,7 +196,7 @@ impl State {
             return Ok(Vec::new());
         }
 
-        if let Some(allowlist) = dev_list_var("Lingmo_DRM_ALLOW_DEVICES") {
+        if let Some(allowlist) = dev_list_var("LINGMO_DRM_ALLOW_DEVICES") {
             let mut matched = false;
             if let Ok(node) = DrmNode::from_dev_id(dev) {
                 let node = node
@@ -211,14 +211,14 @@ impl State {
                 }
                 if !matched {
                     info!(
-                        "Skipping device {} due to Lingmo_DRM_ALLOW_DEVICE list.",
+                        "Skipping device {} due to LINGMO_DRM_ALLOW_DEVICE list.",
                         path.display()
                     );
                     return Ok(Vec::new());
                 }
             }
         }
-        if let Some(blocklist) = dev_list_var("Lingmo_DRM_BLOCK_DEVICES")
+        if let Some(blocklist) = dev_list_var("LINGMO_DRM_BLOCK_DEVICES")
             && let Ok(node) = DrmNode::from_dev_id(dev)
         {
             let node = node
@@ -228,7 +228,7 @@ impl State {
             for ident in blocklist {
                 if ident.matches(&node) {
                     info!(
-                        "Skipping device {} due to Lingmo_DRM_BLOCK_DEVICE list.",
+                        "Skipping device {} due to LINGMO_DRM_BLOCK_DEVICE list.",
                         path.display()
                     );
                     return Ok(Vec::new());
@@ -1469,5 +1469,3 @@ mod test {
         }
     }
 }
-
-

@@ -13,7 +13,7 @@ use calloop::{
     LoopSignal,
     timer::{TimeoutAction, Timer},
 };
-use lingmo_comp_config::output::comp::{AdaptiveSync, OutputState};
+use cosmic_comp_config::output::comp::{AdaptiveSync, OutputState};
 use indexmap::IndexMap;
 use render::gles::GbmGlowBackend;
 use smithay::{
@@ -238,7 +238,7 @@ fn determine_primary_gpu(
     drm_devices: &IndexMap<DrmNode, Device>,
     seat: String,
 ) -> Result<Option<DrmNode>> {
-    if let Some(device) = dev_var("Lingmo_RENDER_DEVICE")
+    if let Some(device) = dev_var("LINGMO_RENDER_DEVICE")
         && let Some(node) = drm_devices.values().find_map(|dev| {
             device
                 .matches(&dev.inner.render_node)
@@ -567,7 +567,7 @@ impl State {
             }
         }
 
-        if !crate::utils::env::bool_var("Lingmo_DISABLE_SYNCOBJ").unwrap_or(false) {
+        if !crate::utils::env::bool_var("LINGMO_DISABLE_SYNCOBJ").unwrap_or(false) {
             if let Some(primary_node) = primary_node
                 .as_ref()
                 .and_then(|node| node.node_with_type(NodeType::Primary).and_then(|x| x.ok()))
@@ -1288,5 +1288,3 @@ impl KmsGuard<'_> {
         Ok(())
     }
 }
-
-

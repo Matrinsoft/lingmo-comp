@@ -3,7 +3,7 @@
 use crate::state::State;
 use crate::wayland::protocols::a11y::A11yHandler;
 use anyhow::{Context, Result, anyhow};
-use lingmo_comp_config::NumlockState;
+use cosmic_comp_config::NumlockState;
 use cosmic_config::CosmicConfigEntry;
 use cosmic_settings_daemon_config::greeter;
 use smithay::reexports::{calloop::EventLoop, wayland_server::DisplayHandle};
@@ -22,7 +22,7 @@ pub fn init_backend_auto(
     event_loop: &mut EventLoop<'static, State>,
     state: &mut State,
 ) -> Result<()> {
-    let res = match std::env::var("Lingmo_BACKEND") {
+    let res = match std::env::var("LINGMO_BACKEND") {
         Ok(x) if x == "x11" => x11::init_backend(dh, event_loop, state),
         Ok(x) if x == "winit" => winit::init_backend(dh, event_loop, state),
         Ok(x) if x == "kms" => kms::init_backend(dh, event_loop, state),
@@ -84,20 +84,20 @@ pub fn init_backend_auto(
                 }
             },
             Err(_) => {
-                tracing::info!("`Lingmo-greeter` state not found.");
+                tracing::info!("`cosmic-greeter` state not found.");
                 greeter::GreeterAccessibilityState::default()
             }
         };
 
         if let Some(magnifier) = greeter_state.magnifier {
-            let mut zoom = state.common.config.Lingmo_conf.accessibility_zoom;
+            let mut zoom = state.common.config.cosmic_conf.accessibility_zoom;
 
             zoom.start_on_login = magnifier;
             if let Err(err) = state
                 .common
                 .config
-                .Lingmo_conf
-                .set_accessibility_zoom(&state.common.config.Lingmo_helper, zoom)
+                .cosmic_conf
+                .set_accessibility_zoom(&state.common.config.cosmic_helper, zoom)
             {
                 tracing::error!("Failed to set screen filter: {err:?}");
             }
@@ -112,15 +112,15 @@ pub fn init_backend_auto(
         if state
             .common
             .config
-            .Lingmo_conf
+            .cosmic_conf
             .accessibility_zoom
             .start_on_login
         {
             state.common.shell.write().trigger_zoom(
                 &initial_seat,
                 None,
-                1.0 + (state.common.config.Lingmo_conf.accessibility_zoom.increment as f64 / 100.),
-                &state.common.config.Lingmo_conf.accessibility_zoom,
+                1.0 + (state.common.config.cosmic_conf.accessibility_zoom.increment as f64 / 100.),
+                &state.common.config.cosmic_conf.accessibility_zoom,
                 true,
                 &state.common.event_loop_handle,
             );
@@ -129,7 +129,7 @@ pub fn init_backend_auto(
         let desired_numlock = state
             .common
             .config
-            .Lingmo_conf
+            .cosmic_conf
             .keyboard_config
             .numlock_state;
         // Restore numlock state based on config.
@@ -162,5 +162,3 @@ pub fn init_backend_auto(
     }
     res
 }
-
-

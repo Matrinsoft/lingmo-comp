@@ -65,4 +65,3 @@ impl Window for CosmicSurface {
 }
 
 delegate_toplevel_info!(State, CosmicSurface);
-

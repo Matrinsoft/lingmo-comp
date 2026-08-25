@@ -20,7 +20,7 @@ use smithay::{
 use wayland_backend::server::GlobalId;
 
 #[derive(Debug)]
-pub struct LingmoImageCaptureSourceState {
+pub struct CosmicImageCaptureSourceState {
     workspace_source_global: GlobalId,
 }
 
@@ -47,8 +47,8 @@ impl ImageCaptureSourceKind {
     }
 }
 
-impl LingmoImageCaptureSourceState {
-    pub fn new<D, F>(display: &DisplayHandle, client_filter: F) -> LingmoImageCaptureSourceState
+impl CosmicImageCaptureSourceState {
+    pub fn new<D, F>(display: &DisplayHandle, client_filter: F) -> CosmicImageCaptureSourceState
     where
         D: GlobalDispatch<
                 ZcosmicWorkspaceImageCaptureSourceManagerV1,
@@ -59,7 +59,7 @@ impl LingmoImageCaptureSourceState {
             + 'static,
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + Clone + 'static,
     {
-        LingmoImageCaptureSourceState {
+        CosmicImageCaptureSourceState {
             workspace_source_global: display
                 .create_global::<D, ZcosmicWorkspaceImageCaptureSourceManagerV1, _>(
                     1,
@@ -134,4 +134,3 @@ where
         }
     }
 }
-

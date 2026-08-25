@@ -5,7 +5,7 @@ use crate::{
     state::State,
     wayland::protocols::workspace::{State as WState, WorkspaceHandle},
 };
-use lingmo_comp_config::ActivationPolicy;
+use cosmic_comp_config::ActivationPolicy;
 use smithay::{
     input::Seat,
     reexports::wayland_server::protocol::wl_surface::WlSurface,
@@ -129,7 +129,7 @@ impl XdgActivationHandler for State {
                 }
             }
             ActivationContext::Workspace(_) => {
-                match self.common.config.Lingmo_conf.activation_policy {
+                match self.common.config.cosmic_conf.activation_policy {
                     ActivationPolicy::Focus => {
                         self.activate_surface(
                             &surface,
@@ -293,5 +293,3 @@ impl State {
         };
     }
 }
-
-

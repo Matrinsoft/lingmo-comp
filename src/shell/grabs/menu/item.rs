@@ -80,18 +80,18 @@ where
         } else {
             theme.active(true, false, &self.styling)
         };
-        if matches!(self.styling, cosmic::Theme::Button::MenuItem) {
+        if matches!(self.styling, cosmic::theme::Button::MenuItem) {
             match theme.list_item_position {
                 Some((Alignment::Start, _)) => {
                     styling.border_radius =
-                        styling.border_radius.bottom(theme.Lingmo().radius_0()[3]);
+                        styling.border_radius.bottom(theme.cosmic().radius_0()[3]);
                 }
                 Some((Alignment::End, _)) => {
-                    styling.border_radius = styling.border_radius.top(theme.Lingmo().radius_0()[0]);
+                    styling.border_radius = styling.border_radius.top(theme.cosmic().radius_0()[0]);
                 }
                 Some((Alignment::Center, _)) => {}
                 None => {
-                    styling.border_radius = theme.Lingmo().radius_0().into();
+                    styling.border_radius = theme.cosmic().radius_0().into();
                 }
             };
         }
@@ -242,4 +242,3 @@ where
         Element::new(val)
     }
 }
-

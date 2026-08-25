@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use LINGMO_comp_config::AppearanceConfig;
+use cosmic_comp_config::AppearanceConfig;
 use id_tree::NodeId;
 use smithay::{
     backend::{
@@ -76,7 +76,7 @@ use super::{
         tiling::NodeDesc,
     },
 };
-use LINGMO_settings_config::shortcuts::action::{Direction, FocusDirection};
+use cosmic_settings_config::shortcuts::action::{Direction, FocusDirection};
 
 space_elements! {
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]

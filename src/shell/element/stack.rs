@@ -22,7 +22,7 @@ use crate::{
 };
 use calloop::LoopHandle;
 use cosmic::{
-    Apply, Element as LingmoElement, Theme,
+    Apply, Element as CosmicElement, Theme,
     iced::{
         Alignment,
         core::{Background, Border, Color, Length, border::Radius},
@@ -30,9 +30,9 @@ use cosmic::{
         runtime::Task,
         widget::{self as iced_widget, scrollable::AbsoluteOffset},
     },
-    theme, widget as Lingmo_widget,
+    theme, widget as cosmic_widget,
 };
-use lingmo_comp_config::AppearanceConfig;
+use cosmic_comp_config::AppearanceConfig;
 use cosmic_settings_config::shortcuts;
 use shortcuts::action::{Direction, FocusDirection};
 use smithay::{
@@ -149,7 +149,7 @@ impl CosmicStack {
         mut theme: cosmic::Theme,
         appearance: AppearanceConfig,
     ) -> CosmicStack {
-        theme.transparent = theme.Lingmo().frosted_windows;
+        theme.transparent = theme.cosmic().frosted_windows;
         let windows = windows.map(Into::into).collect::<Vec<_>>();
         assert!(!windows.is_empty());
 
@@ -663,8 +663,8 @@ impl CosmicStack {
             let windows = p.windows.lock().unwrap();
             let active = p.active.load(Ordering::SeqCst);
             let theme = p.theme.lock().unwrap();
-            let frosted = if theme.Lingmo().frosted_windows {
-                (theme.Lingmo().frosted as u8 + 1) as usize
+            let frosted = if theme.cosmic().frosted_windows {
+                (theme.cosmic().frosted as u8 + 1) as usize
             } else {
                 0
             };
@@ -713,7 +713,7 @@ impl CosmicStack {
             }
             let radii = if round {
                 theme
-                    .Lingmo()
+                    .cosmic()
                     .radius_s()
                     .map(|x| if x < 4.0 { x } else { x + 4.0 })
                     .map(|x| (x * scale as f32).round() as u8)
@@ -741,7 +741,7 @@ impl CosmicStack {
                     radii,
                     if activated { alpha } else { alpha * 0.75 },
                     output_scale.x,
-                    theme.Lingmo().is_dark,
+                    theme.cosmic().is_dark,
                 ))
                 .into(),
             )
@@ -778,8 +778,8 @@ impl CosmicStack {
         let window_loc = location + Point::from((0, (TAB_HEIGHT as f64 * scale.y) as i32));
         let frosted = self.0.with_program(|p| {
             let theme = p.theme.lock().unwrap();
-            if theme.Lingmo().frosted_windows {
-                (theme.Lingmo().frosted as u8 + 1) as usize
+            if theme.cosmic().frosted_windows {
+                (theme.cosmic().frosted as u8 + 1) as usize
             } else {
                 0
             }
@@ -794,7 +794,7 @@ impl CosmicStack {
             let round = (appearance.clip_tiled_windows || !tiled) && !maximized;
             round.then(|| {
                 theme
-                    .Lingmo()
+                    .cosmic()
                     .radius_s()
                     .map(|x| if x < 4.0 { x } else { x + 4.0 })
                     .map(|x| x.round() as u8)
@@ -818,7 +818,7 @@ impl CosmicStack {
                 CosmicMappedKey(CosmicMappedKeyInner::Stack(Arc::downgrade(&self.0.0)));
 
             if !maximized {
-                let (r, g, b, a) = theme.Lingmo().bg_divider().into_components();
+                let (r, g, b, a) = theme.cosmic().bg_divider().into_components();
                 push_above(CosmicStackRenderElement::Border(IndicatorShader::element(
                     renderer,
                     Key::Window(Usage::Border, window_key.clone()),
@@ -859,7 +859,7 @@ impl CosmicStack {
     }
 
     pub(crate) fn set_theme(&self, mut theme: cosmic::Theme) {
-        theme.transparent = theme.Lingmo().frosted_windows;
+        theme.transparent = theme.cosmic().frosted_windows;
         self.0.with_program(|p| {
             *p.theme.lock().unwrap() = theme.clone();
         });
@@ -987,7 +987,7 @@ impl CosmicStack {
                 .theme
                 .lock()
                 .unwrap()
-                .Lingmo()
+                .cosmic()
                 .radius_s()
                 .map(|x| if x < 4.0 { x } else { x + 4.0 })
                 .map(|val| val.round() as u8);
@@ -1229,7 +1229,7 @@ impl Program for CosmicStackInternal {
         Task::none()
     }
 
-    fn view(&self) -> LingmoElement<'_, Self::Message> {
+    fn view(&self) -> CosmicElement<'_, Self::Message> {
         HOOKS.get().unwrap().stack_decorations.view(self)
     }
 
@@ -1247,7 +1247,7 @@ impl Program for CosmicStackInternal {
             );
 
             let mut paint = tiny_skia::Paint::default();
-            let (b, g, r, a) = theme.Lingmo().accent_color().into_components();
+            let (b, g, r, a) = theme.cosmic().accent_color().into_components();
             paint.set_color(tiny_skia::Color::from_rgba(r, g, b, a).unwrap());
 
             for rect in damage {
@@ -1283,13 +1283,13 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
         let group_focused = stack.group_focused.load(Ordering::SeqCst);
 
         let elements = vec![
-            Lingmo_widget::icon::from_name("window-stack-symbolic")
+            cosmic_widget::icon::from_name("window-stack-symbolic")
                 .size(16)
                 .prefer_svg(true)
                 .icon()
                 .class(if group_focused {
                     theme::Svg::custom(|theme| iced_widget::svg::Style {
-                        color: Some(if theme.Lingmo().is_dark {
+                        color: Some(if theme.cosmic().is_dark {
                             Color::BLACK
                         } else {
                             Color::WHITE
@@ -1305,7 +1305,7 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
                 .on_press(Message::DragStart)
                 .on_right_press(Message::Menu)
                 .into(),
-            LingmoElement::new(
+            CosmicElement::new(
                 Tabs::new(
                     windows.iter().enumerate().map(|(i, w)| {
                         let user_data = w.user_data();
@@ -1353,7 +1353,7 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
                 .theme
                 .lock()
                 .unwrap()
-                .Lingmo()
+                .cosmic()
                 .radius_s()
                 .map(|x| if x < 4.0 { x } else { x + 4.0 });
             Radius::from([radii[0], radii[1], 0., 0.])
@@ -1366,28 +1366,28 @@ impl Decorations<CosmicStackInternal, Message> for DefaultDecorations {
             .apply(iced_widget::container)
             .align_y(Alignment::Center)
             .class(theme::Container::custom(move |theme| {
-                let Lingmo_theme = theme.Lingmo();
+                let cosmic_theme = theme.cosmic();
 
                 let mut background = if group_focused {
-                    Lingmo_theme.accent_color()
+                    cosmic_theme.accent_color()
                 } else {
-                    Lingmo_theme.primary_container_color()
+                    cosmic_theme.primary_container_color()
                 };
-                if Lingmo_theme.frosted_windows {
-                    background.alpha = Lingmo_theme.alpha_map.blurred_alpha(Lingmo_theme.frosted);
+                if cosmic_theme.frosted_windows {
+                    background.alpha = cosmic_theme.alpha_map.blurred_alpha(cosmic_theme.frosted);
                 }
 
                 iced_widget::container::Style {
                     snap: true,
                     icon_color: Some(
-                        Lingmo_theme
-                            .background(Lingmo_theme.frosted_windows)
+                        cosmic_theme
+                            .background(cosmic_theme.frosted_windows)
                             .on
                             .into(),
                     ),
                     text_color: Some(
-                        Lingmo_theme
-                            .background(Lingmo_theme.frosted_windows)
+                        cosmic_theme
+                            .background(cosmic_theme.frosted_windows)
                             .on
                             .into(),
                     ),
@@ -1696,7 +1696,7 @@ impl PointerTarget<State> for CosmicStack {
                             Focus::ResizeRight => ResizeEdge::RIGHT,
                             Focus::Header => unreachable!(),
                         },
-                        state.common.config.Lingmo_conf.edge_snap_threshold,
+                        state.common.config.cosmic_conf.edge_snap_threshold,
                         false,
                     );
                     if let Some((grab, focus)) = res {
@@ -2106,5 +2106,3 @@ where
         }
     }
 }
-
-

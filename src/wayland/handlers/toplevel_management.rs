@@ -112,7 +112,7 @@ impl ToplevelManagementHandler for State {
 
             // move pointer to window if it’s on a different monitor/output
             if seat.active_output() != *output
-                && self.common.config.Lingmo_conf.cursor_follows_focus
+                && self.common.config.cosmic_conf.cursor_follows_focus
                 && let Some(new_pos) = new_pos
             {
                 seat.set_active_output(output);
@@ -293,4 +293,3 @@ pub fn minimize_rectangle(output: &Output, window: &CosmicSurface) -> Rectangle<
 }
 
 delegate_toplevel_management!(State);
-

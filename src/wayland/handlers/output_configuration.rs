@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use lingmo_comp_config::output::comp::{OutputConfig, OutputState, TransformDef};
+use cosmic_comp_config::output::comp::{OutputConfig, OutputState, TransformDef};
 use smithay::{output::Output, utils::Point};
 use tracing::{error, warn};
 
@@ -245,4 +245,3 @@ impl State {
 }
 
 delegate_output_configuration!(State);
-

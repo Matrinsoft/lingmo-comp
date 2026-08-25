@@ -113,4 +113,3 @@ pub fn screenshot_window(state: &mut State, surface: &CosmicSurface) {
         }
     }
 }
-

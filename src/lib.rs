@@ -79,7 +79,7 @@ impl State {
             if let Err(err) =
                 session::run_socket(self.common.event_loop_handle.clone(), &self.common)
             {
-                warn!(?err, "Failed to setup lingmo-session communication");
+                warn!(?err, "Failed to setup cosmic-session communication");
             }
 
             self.common.kiosk_child = if let Some(mut command) = self.kiosk_command.take() {
@@ -147,7 +147,7 @@ pub fn run(hooks: crate::hooks::Hooks) -> Result<(), Box<dyn Error>> {
 
     // setup logger
     logger::init_logger()?;
-    info!("Lingmo starting up!");
+    info!("Cosmic starting up!");
 
     profiling::register_thread!("Main Thread");
     #[cfg(feature = "profile-with-tracy")]
@@ -162,7 +162,7 @@ pub fn run(hooks: crate::hooks::Hooks) -> Result<(), Box<dyn Error>> {
 
     // init hook globals
     hooks::HOOKS.set(hooks)
-        .expect("Hooks global has already been initialized. Running multiple instances of Lingmo in one process is not supported.");
+        .expect("Hooks global has already been initialized. Running multiple instances of LINGMO in one process is not supported.");
 
     // init event loop
     let mut event_loop = EventLoop::try_new().with_context(|| "Failed to initialize event loop")?;
@@ -282,9 +282,9 @@ fn print_help(version: &str, git_rev: &str) {
         r#"lingmo-comp {version} (git commit {git_rev})
 System76 <info@system76.com>
 
-Designed for the Lingmo desktop environment, lingmo-comp is a Wayland Compositor.
+Designed for the LINGMO™ desktop environment, lingmo-comp is a Wayland Compositor.
 
-Project home page: https://github.com/Matrinsoft/lingmo-comp
+Project home page: https://github.com/pop-os/lingmo-comp
 
 Options:
   -h, --help          Show this message
@@ -365,4 +365,3 @@ fn refresh(state: &mut State) {
     KeyboardLayoutState::refresh(state);
     state.last_refresh = LastRefresh::At(Instant::now());
 }
-

@@ -1,6 +1,6 @@
 use std::{ops::ControlFlow, time::Instant};
 
-use lingmo_comp_config::workspace::WorkspaceLayout;
+use cosmic_comp_config::workspace::WorkspaceLayout;
 use keyframe::{ease, functions::EaseInOutCubic};
 use smithay::{
     desktop::{LayerSurface, PopupKind, PopupManager, layer_map_for_output},
@@ -446,4 +446,3 @@ fn layer_surfaces(
         })
         .map(|(surface, geometry)| (surface, geometry.loc.as_local().to_global(output)))
 }
-

@@ -247,4 +247,3 @@ impl SessionHolder for CosmicSurface {
             })
     }
 }
-

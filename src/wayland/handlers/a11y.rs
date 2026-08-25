@@ -21,11 +21,11 @@ impl A11yHandler for State {
         {
             let seat = shell.seats.last_active().clone();
             let level = if enabled {
-                1.0 + (self.common.config.Lingmo_conf.accessibility_zoom.increment as f64 / 100.0)
+                1.0 + (self.common.config.cosmic_conf.accessibility_zoom.increment as f64 / 100.0)
             } else {
                 1.0
             };
-            let zoom_config = &self.common.config.Lingmo_conf.accessibility_zoom;
+            let zoom_config = &self.common.config.cosmic_conf.accessibility_zoom;
 
             shell.trigger_zoom(
                 &seat,
@@ -64,4 +64,3 @@ impl A11yHandler for State {
 }
 
 delegate_a11y!(State);
-

@@ -121,4 +121,3 @@ impl PointerConstraintsHandler for State {
         }
     }
 }
-

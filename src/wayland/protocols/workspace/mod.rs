@@ -32,11 +32,11 @@ bitflags::bitflags! {
         const Activate = 1;
         const Deactivate = 2;
         const Remove = 4;
-        /// not in legacy Lingmo protocol
+        /// not in legacy cosmic protocol
         const Assign = 8;
-        /// Lingmo specific
+        /// cosmic specific
         const Rename = 16;
-        /// Lingmo specific
+        /// cosmic specific
         const SetTilingState = 32;
         const Pin = 64;
         const Move = 128;
@@ -49,7 +49,7 @@ bitflags::bitflags! {
         const Active = 1;
         const Urgent = 2;
         const Hidden = 4;
-        /// Lingmo specific
+        /// cosmic specific
         const Pinned = 8;
     }
 }
@@ -656,4 +656,3 @@ macro_rules! delegate_workspace {
     };
 }
 pub(crate) use delegate_workspace;
-

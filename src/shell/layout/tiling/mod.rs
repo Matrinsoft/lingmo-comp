@@ -37,7 +37,7 @@ use crate::{
     },
 };
 
-use lingmo_comp_config::AppearanceConfig;
+use cosmic_comp_config::AppearanceConfig;
 use cosmic_settings_config::shortcuts::action::{FocusDirection, ResizeDirection};
 use id_tree::{InsertBehavior, MoveBehavior, Node, NodeId, NodeIdError, RemoveBehavior, Tree};
 use keyframe::{
@@ -3431,7 +3431,7 @@ impl TilingLayout {
                 Some(None),
                 None,
                 None,
-                self.theme.Lingmo(),
+                self.theme.cosmic(),
                 &mut |_| {},
             );
 
@@ -4018,7 +4018,7 @@ impl TilingLayout {
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
         resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
-        theme: &cosmic::Theme::CosmicTheme,
+        theme: &cosmic::theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
@@ -4181,7 +4181,7 @@ impl TilingLayout {
         seat: Option<&Seat<State>>,
         non_exclusive_zone: Rectangle<i32, Local>,
         overview: (OverviewMode, Option<(SwapIndicator, Option<&Tree<Data>>)>),
-        theme: &cosmic::Theme::CosmicTheme,
+        theme: &cosmic::theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
@@ -4303,7 +4303,7 @@ impl TilingLayout {
     }
 
     fn gaps(&self) -> (i32, i32) {
-        let g = self.theme.Lingmo().gaps;
+        let g = self.theme.cosmic().gaps;
         (g.0 as i32, g.1 as i32)
     }
 }
@@ -4353,7 +4353,7 @@ fn geometries_for_groupview<'a, R>(
     mouse_tiling: Option<Option<&TargetZone>>,
     swap_desc: Option<NodeDesc>,
     swap_tree: Option<&Tree<Data>>,
-    _theme: &cosmic::Theme::CosmicTheme,
+    _theme: &cosmic::theme::CosmicTheme,
     push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
 ) -> HashMap<NodeId, Rectangle<i32, Local>>
 where
@@ -5028,7 +5028,7 @@ fn render_old_tree_windows<R>(
     percentage: f32,
     indicator_thickness: u8,
     is_swap_mode: bool,
-    theme: &cosmic::Theme::CosmicTheme,
+    theme: &cosmic::theme::CosmicTheme,
     scanout_node: Option<DrmNode>,
     push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
 ) where
@@ -5288,7 +5288,7 @@ fn render_new_tree_windows<R>(
     swap_desc: Option<NodeDesc>,
     swapping_stack_surface_id: &Id,
     backdrop_id: &Id,
-    theme: &cosmic::Theme::CosmicTheme,
+    theme: &cosmic::theme::CosmicTheme,
     scanout_node: Option<DrmNode>,
     push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
 ) where
@@ -5937,5 +5937,3 @@ fn scale_to_center<C>(
         )
     }
 }
-
-

@@ -798,4 +798,3 @@ impl TouchGrab<State> for MoveGrab {
         }
     }
 }
-

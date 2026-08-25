@@ -39,7 +39,7 @@ use crate::{
     backend::render::{
         CursorMode, ElementFilter, RendererRef,
         cursor::{self, CursorRenderElement},
-        element::{AsGlowRenderer, LingmoElement, DamageElement},
+        element::{AsGlowRenderer, CosmicElement, DamageElement},
         render_workspace,
         wayland::SurfaceRenderElement,
     },
@@ -349,7 +349,7 @@ pub fn render_workspace_to_buffer(
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoElement<R>: RenderElement<R>,
+        CosmicElement<R>: RenderElement<R>,
         CosmicMappedRenderElement<R>: RenderElement<R>,
         WorkspaceRenderElement<R>: RenderElement<R>,
     {
@@ -590,7 +590,7 @@ pub fn render_window_to_buffer(
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoElement<R>: RenderElement<R>,
+        CosmicElement<R>: RenderElement<R>,
         CosmicMappedRenderElement<R>: RenderElement<R>,
     {
         let mut elements: Vec<_> = additional_damage
@@ -655,7 +655,7 @@ pub fn render_window_to_buffer(
                 );
             }
 
-            // TODO Lingmo-workspaces wants to omit, but metadata cursor capture in portal should
+            // TODO cosmic-workspaces wants to omit, but metadata cursor capture in portal should
             // still include dnd surface in window capture buffer?
             if draw_cursor && let Some(dnd_icon) = get_dnd_icon(&seat) {
                 cursor::draw_dnd_icon(
@@ -845,7 +845,7 @@ pub fn render_cursor_to_buffer(
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoElement<R>: RenderElement<R>,
+        CosmicElement<R>: RenderElement<R>,
         CosmicMappedRenderElement<R>: RenderElement<R>,
     {
         let mut elements: Vec<_> = additional_damage
@@ -965,4 +965,3 @@ pub fn render_cursor_to_buffer(
         );
     }
 }
-

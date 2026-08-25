@@ -463,8 +463,8 @@ impl<P: Program + Send + 'static> IcedElementInternal<P> {
                 &self.theme,
                 &Style {
                     scale_factor: 1.0, // TODO: why is this
-                    icon_color: self.theme.Lingmo().on_bg_color().into(),
-                    text_color: self.theme.Lingmo().on_bg_color().into(),
+                    icon_color: self.theme.cosmic().on_bg_color().into(),
+                    text_color: self.theme.cosmic().on_bg_color().into(),
                 },
                 &mut NullClipboard,
             )
@@ -1094,7 +1094,7 @@ impl<P: Program + Send + 'static> IcedElement<P> {
                     ),
                     scale.x,
                     radii,
-                    (internal_ref.theme.Lingmo().frosted as u8 + 1) as usize,
+                    (internal_ref.theme.cosmic().frosted as u8 + 1) as usize,
                 ) {
                     Ok(Some(elem)) => {
                         if let Some(push_below) = push_below {
@@ -1116,4 +1116,3 @@ render_elements! {
     UI=MemoryRenderBufferRenderElement<R>,
     Blur=BlurElement,
 }
-

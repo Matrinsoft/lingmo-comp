@@ -6,7 +6,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use lingmo_comp_config::AppearanceConfig;
+use cosmic_comp_config::AppearanceConfig;
 use cosmic_settings_config::shortcuts::action::ResizeDirection;
 use keyframe::{ease, functions::EaseInOutCubic};
 use smallvec::SmallVec;
@@ -1490,7 +1490,7 @@ impl FloatingLayout {
         mut resize_indicator: Option<(ResizeMode, ResizeIndicator)>,
         indicator_thickness: u8,
         alpha: f32,
-        theme: &cosmic::Theme::CosmicTheme,
+        theme: &cosmic::theme::CosmicTheme,
         scanout_node: Option<DrmNode>,
         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
     ) where
@@ -1687,9 +1687,7 @@ impl FloatingLayout {
     }
 
     fn gaps(&self) -> (i32, i32) {
-        let g = self.theme.Lingmo().gaps;
+        let g = self.theme.cosmic().gaps;
         (g.0 as i32, g.1 as i32)
     }
 }
-
-

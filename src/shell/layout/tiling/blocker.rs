@@ -60,4 +60,3 @@ impl TilingBlocker {
             .collect::<HashMap<ClientId, Client>>()
     }
 }
-

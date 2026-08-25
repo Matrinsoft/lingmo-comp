@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use calloop::LoopHandle;
-use lingmo_comp_config::output::comp::AdaptiveSync;
+use cosmic_comp_config::output::comp::AdaptiveSync;
 use cosmic_protocols::output_management::v1::server::{
     zcosmic_output_configuration_head_v1::ZcosmicOutputConfigurationHeadV1,
     zcosmic_output_configuration_v1::ZcosmicOutputConfigurationV1,
@@ -556,5 +556,3 @@ macro_rules! delegate_output_configuration {
 pub(crate) use delegate_output_configuration;
 
 use crate::utils::{global::remove_global_with_timer, prelude::OutputExt};
-
-

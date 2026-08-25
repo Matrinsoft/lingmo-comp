@@ -314,4 +314,3 @@ pub fn send_workspace_to_client(
 
     changed
 }
-

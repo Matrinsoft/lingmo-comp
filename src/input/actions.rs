@@ -13,7 +13,7 @@ use crate::{
         handlers::xdg_activation::ActivationContext, protocols::workspace::WorkspaceUpdateGuard,
     },
 };
-use lingmo_comp_config::{TileBehavior, workspace::WorkspaceLayout};
+use cosmic_comp_config::{TileBehavior, workspace::WorkspaceLayout};
 use cosmic_config::ConfigSet;
 use cosmic_settings_config::shortcuts;
 use cosmic_settings_config::shortcuts::action::{Direction, FocusDirection};
@@ -28,6 +28,8 @@ use tracing::{error, warn};
 use std::{os::unix::process::CommandExt, thread};
 
 use super::gestures;
+
+const MAX_ZOOM: f64 = 256.0;
 
 fn propagate_by_default(action: &shortcuts::Action) -> bool {
     matches!(
@@ -115,7 +117,7 @@ impl State {
         let wraparound: bool = self
             .common
             .config
-            .Lingmo_conf
+            .cosmic_conf
             .workspaces
             .workspace_wraparound;
 
@@ -209,10 +211,10 @@ impl State {
             Action::NextWorkspace => {
                 if let Some(direction) = pattern.inferred_direction()
                     && (((direction == Direction::Left || direction == Direction::Right)
-                        && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                        && self.common.config.cosmic_conf.workspaces.workspace_layout
                             == WorkspaceLayout::Vertical)
                         || ((direction == Direction::Up || direction == Direction::Down)
-                            && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                            && self.common.config.cosmic_conf.workspaces.workspace_layout
                                 == WorkspaceLayout::Horizontal))
                 {
                     return;
@@ -224,7 +226,7 @@ impl State {
                     false,
                     self.common
                         .config
-                        .Lingmo_conf
+                        .cosmic_conf
                         .workspaces
                         .workspace_wraparound,
                     &mut self.common.workspace_state.update(),
@@ -249,10 +251,10 @@ impl State {
             Action::PreviousWorkspace => {
                 if let Some(direction) = pattern.inferred_direction()
                     && (((direction == Direction::Left || direction == Direction::Right)
-                        && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                        && self.common.config.cosmic_conf.workspaces.workspace_layout
                             == WorkspaceLayout::Vertical)
                         || ((direction == Direction::Up || direction == Direction::Down)
-                            && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                            && self.common.config.cosmic_conf.workspaces.workspace_layout
                                 == WorkspaceLayout::Horizontal))
                 {
                     return;
@@ -264,7 +266,7 @@ impl State {
                     false,
                     self.common
                         .config
-                        .Lingmo_conf
+                        .cosmic_conf
                         .workspaces
                         .workspace_wraparound,
                     &mut self.common.workspace_state.update(),
@@ -345,10 +347,10 @@ impl State {
             x @ Action::MoveToNextWorkspace | x @ Action::SendToNextWorkspace => {
                 if let Some(direction) = pattern.inferred_direction()
                     && (((direction == Direction::Left || direction == Direction::Right)
-                        && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                        && self.common.config.cosmic_conf.workspaces.workspace_layout
                             == WorkspaceLayout::Vertical)
                         || ((direction == Direction::Up || direction == Direction::Down)
-                            && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                            && self.common.config.cosmic_conf.workspaces.workspace_layout
                                 == WorkspaceLayout::Horizontal))
                 {
                     return;
@@ -411,7 +413,7 @@ impl State {
                         let wraparound = self
                             .common
                             .config
-                            .Lingmo_conf
+                            .cosmic_conf
                             .workspaces
                             .workspace_wraparound;
 
@@ -439,10 +441,10 @@ impl State {
             x @ Action::MoveToPreviousWorkspace | x @ Action::SendToPreviousWorkspace => {
                 if let Some(direction) = pattern.inferred_direction()
                     && (((direction == Direction::Left || direction == Direction::Right)
-                        && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                        && self.common.config.cosmic_conf.workspaces.workspace_layout
                             == WorkspaceLayout::Vertical)
                         || ((direction == Direction::Up || direction == Direction::Down)
-                            && self.common.config.Lingmo_conf.workspaces.workspace_layout
+                            && self.common.config.cosmic_conf.workspaces.workspace_layout
                                 == WorkspaceLayout::Horizontal))
                 {
                     return;
@@ -504,7 +506,7 @@ impl State {
                         let wraparound = self
                             .common
                             .config
-                            .Lingmo_conf
+                            .cosmic_conf
                             .workspaces
                             .workspace_wraparound;
 
@@ -575,7 +577,7 @@ impl State {
                             .map(Into::<KeyboardFocusTarget>::into);
                         std::mem::drop(shell);
 
-                        let update_cursor = self.common.config.Lingmo_conf.cursor_follows_focus;
+                        let update_cursor = self.common.config.cosmic_conf.cursor_follows_focus;
                         Shell::set_focus(self, new_target.as_ref(), seat, None, update_cursor);
 
                         if let Some(ptr) = seat.get_pointer() {
@@ -774,7 +776,7 @@ impl State {
 
                             let action = match (
                                 direction,
-                                self.common.config.Lingmo_conf.workspaces.workspace_layout,
+                                self.common.config.cosmic_conf.workspaces.workspace_layout,
                             ) {
                                 (Direction::Left, WorkspaceLayout::Horizontal)
                                 | (Direction::Up, WorkspaceLayout::Vertical) => {
@@ -833,7 +835,7 @@ impl State {
 
                         let action = match (
                             direction,
-                            self.common.config.Lingmo_conf.workspaces.workspace_layout,
+                            self.common.config.cosmic_conf.workspaces.workspace_layout,
                         ) {
                             (Direction::Left, WorkspaceLayout::Horizontal)
                             | (Direction::Up, WorkspaceLayout::Vertical) => {
@@ -985,22 +987,22 @@ impl State {
 
             Action::ToggleTiling => {
                 if matches!(
-                    self.common.config.Lingmo_conf.autotile_behavior,
+                    self.common.config.cosmic_conf.autotile_behavior,
                     TileBehavior::Global
                 ) {
-                    let autotile = !self.common.config.Lingmo_conf.autotile;
-                    self.common.config.Lingmo_conf.autotile = autotile;
+                    let autotile = !self.common.config.cosmic_conf.autotile;
+                    self.common.config.cosmic_conf.autotile = autotile;
 
                     {
                         let mut shell = self.common.shell.write();
                         let shell_ref = &mut *shell;
                         shell_ref.workspaces.update_autotile(
-                            self.common.config.Lingmo_conf.autotile,
+                            self.common.config.cosmic_conf.autotile,
                             &mut self.common.workspace_state.update(),
                             shell_ref.seats.iter(),
                         );
                     }
-                    let config = self.common.config.Lingmo_helper.clone();
+                    let config = self.common.config.cosmic_helper.clone();
                     thread::spawn(move || {
                         if let Err(err) = config.set("autotile", autotile) {
                             error!(?err, "Failed to update autotile key");
@@ -1040,7 +1042,7 @@ impl State {
             x @ Action::ZoomIn | x @ Action::ZoomOut => {
                 let change = {
                     let increment =
-                        self.common.config.Lingmo_conf.accessibility_zoom.increment as f64 / 100.0;
+                        self.common.config.cosmic_conf.accessibility_zoom.increment as f64 / 100.0;
                     match x {
                         Action::ZoomIn => increment,
                         Action::ZoomOut => -increment,
@@ -1085,7 +1087,7 @@ impl State {
             .env("DISPLAY", &display)
             .env("XDG_ACTIVATION_TOKEN", &*token)
             .env("DESKTOP_STARTUP_ID", &*token)
-            .env_remove("Lingmo_SESSION_SOCK");
+            .env_remove("LINGMO_SESSION_SOCK");
         unsafe {
             cmd.pre_exec(|| {
                 crate::utils::rlimit::restore_nofile_limit();
@@ -1116,12 +1118,19 @@ impl State {
         }
 
         if zoom_seat == *seat {
-            let new_level = (current_level + change).max(1.0);
+            let factor = 1.0 + change.abs();
+            let new_level = if change < 0. {
+                current_level / factor
+            } else {
+                current_level * factor
+            }
+            .clamp(1.0, MAX_ZOOM);
+            let new_level = if new_level < 1.01 { 1.0 } else { new_level };
             shell.trigger_zoom(
                 seat,
                 Some(&output),
                 new_level,
-                &self.common.config.Lingmo_conf.accessibility_zoom,
+                &self.common.config.cosmic_conf.accessibility_zoom,
                 animate,
                 &self.common.event_loop_handle,
             );
@@ -1193,5 +1202,3 @@ fn to_previous_workspace(
         workspace_state,
     )
 }
-
-

@@ -6,7 +6,7 @@ use smithay::input::keyboard::ModifiersState;
 pub enum Action {
     /// Behaviors managed internally by lingmo-comp.
     Private(PrivateAction),
-    /// Behaviors managed via Lingmo-settings.
+    /// Behaviors managed via cosmic-settings.
     Shortcut(shortcuts::Action),
 }
 
@@ -22,7 +22,7 @@ pub enum PrivateAction {
 }
 
 /// Convert `cosmic_settings_config::shortcuts::State` to `smithay::backend::input::KeyState`.
-pub fn Lingmo_keystate_to_smithay(value: KeyState) -> smithay::backend::input::KeyState {
+pub fn cosmic_keystate_to_smithay(value: KeyState) -> smithay::backend::input::KeyState {
     match value {
         KeyState::Pressed => smithay::backend::input::KeyState::Pressed,
         KeyState::Released => smithay::backend::input::KeyState::Released,
@@ -30,7 +30,7 @@ pub fn Lingmo_keystate_to_smithay(value: KeyState) -> smithay::backend::input::K
 }
 
 /// Convert `smithay::backend::input::KeyState` to `cosmic_settings_config::shortcuts::State`.
-pub fn Lingmo_keystate_from_smithay(value: smithay::backend::input::KeyState) -> KeyState {
+pub fn cosmic_keystate_from_smithay(value: smithay::backend::input::KeyState) -> KeyState {
     match value {
         smithay::backend::input::KeyState::Pressed => KeyState::Pressed,
         smithay::backend::input::KeyState::Released => KeyState::Released,
@@ -38,7 +38,7 @@ pub fn Lingmo_keystate_from_smithay(value: smithay::backend::input::KeyState) ->
 }
 
 /// Compare `cosmic_settings_config::shortcuts::Modifiers` to `smithay::input::keyboard::ModifiersState`.
-pub fn Lingmo_modifiers_eq_smithay(this: &Modifiers, other: &ModifiersState) -> bool {
+pub fn cosmic_modifiers_eq_smithay(this: &Modifiers, other: &ModifiersState) -> bool {
     this.ctrl == other.ctrl
         && this.alt == other.alt
         && this.shift == other.shift
@@ -46,7 +46,7 @@ pub fn Lingmo_modifiers_eq_smithay(this: &Modifiers, other: &ModifiersState) -> 
 }
 
 /// Convert `smithay::input::keyboard::ModifiersState` to `cosmic_settings_config::shortcuts::Modifiers`
-pub fn Lingmo_modifiers_from_smithay(value: ModifiersState) -> Modifiers {
+pub fn cosmic_modifiers_from_smithay(value: ModifiersState) -> Modifiers {
     Modifiers {
         ctrl: value.ctrl,
         alt: value.alt,
@@ -54,4 +54,3 @@ pub fn Lingmo_modifiers_from_smithay(value: ModifiersState) -> Modifiers {
         logo: value.logo,
     }
 }
-

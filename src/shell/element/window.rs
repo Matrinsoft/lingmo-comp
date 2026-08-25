@@ -17,7 +17,7 @@ use crate::{
 };
 use calloop::LoopHandle;
 use cosmic::iced::{Color, Task};
-use lingmo_comp_config::AppearanceConfig;
+use cosmic_comp_config::AppearanceConfig;
 use smithay::{
     backend::{
         drm::DrmNode,
@@ -196,7 +196,7 @@ impl CosmicWindow {
         let window = window.into();
         let width = window.geometry().size.w;
         let last_title = window.title();
-        theme.transparent = theme.Lingmo().frosted_windows;
+        theme.transparent = theme.cosmic().frosted_windows;
 
         if appearance.clip_floating_windows {
             window.set_tiled(true);
@@ -368,8 +368,8 @@ impl CosmicWindow {
 
         self.0.with_program(|p| {
             let theme = p.theme.lock().unwrap();
-            let frosted = if theme.Lingmo().frosted_windows {
-                (theme.Lingmo().frosted as u8 + 1) as usize
+            let frosted = if theme.cosmic().frosted_windows {
+                (theme.cosmic().frosted as u8 + 1) as usize
             } else {
                 0
             };
@@ -423,7 +423,7 @@ impl CosmicWindow {
                 return None;
             }
             let mut radii = theme
-                .Lingmo()
+                .cosmic()
                 .radius_s()
                 .map(|x| if x < 4.0 { x } else { x + 4.0 })
                 .map(|x| (x * scale as f32).round() as u8);
@@ -459,7 +459,7 @@ impl CosmicWindow {
                     radii,
                     if activated { alpha } else { alpha * 0.75 },
                     output_scale.x,
-                    theme.Lingmo().is_dark,
+                    theme.cosmic().is_dark,
                 ))
                 .into(),
             )
@@ -489,7 +489,7 @@ impl CosmicWindow {
                 p.theme
                     .lock()
                     .unwrap()
-                    .Lingmo()
+                    .cosmic()
                     .radius_s()
                     .map(|x| if x < 4.0 { x } else { x + 4.0 })
                     .map(|x| x.round() as u8),
@@ -519,7 +519,7 @@ impl CosmicWindow {
         let (mut geo, bg_divider) = self.0.with_program(|p| {
             (
                 SpaceElement::geometry(&p.window).to_f64(),
-                p.theme.lock().unwrap().Lingmo().bg_divider(),
+                p.theme.lock().unwrap().cosmic().bg_divider(),
             )
         });
         geo.loc += location.to_f64().to_logical(scale);
@@ -555,8 +555,8 @@ impl CosmicWindow {
                 radii[3] = 0;
             }
             let theme = p.theme.lock().unwrap();
-            let frosted = if theme.Lingmo().frosted_windows {
-                (theme.Lingmo().frosted as u8 + 1) as usize
+            let frosted = if theme.cosmic().frosted_windows {
+                (theme.cosmic().frosted as u8 + 1) as usize
             } else {
                 0
             };
@@ -595,7 +595,7 @@ impl CosmicWindow {
     }
 
     pub(crate) fn set_theme(&self, mut theme: cosmic::Theme) {
-        theme.transparent = theme.Lingmo().frosted_windows;
+        theme.transparent = theme.cosmic().frosted_windows;
         self.0.with_program(|p| {
             *p.theme.lock().unwrap() = theme.clone();
         });
@@ -669,7 +669,7 @@ impl CosmicWindow {
                     p.theme
                         .lock()
                         .unwrap()
-                        .Lingmo()
+                        .cosmic()
                         .radius_s()
                         .map(|x| if x < 4.0 { x } else { x + 4.0 })
                         .map(|x| x.round() as u8)
@@ -832,8 +832,8 @@ impl Program for CosmicWindowInternal {
     fn background_color(&self, theme: &cosmic::Theme) -> Color {
         if self.window.is_maximized(false) {
             theme
-                .Lingmo()
-                .background(theme.Lingmo().frosted_windows)
+                .cosmic()
+                .background(theme.cosmic().frosted_windows)
                 .base
                 .into()
         } else {
@@ -1093,7 +1093,7 @@ impl PointerTarget<State> for CosmicWindow {
                             Focus::ResizeRight => ResizeEdge::RIGHT,
                             Focus::Header => unreachable!(),
                         },
-                        state.common.config.Lingmo_conf.edge_snap_threshold,
+                        state.common.config.cosmic_conf.edge_snap_threshold,
                         false,
                     );
 
@@ -1457,5 +1457,3 @@ where
         }
     }
 }
-
-

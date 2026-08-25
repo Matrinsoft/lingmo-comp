@@ -34,7 +34,7 @@ impl StackHover {
         size: Size<i32, Logical>,
         mut theme: cosmic::Theme,
     ) -> StackHover {
-        theme.transparent = theme.Lingmo().frosted_system_interface;
+        theme.transparent = theme.cosmic().frosted_system_interface;
 
         let elem = IcedElement::new(StackHoverInternal, size, evlh, theme);
         let minimum = elem.minimum_size();
@@ -66,7 +66,7 @@ impl StackHover {
             scale,
             alpha,
             self.elem
-                .with_theme(|theme| theme.Lingmo().radius_s())
+                .with_theme(|theme| theme.cosmic().radius_s())
                 .map(|x| x.round() as u8),
             push_above,
             push_below,
@@ -105,21 +105,21 @@ impl Program for StackHoverInternal {
         .padding(16)
         .apply(container)
         .class(theme::Container::custom(|theme| {
-            let mut background = theme.Lingmo().accent_color();
+            let mut background = theme.cosmic().accent_color();
             if theme.transparent {
                 background.alpha = theme
-                    .Lingmo()
+                    .cosmic()
                     .alpha_map
-                    .blurred_alpha(theme.Lingmo().frosted);
+                    .blurred_alpha(theme.cosmic().frosted);
             }
 
             container::Style {
                 snap: true,
-                icon_color: Some(Color::from(theme.Lingmo().accent.on)),
-                text_color: Some(Color::from(theme.Lingmo().accent.on)),
+                icon_color: Some(Color::from(theme.cosmic().accent.on)),
+                text_color: Some(Color::from(theme.cosmic().accent.on)),
                 background: Some(Background::Color(background.into())),
                 border: Border {
-                    radius: theme.Lingmo().radius_s().into(),
+                    radius: theme.cosmic().radius_s().into(),
                     width: 0.0,
                     color: Color::TRANSPARENT,
                 },
@@ -131,4 +131,3 @@ impl Program for StackHoverInternal {
         .into()
     }
 }
-

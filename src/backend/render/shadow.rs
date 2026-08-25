@@ -189,4 +189,3 @@ impl ShadowShader {
         cache.get(&key).unwrap().1.clone()
     }
 }
-

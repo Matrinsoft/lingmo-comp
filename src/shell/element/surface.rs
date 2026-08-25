@@ -1137,4 +1137,3 @@ fn with_toplevel_state<T, F: FnOnce(Option<&smithay::wayland::shell::xdg::Toplev
         toplevel.with_committed_state(cb)
     }
 }
-

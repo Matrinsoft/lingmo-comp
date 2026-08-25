@@ -115,4 +115,3 @@ impl WorkspaceHandler for State {
 }
 
 delegate_workspace!(State);
-

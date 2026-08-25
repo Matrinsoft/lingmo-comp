@@ -181,7 +181,7 @@ pub fn tab_items(
                     surface,
                     state.common.event_loop_handle.clone(),
                     state.common.theme.clone(),
-                    state.common.config.Lingmo_conf.appearance_settings,
+                    state.common.config.cosmic_conf.appearance_settings,
                 )
                 .into();
 
@@ -382,7 +382,7 @@ pub fn window_items(
                             &resize_clone,
                             &seat,
                             ResizeEdge::TOP,
-                            state.common.config.Lingmo_conf.edge_snap_threshold,
+                            state.common.config.cosmic_conf.edge_snap_threshold,
                         );
 
                         std::mem::drop(shell);
@@ -417,7 +417,7 @@ pub fn window_items(
                             &resize_clone,
                             &seat,
                             ResizeEdge::LEFT,
-                            state.common.config.Lingmo_conf.edge_snap_threshold,
+                            state.common.config.cosmic_conf.edge_snap_threshold,
                         );
 
                         std::mem::drop(shell);
@@ -452,7 +452,7 @@ pub fn window_items(
                             &resize_clone,
                             &seat,
                             ResizeEdge::RIGHT,
-                            state.common.config.Lingmo_conf.edge_snap_threshold,
+                            state.common.config.cosmic_conf.edge_snap_threshold,
                         );
 
                         std::mem::drop(shell);
@@ -487,7 +487,7 @@ pub fn window_items(
                             &resize_clone,
                             &seat,
                             ResizeEdge::BOTTOM,
-                            state.common.config.Lingmo_conf.edge_snap_threshold,
+                            state.common.config.cosmic_conf.edge_snap_threshold,
                         );
 
                         std::mem::drop(shell);
@@ -672,4 +672,3 @@ pub fn fullscreen_items(window: &CosmicSurface, config: &Config) -> impl Iterato
     .into_iter()
     .flatten()
 }
-

@@ -222,4 +222,3 @@ fn build_user_interface<'a, P: Program>(
 
     UserInterface::build(view, size, cache, renderer)
 }
-

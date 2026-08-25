@@ -9,8 +9,8 @@ use zbus::names::{UniqueName, WellKnownName};
 use super::name_owners::NameOwners;
 
 static ALLOWED_NAMES: &[WellKnownName] = &[
-    WellKnownName::from_static_str_unchecked("org.freedesktop.impl.portal.desktop.Lingmo"),
-    WellKnownName::from_static_str_unchecked("com.lingmoos.LingmoOSK"),
+    WellKnownName::from_static_str_unchecked("org.freedesktop.impl.portal.desktop.cosmic"),
+    WellKnownName::from_static_str_unchecked("com.system76.CosmicOSK"),
 ];
 
 /// Channel for handing the EI socketpair (and requested device types)
@@ -73,10 +73,8 @@ pub async fn init(
         name_owners: name_owners.clone(),
     };
     conn.object_server()
-        .at("/com/lingmoos/LingmoComp/Ei", ei)
+        .at("/com/system76/CosmicComp/Ei", ei)
         .await?;
     conn.request_name("com.lingmoos.LingmoComp").await?;
     Ok(())
 }
-
-

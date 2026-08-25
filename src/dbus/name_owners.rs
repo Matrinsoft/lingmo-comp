@@ -90,7 +90,7 @@ fn update_task(inner: Weak<Mutex<Inner>>) -> impl Future<Output = ()> {
 /// Track which DBus unique names own which well-known names, so protocols can be restricted to
 /// only certain names.
 ///
-/// Enforcement can be disabled by setting `Lingmo_ENFORCE_DBUS_OWNERS`.
+/// Enforcement can be disabled by setting `LINGMO_ENFORCE_DBUS_OWNERS`.
 #[derive(Clone, Debug)]
 pub struct NameOwners(Arc<Mutex<Inner>>);
 
@@ -102,7 +102,7 @@ impl NameOwners {
         let dbus = fdo::DBusProxy::new(connection).await?;
         let stream = dbus.receive_name_owner_changed().await?;
 
-        let enforce = crate::utils::env::bool_var("Lingmo_ENFORCE_DBUS_OWNERS").unwrap_or(true);
+        let enforce = crate::utils::env::bool_var("LINGMO_ENFORCE_DBUS_OWNERS").unwrap_or(true);
 
         let names = dbus.list_names().await?;
         let unique_names = names
@@ -211,4 +211,3 @@ impl NameOwners {
         self.check_owner_no_poll(name, allowed_names)
     }
 }
-

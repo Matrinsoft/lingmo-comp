@@ -171,4 +171,3 @@ impl RubberBand {
         self.derivative(diff)
     }
 }
-

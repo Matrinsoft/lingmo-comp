@@ -213,7 +213,7 @@ impl XdgShellHandler for State {
             &seat,
             serial,
             edges.into(),
-            self.common.config.Lingmo_conf.edge_snap_threshold,
+            self.common.config.cosmic_conf.edge_snap_threshold,
             true,
         ) {
             std::mem::drop(shell);
@@ -426,4 +426,3 @@ impl XdgShellHandler for State {
         }
     }
 }
-

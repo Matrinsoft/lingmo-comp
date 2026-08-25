@@ -22,7 +22,7 @@ use crate::{
         protocols::workspace::{State as WState, WorkspaceCapabilities},
     },
 };
-use lingmo_comp_config::{
+use cosmic_comp_config::{
     AppearanceConfig, TileBehavior, ZoomConfig, ZoomMovement,
     workspace::{PinnedWorkspace, WorkspaceLayout, WorkspaceMode},
 };
@@ -269,7 +269,7 @@ pub struct PendingLayer {
 pub struct Shell {
     pub workspaces: Workspaces,
 
-    // Can't make this into a HashSet. See https://github.com/Matrinsoft/lingmo-comp/pull/1902
+    // Can't make this into a HashSet. See https://github.com/pop-os/lingmo-comp/pull/1902
     pub pending_windows: Vec<PendingWindow>,
     pub pending_layers: Vec<PendingLayer>,
     pub pending_activations: HashMap<ActivationKey, ActivationContext>,
@@ -838,13 +838,13 @@ impl Workspaces {
         Workspaces {
             sets: IndexMap::new(),
             backup_set: None,
-            layout: config.Lingmo_conf.workspaces.workspace_layout,
-            mode: config.Lingmo_conf.workspaces.workspace_mode,
-            autotile: config.Lingmo_conf.autotile,
-            autotile_behavior: config.Lingmo_conf.autotile_behavior,
+            layout: config.cosmic_conf.workspaces.workspace_layout,
+            mode: config.cosmic_conf.workspaces.workspace_mode,
+            autotile: config.cosmic_conf.autotile,
+            autotile_behavior: config.cosmic_conf.autotile_behavior,
             theme,
-            appearance: config.Lingmo_conf.appearance_settings,
-            persisted_workspaces: config.Lingmo_conf.pinned_workspaces.clone(),
+            appearance: config.cosmic_conf.appearance_settings,
+            persisted_workspaces: config.cosmic_conf.pinned_workspaces.clone(),
         }
     }
 
@@ -1160,9 +1160,9 @@ impl Workspaces {
         xdg_activation_state: &XdgActivationState,
     ) {
         let old_mode = self.mode;
-        self.mode = config.Lingmo_conf.workspaces.workspace_mode;
-        self.layout = config.Lingmo_conf.workspaces.workspace_layout;
-        self.appearance = config.Lingmo_conf.appearance_settings;
+        self.mode = config.cosmic_conf.workspaces.workspace_mode;
+        self.layout = config.cosmic_conf.workspaces.workspace_layout;
+        self.appearance = config.cosmic_conf.appearance_settings;
 
         for set in self.sets.values_mut() {
             set.appearance = self.appearance;
@@ -1216,7 +1216,7 @@ impl Workspaces {
                                     output,
                                     &set.group,
                                     false,
-                                    config.Lingmo_conf.autotile,
+                                    config.cosmic_conf.autotile,
                                     self.theme.clone(),
                                     self.appearance,
                                 ),
@@ -1499,7 +1499,7 @@ impl Workspaces {
             .flat_map(|set| &set.workspaces)
             .flat_map(|w| w.to_pinned())
             .collect();
-        let config = config.Lingmo_helper.clone();
+        let config = config.cosmic_helper.clone();
         thread::spawn(move || {
             if let Err(err) = config.set("pinned_workspaces", pinned_workspaces) {
                 error!(?err, "Failed to update pinned_workspaces key");
@@ -1572,12 +1572,12 @@ impl Common {
     pub fn update_config(&mut self) {
         let mut shell = self.shell.write();
         let shell_ref = &mut *shell;
-        shell_ref.active_hint = self.config.Lingmo_conf.active_hint;
-        shell_ref.appearance_conf = self.config.Lingmo_conf.appearance_settings;
+        shell_ref.active_hint = self.config.cosmic_conf.active_hint;
+        shell_ref.appearance_conf = self.config.cosmic_conf.appearance_settings;
         if let Some(zoom_state) = shell_ref.zoom_state.as_mut() {
-            zoom_state.increment = self.config.Lingmo_conf.accessibility_zoom.increment;
-            zoom_state.movement = self.config.Lingmo_conf.accessibility_zoom.view_moves;
-            zoom_state.show_overlay = self.config.Lingmo_conf.accessibility_zoom.show_overlay;
+            zoom_state.increment = self.config.cosmic_conf.accessibility_zoom.increment;
+            zoom_state.movement = self.config.cosmic_conf.accessibility_zoom.view_moves;
+            zoom_state.show_overlay = self.config.cosmic_conf.accessibility_zoom.show_overlay;
 
             for output in shell_ref.workspaces.sets.keys() {
                 let output_state = output.user_data().get::<Mutex<OutputZoomState>>().unwrap();
@@ -1595,7 +1595,7 @@ impl Common {
         );
 
         for mapped in shell_ref.mapped() {
-            mapped.update_appearance_conf(&self.config.Lingmo_conf.appearance_settings);
+            mapped.update_appearance_conf(&self.config.cosmic_conf.appearance_settings);
         }
     }
 
@@ -1687,7 +1687,7 @@ impl Common {
 
 impl Shell {
     pub fn new(config: &Config) -> Self {
-        let theme = cosmic::Theme::system_preference();
+        let theme = cosmic::theme::system_preference();
 
         let tiling_exceptions = layout::TilingExceptions::new(config.tiling_exceptions.iter());
 
@@ -1704,13 +1704,13 @@ impl Shell {
             xwayland_keyboard_grab: None,
 
             theme,
-            active_hint: config.Lingmo_conf.active_hint,
+            active_hint: config.cosmic_conf.active_hint,
             overview_mode: OverviewMode::None,
             swap_indicator: None,
             resize_mode: ResizeMode::None,
             resize_state: None,
             resize_indicator: None,
-            appearance_conf: config.Lingmo_conf.appearance_settings,
+            appearance_conf: config.cosmic_conf.appearance_settings,
             zoom_state: None,
             tiling_exceptions,
 
@@ -2285,6 +2285,11 @@ impl Shell {
                         .get::<Mutex<OutputZoomState>>()
                         .is_some_and(|state| state.lock().unwrap().is_animating())
                 })
+            })
+            || self.seats.iter().any(|seat| {
+                seat.user_data()
+                    .get::<crate::backend::render::cursor::CursorState>()
+                    .is_some_and(|state| state.lock().unwrap().is_magnifying())
             })
     }
 
@@ -3694,7 +3699,7 @@ impl Shell {
         };
 
         let mut theme = self.theme.clone();
-        theme.transparent = theme.Lingmo().frosted_windows;
+        theme.transparent = theme.cosmic().frosted_windows;
         let grab = MenuGrab::new(
             GrabStartData::Pointer(start_data),
             seat,
@@ -3804,8 +3809,8 @@ impl Shell {
             GrabStartData::Pointer(start_data) => Trigger::Pointer(start_data.button),
             GrabStartData::Touch(start_data) => Trigger::Touch(start_data.slot),
         };
-        let active_hint = if config.Lingmo_conf.active_hint {
-            self.theme.Lingmo().active_hint as u8
+        let active_hint = if config.cosmic_conf.active_hint {
+            self.theme.cosmic().active_hint as u8
         } else {
             0
         };
@@ -3950,7 +3955,7 @@ impl Shell {
             initial_window_location,
             cursor_output,
             active_hint,
-            config.Lingmo_conf.edge_snap_threshold as f64,
+            config.cosmic_conf.edge_snap_threshold as f64,
             layer,
             release,
             evlh.clone(),
@@ -4981,11 +4986,11 @@ impl Shell {
 
     pub fn update_toolkit(
         &mut self,
-        toolkit: cosmic::config::LingmoTk,
+        toolkit: cosmic::config::CosmicTk,
         xdg_activation_state: &XdgActivationState,
         workspace_state: &mut WorkspaceUpdateGuard<'_, State>,
     ) {
-        let mut container = cosmic::config::Lingmo_TK.write().unwrap();
+        let mut container = cosmic::config::LINGMO_TK.write().unwrap();
         if *container != toolkit {
             *container = toolkit;
             drop(container);
@@ -5154,5 +5159,3 @@ pub fn check_grab_preconditions(
 
     Some(start_data)
 }
-
-

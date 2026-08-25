@@ -85,7 +85,7 @@ impl MenuGrabState {
                 scale.into(),
                 1.0,
                 elem.iced
-                    .with_theme(|theme| theme.Lingmo().radius_s())
+                    .with_theme(|theme| theme.cosmic().radius_s())
                     .map(|x| x.round() as u8),
                 push,
                 None,
@@ -280,7 +280,7 @@ impl Program for ContextMenu {
 
                             let position = elements.last().unwrap().position;
                             let mut theme = state.common.theme.clone();
-                            theme.transparent = theme.Lingmo().frosted_system_interface;
+                            theme.transparent = theme.cosmic().frosted_system_interface;
                             let element = IcedElement::new(
                                 ContextMenu::new(items),
                                 Size::default(),
@@ -426,7 +426,7 @@ impl Program for ContextMenu {
                                 .prefer_svg(true)
                                 .icon()
                                 .class(theme::Svg::custom(|theme| iced_widget::svg::Style {
-                                    color: Some(theme.Lingmo().accent.base.into()),
+                                    color: Some(theme.cosmic().accent.base.into()),
                                 }))
                                 .into()
                         } else {
@@ -436,7 +436,7 @@ impl Program for ContextMenu {
                             .width(mode)
                             .class(if *disabled {
                                 theme::Text::Custom(|theme| {
-                                    let mut color = theme.Lingmo().background(false).component.on;
+                                    let mut color = theme.cosmic().background(false).component.on;
                                     color.alpha *= 0.5;
                                     TextStyle {
                                         color: Some(color.into()),
@@ -455,7 +455,7 @@ impl Program for ContextMenu {
                                 .align_x(Horizontal::Right)
                                 .width(Length::Shrink)
                                 .class(theme::Text::Custom(|theme| {
-                                    let mut color = theme.Lingmo().background(false).component.on;
+                                    let mut color = theme.cosmic().background(false).component.on;
                                     color.alpha *= 0.75;
                                     TextStyle {
                                         color: Some(color.into()),
@@ -483,15 +483,15 @@ impl Program for ContextMenu {
         .apply(iced_widget::container)
         .padding(1)
         .class(theme::Container::custom(|theme| {
-            let Lingmo = theme.Lingmo();
-            let component = &Lingmo.background(theme.Lingmo().frosted_windows).component;
+            let cosmic = theme.cosmic();
+            let component = &cosmic.background(theme.cosmic().frosted_windows).component;
             iced_widget::container::Style {
                 snap: true,
-                icon_color: Some(Lingmo.accent.base.into()),
+                icon_color: Some(cosmic.accent.base.into()),
                 text_color: Some(component.on.into()),
                 background: Some(Background::Color(component.base.into())),
                 border: Border {
-                    radius: Lingmo.radius_s().into(),
+                    radius: cosmic.radius_s().into(),
                     width: 1.0,
                     color: component.divider.into(),
                 },
@@ -1104,4 +1104,3 @@ impl Drop for MenuGrab {
             .take();
     }
 }
-

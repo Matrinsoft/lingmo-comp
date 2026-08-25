@@ -237,4 +237,3 @@ macro_rules! delegate_a11y {
 pub(crate) use delegate_a11y;
 
 use crate::config::ColorFilter;
-

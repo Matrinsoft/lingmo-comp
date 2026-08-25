@@ -1,4 +1,4 @@
-/// Internal output configurations used by cosmic-comp
+/// Internal output configurations used by lingmo-comp
 pub mod comp;
 
 #[cfg(feature = "randr")]

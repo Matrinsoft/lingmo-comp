@@ -580,4 +580,3 @@ impl Drop for ResizeSurfaceGrab {
         cursor_state.lock().unwrap().unset_shape();
     }
 }
-

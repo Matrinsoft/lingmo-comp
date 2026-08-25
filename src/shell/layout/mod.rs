@@ -101,4 +101,3 @@ pub fn has_floating_exception(exceptions: &TilingExceptions, window: &CosmicSurf
 
     false
 }
-

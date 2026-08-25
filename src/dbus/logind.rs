@@ -32,4 +32,3 @@ pub fn lid_closed(common: &Common) -> Result<bool> {
             .context("Failed to talk to logind")
     })
 }
-

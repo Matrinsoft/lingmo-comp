@@ -27,19 +27,19 @@ impl From<TabRuleTheme> for theme::Rule {
     fn from(theme: TabRuleTheme) -> Self {
         match theme {
             TabRuleTheme::ActiveActivated => Self::custom(|theme| widget::rule::Style {
-                color: theme.Lingmo().accent_color().into(),
+                color: theme.cosmic().accent_color().into(),
                 snap: true,
                 radius: 0.0.into(),
                 fill_mode: FillMode::Full,
             }),
             TabRuleTheme::ActiveDeactivated => Self::custom(|theme| widget::rule::Style {
-                color: theme.Lingmo().palette.neutral_5.into(),
+                color: theme.cosmic().palette.neutral_5.into(),
                 snap: true,
                 radius: 0.0.into(),
                 fill_mode: FillMode::Full,
             }),
             TabRuleTheme::Default => Self::custom(|theme| widget::rule::Style {
-                color: theme.Lingmo().palette.neutral_5.into(),
+                color: theme.cosmic().palette.neutral_5.into(),
                 snap: true,
                 radius: 8.0.into(),
                 fill_mode: FillMode::Padded(4),
@@ -61,19 +61,19 @@ impl From<TabBackgroundTheme> for theme::Container<'_> {
             TabBackgroundTheme::ActiveActivated => {
                 Self::custom(move |theme| widget::container::Style {
                     snap: true,
-                    icon_color: Some(Color::from(theme.Lingmo().accent_text_color())),
-                    text_color: Some(Color::from(theme.Lingmo().accent_text_color())),
+                    icon_color: Some(Color::from(theme.cosmic().accent_text_color())),
+                    text_color: Some(Color::from(theme.cosmic().accent_text_color())),
                     background: Some(Background::Color({
                         let mut color = theme
-                            .Lingmo()
-                            .primary(theme.Lingmo().frosted_windows)
+                            .cosmic()
+                            .primary(theme.cosmic().frosted_windows)
                             .component
                             .selected;
-                        if theme.Lingmo().frosted_windows {
+                        if theme.cosmic().frosted_windows {
                             color.alpha = theme
-                                .Lingmo()
+                                .cosmic()
                                 .alpha_map
-                                .blurred_alpha(theme.Lingmo().frosted);
+                                .blurred_alpha(theme.cosmic().frosted);
                         }
                         color.into()
                     })),
@@ -92,15 +92,15 @@ impl From<TabBackgroundTheme> for theme::Container<'_> {
                     text_color: None,
                     background: Some(Background::Color({
                         let mut color = theme
-                            .Lingmo()
-                            .primary(theme.Lingmo().frosted_windows)
+                            .cosmic()
+                            .primary(theme.cosmic().frosted_windows)
                             .component
                             .base;
-                        if theme.Lingmo().frosted_windows {
+                        if theme.cosmic().frosted_windows {
                             color.alpha = theme
-                                .Lingmo()
+                                .cosmic()
                                 .alpha_map
-                                .blurred_alpha(theme.Lingmo().frosted);
+                                .blurred_alpha(theme.cosmic().frosted);
                         }
                         color.into()
                     })),
@@ -478,4 +478,3 @@ where
         )
     }
 }
-

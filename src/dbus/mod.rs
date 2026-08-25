@@ -4,7 +4,7 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use calloop::{InsertError, LoopHandle, stream::StreamSource};
-use lingmo_comp_config::output::comp::OutputState;
+use cosmic_comp_config::output::comp::OutputState;
 use std::{
     cell::{RefCell, RefMut},
     collections::HashMap,
@@ -177,4 +177,3 @@ pub fn ready(common: &Common) -> Result<()> {
     })?;
     Ok(())
 }
-

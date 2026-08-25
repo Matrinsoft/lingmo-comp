@@ -64,7 +64,7 @@ impl<Internal, Message: std::clone::Clone + 'static, Lower: Decorations<Internal
     }
 }
 
-/// The customized cosmic-comp entrypoint
+/// The customized lingmo-comp entrypoint
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     cosmic_comp::run(Hooks {
         window_decorations: Some(Arc::new(AddIndicator {

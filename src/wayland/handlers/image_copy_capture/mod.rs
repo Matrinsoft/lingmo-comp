@@ -472,4 +472,3 @@ fn constraints_for_renderer(
 
     constraints
 }
-

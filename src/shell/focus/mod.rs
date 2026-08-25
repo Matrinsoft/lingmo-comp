@@ -382,7 +382,7 @@ fn update_focus_state(
         }
 
         if should_update_cursor
-            && state.common.config.Lingmo_conf.cursor_follows_focus
+            && state.common.config.cosmic_conf.cursor_follows_focus
             && target.is_some()
         {
             //need to borrow mutably for surface under
@@ -791,4 +791,3 @@ fn exclusive_layer_surface_layer(shell: &Shell) -> Option<Layer> {
     }
     layer
 }
-
