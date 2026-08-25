@@ -282,7 +282,7 @@ fn print_help(version: &str, git_rev: &str) {
         r#"lingmo-comp {version} (git commit {git_rev})
 System76 <info@system76.com>
 
-Designed for the Lingmoâ„?desktop environment, lingmo-comp is a Wayland Compositor.
+Designed for the Lingmo desktop environment, lingmo-comp is a Wayland Compositor.
 
 Project home page: https://github.com/Matrinsoft/lingmo-comp
 

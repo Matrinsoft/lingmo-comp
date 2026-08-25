@@ -105,7 +105,7 @@ pub fn fps_ui(
                         std::env!("CARGO_PKG_VERSION")
                     ));
                     if let Some(hash) = std::option_env!("GIT_HASH").and_then(|x| x.get(0..10)) {
-                        ui.label(format!("î˜? {hash}"));
+                        ui.label(format!("??? {hash}"));
                     }
 
                     if !debug_active {

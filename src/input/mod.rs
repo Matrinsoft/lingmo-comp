@@ -2099,7 +2099,7 @@ impl State {
                 return;
             }
             // No keycode for this keysym in the seat keymap (out-of-layout / Unicode), so fall
-            // through to the text paths below. Any held modifier is lost â€?best effort.
+            // through to the text paths below. Any held modifier is lost best effort.
             tracing::warn!(
                 "[ei-text]   -> keysym not in seat keymap; falling back (modifier not applied)"
             );

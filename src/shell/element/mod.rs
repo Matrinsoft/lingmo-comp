@@ -749,13 +749,13 @@ impl LingmoMapped {
                                             ui.label("ðŸ—–");
                                         }
                                         if window.is_fullscreen(true) {
-                                            ui.label("â¬?);
+                                            ui.label("???);
                                         }
                                         if window.is_activated(true) {
                                             ui.label("ðŸ–±");
                                         }
                                         if window.is_resizing(true).is_some() {
-                                            ui.label("â†?);
+                                            ui.label("???);
                                         }
                                     });
 
