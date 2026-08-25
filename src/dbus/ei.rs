@@ -73,7 +73,7 @@ pub async fn init(
         name_owners: name_owners.clone(),
     };
     conn.object_server()
-        .at("/com/system76/LingmoComp/Ei", ei)
+        .at("/com/lingmoos/LingmoComp/Ei", ei)
         .await?;
     conn.request_name("com.lingmoos.LingmoComp").await?;
     Ok(())
