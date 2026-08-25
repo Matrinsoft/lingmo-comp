@@ -16,9 +16,9 @@ use smithay::{
 
 use lingmo_comp_config::output::comp::OutputState as EnabledState;
 
-use Lingmo_protocols::output_management::v1::server::{
+use cosmic_protocols::output_management::v1::server::{
     zLingmo_output_configuration_head_v1::{self, ZLingmoOutputConfigurationHeadV1},
-    zLingmo_output_configuration_v1::{self, ZLingmoOutputConfigurationV1},
+    zcosmic_output_configuration_v1::{self, ZLingmoOutputConfigurationV1},
     zLingmo_output_head_v1::{self, ZLingmoOutputHeadV1},
     zLingmo_output_manager_v1::{self, ZLingmoOutputManagerV1},
 };
@@ -183,13 +183,13 @@ where
         _state: &mut D,
         _client: &Client,
         extension_obj: &ZLingmoOutputConfigurationV1,
-        request: zLingmo_output_configuration_v1::Request,
+        request: zcosmic_output_configuration_v1::Request,
         obj: &Weak<ZwlrOutputConfigurationV1>,
         _dh: &DisplayHandle,
         data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zLingmo_output_configuration_v1::Request::MirrorHead {
+            zcosmic_output_configuration_v1::Request::MirrorHead {
                 id,
                 head,
                 mirroring,
@@ -222,7 +222,7 @@ where
                             }
                         }) {
                             extension_obj.post_error(
-                            zLingmo_output_configuration_v1::Error::MirroredHeadBusy,
+                            zcosmic_output_configuration_v1::Error::MirroredHeadBusy,
                             format!("{:?} can't mirror, it is either a mirror target itself or {:?} is not enabled/already mirroring", head, mirroring),
                         );
                         }
@@ -240,7 +240,7 @@ where
                     data_init.init(id, output_conf);
                 }
             }
-            zLingmo_output_configuration_v1::Request::Release => {
+            zcosmic_output_configuration_v1::Request::Release => {
                 if let Ok(obj) = obj.upgrade() {
                     let data = obj.data::<PendingConfiguration>().unwrap();
                     data.lock().unwrap().extension_obj.take();

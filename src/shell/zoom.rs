@@ -8,7 +8,7 @@ use Lingmo::{
     widget::{self, icon::Named},
 };
 use lingmo_comp_config::ZoomMovement;
-use Lingmo_config::ConfigSet;
+use cosmic_config::ConfigSet;
 use keyframe::{ease, functions::Linear};
 use smithay::{
     backend::renderer::ImportMem,

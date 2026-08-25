@@ -14,9 +14,9 @@ use crate::{
     },
 };
 use lingmo_comp_config::{TileBehavior, workspace::WorkspaceLayout};
-use Lingmo_config::ConfigSet;
-use Lingmo_settings_config::shortcuts;
-use Lingmo_settings_config::shortcuts::action::{Direction, FocusDirection};
+use cosmic_config::ConfigSet;
+use cosmic_settings_config::shortcuts;
+use cosmic_settings_config::shortcuts::action::{Direction, FocusDirection};
 use smithay::{
     input::{Seat, pointer::MotionEvent},
     utils::{Point, Serial},

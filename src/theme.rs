@@ -20,7 +20,7 @@ pub(crate) fn active_window_hint(theme: &Theme) -> palette::Srgba {
     }
 }
 
-pub fn watch_theme(handle: LoopHandle<'_, State>) -> Result<(), Lingmo_config::Error> {
+pub fn watch_theme(handle: LoopHandle<'_, State>) -> Result<(), cosmic_config::Error> {
     let (ping_tx, ping_rx) = calloop::ping::make_ping().unwrap();
     let config_mode_helper = ThemeMode::config()?;
     let config_dark_helper = Theme::dark_config()?;

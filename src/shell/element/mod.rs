@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use calloop::LoopHandle;
-use lingmo_comp_config::AppearanceConfig;
+use LINGMO_comp_config::AppearanceConfig;
 use id_tree::NodeId;
 use smithay::{
     backend::{
@@ -38,8 +38,8 @@ use smithay::{
     wayland::seat::WaylandFocus,
     xwayland::{X11Surface, xwm::X11Relatable},
 };
-use stack::LingmoStackInternal;
-use window::LingmoWindowInternal;
+use stack::LINGMOStackInternal;
+use window::LINGMOWindowInternal;
 
 use std::{
     borrow::Cow,
@@ -50,11 +50,11 @@ use std::{
 
 pub mod surface;
 use self::stack::MoveResult;
-pub use self::surface::LingmoSurface;
+pub use self::surface::LINGMOSurface;
 pub mod stack;
-pub use self::stack::LingmoStack;
+pub use self::stack::LINGMOStack;
 pub mod window;
-pub use self::window::LingmoWindow;
+pub use self::window::LINGMOWindow;
 pub mod resize_indicator;
 pub mod stack_hover;
 pub mod swap_indicator;
@@ -76,13 +76,13 @@ use super::{
         tiling::NodeDesc,
     },
 };
-use Lingmo_settings_config::shortcuts::action::{Direction, FocusDirection};
+use LINGMO_settings_config::shortcuts::action::{Direction, FocusDirection};
 
 space_elements! {
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-    LingmoMappedInternal;
-    Window=LingmoWindow,
-    Stack=LingmoStack,
+    LINGMOMappedInternal;
+    Window=LINGMOWindow,
+    Stack=LINGMOStack,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -93,8 +93,8 @@ pub struct MaximizedState {
 }
 
 #[derive(Clone)]
-pub struct LingmoMapped {
-    element: LingmoMappedInternal,
+pub struct LINGMOMapped {
+    element: LINGMOMappedInternal,
 
     // associated data
     pub maximized_state: Arc<Mutex<Option<MaximizedState>>>,
@@ -113,9 +113,9 @@ pub struct LingmoMapped {
     debug: Arc<Mutex<Option<smithay_egui::EguiState>>>,
 }
 
-impl fmt::Debug for LingmoMapped {
+impl fmt::Debug for LINGMOMapped {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("LingmoMapped")
+        f.debug_struct("LINGMOMapped")
             .field("element", &self.element)
             .field("maximized_state", &self.maximized_state)
             .field("tiling_node_id", &self.tiling_node_id)
@@ -128,53 +128,53 @@ impl fmt::Debug for LingmoMapped {
 }
 
 #[derive(Clone, Debug)]
-pub struct LingmoMappedKey(LingmoMappedKeyInner);
+pub struct LINGMOMappedKey(LINGMOMappedKeyInner);
 #[derive(Clone, Debug)]
-enum LingmoMappedKeyInner {
-    Window(Weak<Mutex<IcedElementInternal<LingmoWindowInternal>>>),
-    Stack(Weak<Mutex<IcedElementInternal<LingmoStackInternal>>>),
+enum LINGMOMappedKeyInner {
+    Window(Weak<Mutex<IcedElementInternal<LINGMOWindowInternal>>>),
+    Stack(Weak<Mutex<IcedElementInternal<LINGMOStackInternal>>>),
 }
 
-impl Hash for LingmoMappedKey {
+impl Hash for LINGMOMappedKey {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match &self.0 {
-            LingmoMappedKeyInner::Window(weak) => weak.as_ptr().hash(state),
-            LingmoMappedKeyInner::Stack(weak) => weak.as_ptr().hash(state),
+            LINGMOMappedKeyInner::Window(weak) => weak.as_ptr().hash(state),
+            LINGMOMappedKeyInner::Stack(weak) => weak.as_ptr().hash(state),
         }
     }
 }
 
-impl IsAlive for LingmoMappedKey {
+impl IsAlive for LINGMOMappedKey {
     fn alive(&self) -> bool {
         match &self.0 {
-            LingmoMappedKeyInner::Window(weak) => weak.strong_count() > 0,
-            LingmoMappedKeyInner::Stack(weak) => weak.strong_count() > 0,
+            LINGMOMappedKeyInner::Window(weak) => weak.strong_count() > 0,
+            LINGMOMappedKeyInner::Stack(weak) => weak.strong_count() > 0,
         }
     }
 }
 
-impl PartialEq for LingmoMappedKey {
+impl PartialEq for LINGMOMappedKey {
     fn eq(&self, other: &Self) -> bool {
         match (&self.0, &other.0) {
-            (LingmoMappedKeyInner::Window(weak1), LingmoMappedKeyInner::Window(weak2)) => {
+            (LINGMOMappedKeyInner::Window(weak1), LINGMOMappedKeyInner::Window(weak2)) => {
                 Weak::ptr_eq(weak1, weak2)
             }
-            (LingmoMappedKeyInner::Stack(weak1), LingmoMappedKeyInner::Stack(weak2)) => {
+            (LINGMOMappedKeyInner::Stack(weak1), LINGMOMappedKeyInner::Stack(weak2)) => {
                 Weak::ptr_eq(weak1, weak2)
             }
             _ => false,
         }
     }
 }
-impl Eq for LingmoMappedKey {}
+impl Eq for LINGMOMappedKey {}
 
-impl PartialEq<LingmoMappedKey> for LingmoMapped {
-    fn eq(&self, other: &LingmoMappedKey) -> bool {
+impl PartialEq<LINGMOMappedKey> for LINGMOMapped {
+    fn eq(&self, other: &LINGMOMappedKey) -> bool {
         match (&self.element, &other.0) {
-            (LingmoMappedInternal::Window(window), LingmoMappedKeyInner::Window(weak)) => {
+            (LINGMOMappedInternal::Window(window), LINGMOMappedKeyInner::Window(weak)) => {
                 Arc::as_ptr(&window.0.0) == weak.as_ptr()
             }
-            (LingmoMappedInternal::Stack(stack), LingmoMappedKeyInner::Stack(weak)) => {
+            (LINGMOMappedInternal::Stack(stack), LINGMOMappedKeyInner::Stack(weak)) => {
                 Arc::as_ptr(&stack.0.0) == weak.as_ptr()
             }
             _ => false,
@@ -182,67 +182,67 @@ impl PartialEq<LingmoMappedKey> for LingmoMapped {
     }
 }
 
-impl PartialEq for LingmoMapped {
+impl PartialEq for LINGMOMapped {
     fn eq(&self, other: &Self) -> bool {
         self.element == other.element
     }
 }
 
-impl Eq for LingmoMapped {}
+impl Eq for LINGMOMapped {}
 
-impl Hash for LingmoMapped {
+impl Hash for LINGMOMapped {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.element.hash(state)
     }
 }
 
-impl LingmoMapped {
-    pub fn windows(&self) -> impl Iterator<Item = (LingmoSurface, Point<i32, Logical>)> + '_ {
+impl LINGMOMapped {
+    pub fn windows(&self) -> impl Iterator<Item = (LINGMOSurface, Point<i32, Logical>)> + '_ {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => {
+            LINGMOMappedInternal::Stack(stack) => {
                 Box::new(stack.surfaces().map(|w| (w, stack.offset())))
-                    as Box<dyn Iterator<Item = (LingmoSurface, Point<i32, Logical>)>>
+                    as Box<dyn Iterator<Item = (LINGMOSurface, Point<i32, Logical>)>>
             }
-            LingmoMappedInternal::Window(window) => {
+            LINGMOMappedInternal::Window(window) => {
                 Box::new(std::iter::once((window.surface(), window.offset())))
             }
             _ => Box::new(std::iter::empty()),
         }
     }
 
-    pub fn active_window(&self) -> LingmoSurface {
+    pub fn active_window(&self) -> LINGMOSurface {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.active(),
-            LingmoMappedInternal::Window(win) => win.surface(),
+            LINGMOMappedInternal::Stack(stack) => stack.active(),
+            LINGMOMappedInternal::Window(win) => win.surface(),
             _ => unreachable!(),
         }
     }
 
-    pub fn has_active_window(&self, window: &LingmoSurface) -> bool {
+    pub fn has_active_window(&self, window: &LINGMOSurface) -> bool {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.has_active(window),
-            LingmoMappedInternal::Window(win) => win.contains_surface(window),
+            LINGMOMappedInternal::Stack(stack) => stack.has_active(window),
+            LINGMOMappedInternal::Window(win) => win.contains_surface(window),
             _ => unreachable!(),
         }
     }
 
     pub fn active_window_offset(&self) -> Point<i32, Logical> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.offset(),
-            LingmoMappedInternal::Window(window) => window.offset(),
+            LINGMOMappedInternal::Stack(stack) => stack.offset(),
+            LINGMOMappedInternal::Window(window) => window.offset(),
             _ => unreachable!(),
         }
     }
 
     pub fn active_window_geometry(&self) -> Rectangle<i32, Logical> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => {
+            LINGMOMappedInternal::Stack(stack) => {
                 let win = stack.active();
                 let location = stack.offset();
                 let size = win.geometry().size;
                 Rectangle::new(location, size)
             }
-            LingmoMappedInternal::Window(win) => {
+            LINGMOMappedInternal::Window(win) => {
                 let location = win.offset();
                 let size = win.geometry().size;
                 Rectangle::new(location, size)
@@ -253,15 +253,15 @@ impl LingmoMapped {
 
     pub fn set_active<S>(&self, window: &S)
     where
-        LingmoSurface: PartialEq<S>,
+        LINGMOSurface: PartialEq<S>,
     {
-        if let LingmoMappedInternal::Stack(stack) = &self.element {
+        if let LINGMOMappedInternal::Stack(stack) = &self.element {
             stack.set_active(window);
         }
     }
 
-    pub fn focus_window(&self, window: &LingmoSurface) {
-        if let LingmoMappedInternal::Stack(stack) = &self.element {
+    pub fn focus_window(&self, window: &LINGMOSurface) {
+        if let LINGMOMappedInternal::Stack(stack) = &self.element {
             stack.set_active(window)
         }
     }
@@ -289,8 +289,8 @@ impl LingmoMapped {
         seat: &Seat<State>,
     ) -> Option<(PointerFocusTarget, Point<f64, Logical>)> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.focus_under(relative_pos, surface_type),
-            LingmoMappedInternal::Window(window) => {
+            LINGMOMappedInternal::Stack(stack) => stack.focus_under(relative_pos, surface_type),
+            LINGMOMappedInternal::Window(window) => {
                 window.focus_under(relative_pos, surface_type, Some(seat))
             }
             _ => unreachable!(),
@@ -298,7 +298,7 @@ impl LingmoMapped {
     }
 
     pub fn handle_move(&self, direction: Direction) -> MoveResult {
-        if let LingmoMappedInternal::Stack(stack) = &self.element {
+        if let LINGMOMappedInternal::Stack(stack) = &self.element {
             stack.handle_move(direction)
         } else {
             MoveResult::Default
@@ -311,7 +311,7 @@ impl LingmoMapped {
         direction: FocusDirection,
         swap: Option<NodeDesc>,
     ) -> bool {
-        if let LingmoMappedInternal::Stack(stack) = &self.element {
+        if let LINGMOMappedInternal::Stack(stack) = &self.element {
             stack.handle_focus(seat, direction, swap)
         } else {
             false
@@ -320,10 +320,10 @@ impl LingmoMapped {
 
     pub fn set_resizing(&self, resizing: bool) {
         for window in match &self.element {
-            LingmoMappedInternal::Stack(s) => {
-                Box::new(s.surfaces()) as Box<dyn Iterator<Item = LingmoSurface>>
+            LINGMOMappedInternal::Stack(s) => {
+                Box::new(s.surfaces()) as Box<dyn Iterator<Item = LINGMOSurface>>
             }
-            LingmoMappedInternal::Window(w) => Box::new(std::iter::once(w.surface())),
+            LINGMOMappedInternal::Window(w) => Box::new(std::iter::once(w.surface())),
             _ => unreachable!(),
         } {
             window.set_resizing(resizing);
@@ -332,8 +332,8 @@ impl LingmoMapped {
 
     pub fn is_resizing(&self, pending: bool) -> Option<bool> {
         let window = match &self.element {
-            LingmoMappedInternal::Stack(s) => s.active(),
-            LingmoMappedInternal::Window(w) => w.surface(),
+            LINGMOMappedInternal::Stack(s) => s.active(),
+            LINGMOMappedInternal::Window(w) => w.surface(),
             _ => unreachable!(),
         };
 
@@ -342,16 +342,16 @@ impl LingmoMapped {
 
     pub fn set_tiled(&self, tiled: bool) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.set_tiled(tiled),
-            LingmoMappedInternal::Window(w) => w.set_tiled(tiled),
+            LINGMOMappedInternal::Stack(s) => s.set_tiled(tiled),
+            LINGMOMappedInternal::Window(w) => w.set_tiled(tiled),
             _ => unreachable!(),
         }
     }
 
     pub fn is_tiled(&self, pending: bool) -> Option<bool> {
         let window = match &self.element {
-            LingmoMappedInternal::Stack(s) => s.active(),
-            LingmoMappedInternal::Window(w) => w.surface(),
+            LINGMOMappedInternal::Stack(s) => s.active(),
+            LINGMOMappedInternal::Window(w) => w.surface(),
             _ => unreachable!(),
         };
 
@@ -360,10 +360,10 @@ impl LingmoMapped {
 
     pub fn set_fullscreen(&self, fullscreen: bool) {
         for window in match &self.element {
-            LingmoMappedInternal::Stack(s) => {
-                Box::new(s.surfaces()) as Box<dyn Iterator<Item = LingmoSurface>>
+            LINGMOMappedInternal::Stack(s) => {
+                Box::new(s.surfaces()) as Box<dyn Iterator<Item = LINGMOSurface>>
             }
-            LingmoMappedInternal::Window(w) => Box::new(std::iter::once(w.surface())),
+            LINGMOMappedInternal::Window(w) => Box::new(std::iter::once(w.surface())),
             _ => unreachable!(),
         } {
             window.set_fullscreen(fullscreen);
@@ -372,8 +372,8 @@ impl LingmoMapped {
 
     pub fn is_fullscreen(&self, pending: bool) -> bool {
         let window = match &self.element {
-            LingmoMappedInternal::Stack(s) => s.active(),
-            LingmoMappedInternal::Window(w) => w.surface(),
+            LINGMOMappedInternal::Stack(s) => s.active(),
+            LINGMOMappedInternal::Window(w) => w.surface(),
             _ => unreachable!(),
         };
 
@@ -382,10 +382,10 @@ impl LingmoMapped {
 
     pub fn set_maximized(&self, maximized: bool) {
         for window in match &self.element {
-            LingmoMappedInternal::Stack(s) => {
-                Box::new(s.surfaces()) as Box<dyn Iterator<Item = LingmoSurface>>
+            LINGMOMappedInternal::Stack(s) => {
+                Box::new(s.surfaces()) as Box<dyn Iterator<Item = LINGMOSurface>>
             }
-            LingmoMappedInternal::Window(w) => Box::new(std::iter::once(w.surface())),
+            LINGMOMappedInternal::Window(w) => Box::new(std::iter::once(w.surface())),
             _ => unreachable!(),
         } {
             window.set_maximized(maximized)
@@ -394,8 +394,8 @@ impl LingmoMapped {
 
     pub fn is_maximized(&self, pending: bool) -> bool {
         let window = match &self.element {
-            LingmoMappedInternal::Stack(s) => s.active(),
-            LingmoMappedInternal::Window(w) => w.surface(),
+            LINGMOMappedInternal::Stack(s) => s.active(),
+            LINGMOMappedInternal::Window(w) => w.surface(),
             _ => unreachable!(),
         };
 
@@ -404,16 +404,16 @@ impl LingmoMapped {
 
     pub fn set_activated(&self, activated: bool) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.set_activate(activated),
-            LingmoMappedInternal::Window(w) => w.set_activate(activated),
+            LINGMOMappedInternal::Stack(s) => s.set_activate(activated),
+            LINGMOMappedInternal::Window(w) => w.set_activate(activated),
             _ => unreachable!(),
         }
     }
 
     pub fn is_activated(&self, pending: bool) -> bool {
         let window = match &self.element {
-            LingmoMappedInternal::Stack(s) => s.active(),
-            LingmoMappedInternal::Window(w) => w.surface(),
+            LINGMOMappedInternal::Stack(s) => s.active(),
+            LINGMOMappedInternal::Window(w) => w.surface(),
             _ => unreachable!(),
         };
 
@@ -432,48 +432,48 @@ impl LingmoMapped {
 
     pub fn pending_size(&self) -> Option<Size<i32, Logical>> {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.pending_size(),
-            LingmoMappedInternal::Window(w) => w.pending_size(),
+            LINGMOMappedInternal::Stack(s) => s.pending_size(),
+            LINGMOMappedInternal::Window(w) => w.pending_size(),
             _ => unreachable!(),
         }
     }
 
     pub fn last_server_size(&self) -> Option<Size<i32, Logical>> {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.last_server_size(),
-            LingmoMappedInternal::Window(w) => w.last_server_size(),
+            LINGMOMappedInternal::Stack(s) => s.last_server_size(),
+            LINGMOMappedInternal::Window(w) => w.last_server_size(),
             _ => unreachable!(),
         }
     }
 
     pub fn set_geometry(&self, geo: Rectangle<i32, Global>) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.set_geometry(geo),
-            LingmoMappedInternal::Window(w) => w.set_geometry(geo),
+            LINGMOMappedInternal::Stack(s) => s.set_geometry(geo),
+            LINGMOMappedInternal::Window(w) => w.set_geometry(geo),
             _ => {}
         }
     }
 
     pub fn on_commit(&self, surface: &WlSurface) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.on_commit(surface),
-            LingmoMappedInternal::Window(w) => w.on_commit(surface),
+            LINGMOMappedInternal::Stack(s) => s.on_commit(surface),
+            LINGMOMappedInternal::Window(w) => w.on_commit(surface),
             _ => {}
         }
     }
 
     pub fn min_size(&self) -> Option<Size<i32, Logical>> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.min_size(),
-            LingmoMappedInternal::Window(window) => window.min_size(),
+            LINGMOMappedInternal::Stack(stack) => stack.min_size(),
+            LINGMOMappedInternal::Window(window) => window.min_size(),
             _ => unreachable!(),
         }
     }
 
     pub fn max_size(&self) -> Option<Size<i32, Logical>> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.max_size(),
-            LingmoMappedInternal::Window(window) => window.max_size(),
+            LINGMOMappedInternal::Stack(stack) => stack.max_size(),
+            LINGMOMappedInternal::Window(window) => window.max_size(),
             _ => unreachable!(),
         }
     }
@@ -487,30 +487,30 @@ impl LingmoMapped {
 
     pub fn latest_size_committed(&self) -> bool {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.surfaces().any(|s| s.latest_size_committed()),
-            LingmoMappedInternal::Window(w) => w.surface().latest_size_committed(),
+            LINGMOMappedInternal::Stack(s) => s.surfaces().any(|s| s.latest_size_committed()),
+            LINGMOMappedInternal::Window(w) => w.surface().latest_size_committed(),
             _ => unreachable!(),
         }
     }
 
     pub fn configure(&self) -> Option<Serial> {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => {
+            LINGMOMappedInternal::Stack(s) => {
                 let active = s.active();
                 for surface in s.surfaces().filter(|s| s != &active) {
                     surface.send_configure();
                 }
                 active.send_configure()
             }
-            LingmoMappedInternal::Window(w) => w.surface().send_configure(),
+            LINGMOMappedInternal::Window(w) => w.surface().send_configure(),
             _ => unreachable!(),
         }
     }
 
     pub fn send_close(&self) {
         let window = match &self.element {
-            LingmoMappedInternal::Stack(s) => s.active(),
-            LingmoMappedInternal::Window(w) => w.surface(),
+            LINGMOMappedInternal::Stack(s) => s.active(),
+            LINGMOMappedInternal::Window(w) => w.surface(),
             _ => unreachable!(),
         };
 
@@ -518,16 +518,16 @@ impl LingmoMapped {
     }
 
     pub fn is_window(&self) -> bool {
-        matches!(&self.element, LingmoMappedInternal::Window(_))
+        matches!(&self.element, LINGMOMappedInternal::Window(_))
     }
 
     pub fn is_stack(&self) -> bool {
-        matches!(&self.element, LingmoMappedInternal::Stack(_))
+        matches!(&self.element, LINGMOMappedInternal::Stack(_))
     }
 
-    pub fn stack_ref(&self) -> Option<&LingmoStack> {
+    pub fn stack_ref(&self) -> Option<&LINGMOStack> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => Some(stack),
+            LINGMOMappedInternal::Stack(stack) => Some(stack),
             _ => None,
         }
     }
@@ -535,15 +535,15 @@ impl LingmoMapped {
     pub fn convert_to_stack(
         &mut self,
         (output, overlap): (&Output, Rectangle<i32, Logical>),
-        theme: Lingmo::Theme,
+        theme: LINGMO::Theme,
         appearance: AppearanceConfig,
     ) {
-        if let LingmoMappedInternal::Window(window) = &self.element {
+        if let LINGMOMappedInternal::Window(window) = &self.element {
             let surface = window.surface();
             let activated = surface.is_activated(true);
             let handle = window.loop_handle();
 
-            let stack = LingmoStack::new(std::iter::once(surface), handle, theme, appearance);
+            let stack = LINGMOStack::new(std::iter::once(surface), handle, theme, appearance);
             if let Some(geo) = *self.last_geometry.lock().unwrap() {
                 stack.set_geometry(geo.to_global(output));
             }
@@ -552,21 +552,21 @@ impl LingmoMapped {
             stack.active().send_configure();
             stack.refresh();
 
-            self.element = LingmoMappedInternal::Stack(stack);
+            self.element = LINGMOMappedInternal::Stack(stack);
         }
     }
 
     pub fn convert_to_surface(
         &mut self,
-        surface: LingmoSurface,
+        surface: LINGMOSurface,
         (output, overlap): (&Output, Rectangle<i32, Logical>),
-        theme: Lingmo::Theme,
+        theme: LINGMO::Theme,
         appearance: AppearanceConfig,
     ) {
         let handle = self.loop_handle();
         surface.try_force_undecorated(false);
         surface.set_tiled(false);
-        let window = LingmoWindow::new(surface, handle, theme, appearance);
+        let window = LINGMOWindow::new(surface, handle, theme, appearance);
 
         if let Some(geo) = *self.last_geometry.lock().unwrap() {
             window.set_geometry(geo.to_global(output));
@@ -576,13 +576,13 @@ impl LingmoMapped {
         window.surface().send_configure();
         window.refresh();
 
-        self.element = LingmoMappedInternal::Window(window);
+        self.element = LINGMOMappedInternal::Window(window);
     }
 
     pub(super) fn loop_handle(&self) -> LoopHandle<'static, crate::state::State> {
         match &self.element {
-            LingmoMappedInternal::Stack(stack) => stack.loop_handle(),
-            LingmoMappedInternal::Window(window) => window.loop_handle(),
+            LINGMOMappedInternal::Stack(stack) => stack.loop_handle(),
+            LINGMOMappedInternal::Window(window) => window.loop_handle(),
             _ => unreachable!(),
         }
     }
@@ -607,14 +607,14 @@ impl LingmoMapped {
         scale: smithay::utils::Scale<f64>,
         alpha: f32,
         scanout_node: Option<DrmNode>,
-        push: &mut dyn FnMut(LingmoMappedRenderElement<R>),
+        push: &mut dyn FnMut(LINGMOMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoMappedRenderElement<R>: RenderElement<R>,
+        LINGMOMappedRenderElement<R>: RenderElement<R>,
     {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.push_popup_render_elements(
+            LINGMOMappedInternal::Stack(s) => s.push_popup_render_elements(
                 renderer,
                 location,
                 scale,
@@ -622,7 +622,7 @@ impl LingmoMapped {
                 scanout_node,
                 &mut |elem| push(elem.into()),
             ),
-            LingmoMappedInternal::Window(w) => w.push_popup_render_elements(
+            LINGMOMappedInternal::Window(w) => w.push_popup_render_elements(
                 renderer,
                 location,
                 scale,
@@ -646,16 +646,16 @@ impl LingmoMapped {
     where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoMappedRenderElement<R>: RenderElement<R>,
-        C: From<LingmoMappedRenderElement<R>>,
+        LINGMOMappedRenderElement<R>: RenderElement<R>,
+        C: From<LINGMOMappedRenderElement<R>>,
     {
         if !self.element.alive() {
             return None;
         }
 
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s
-                .shadow_render_element::<R, LingmoMappedRenderElement<R>>(
+            LINGMOMappedInternal::Stack(s) => s
+                .shadow_render_element::<R, LINGMOMappedRenderElement<R>>(
                     renderer,
                     location,
                     max_size,
@@ -664,8 +664,8 @@ impl LingmoMapped {
                     alpha,
                 )
                 .map(Into::into),
-            LingmoMappedInternal::Window(w) => w
-                .shadow_render_element::<R, LingmoMappedRenderElement<R>>(
+            LINGMOMappedInternal::Window(w) => w
+                .shadow_render_element::<R, LINGMOMappedRenderElement<R>>(
                     renderer,
                     location,
                     max_size,
@@ -687,12 +687,12 @@ impl LingmoMapped {
         alpha: f32,
         scanout_override: Option<bool>,
         scanout_node: Option<DrmNode>,
-        push_above: &mut dyn FnMut(LingmoMappedRenderElement<R>),
-        push_below: &mut dyn FnMut(LingmoMappedRenderElement<R>),
+        push_above: &mut dyn FnMut(LINGMOMappedRenderElement<R>),
+        push_below: &mut dyn FnMut(LINGMOMappedRenderElement<R>),
     ) where
         R: AsGlowRenderer,
         R::TextureId: Send + Clone + 'static,
-        LingmoMappedRenderElement<R>: RenderElement<R>,
+        LINGMOMappedRenderElement<R>: RenderElement<R>,
     {
         #[cfg(feature = "debug")]
         if let Some(debug) = self.debug.lock().unwrap().as_mut() {
@@ -749,13 +749,13 @@ impl LingmoMapped {
                                             ui.label("🗖");
                                         }
                                         if window.is_fullscreen(true) {
-                                            ui.label("???);
+                                            ui.label("⬜");
                                         }
                                         if window.is_activated(true) {
                                             ui.label("🖱");
                                         }
                                         if window.is_resizing(true).is_some() {
-                                            ui.label("???);
+                                            ui.label("↔");
                                         }
                                     });
 
@@ -864,7 +864,7 @@ impl LingmoMapped {
         };
 
         match &self.element {
-            LingmoMappedInternal::Stack(s) => s.push_render_elements(
+            LINGMOMappedInternal::Stack(s) => s.push_render_elements(
                 renderer,
                 location,
                 max_size,
@@ -875,7 +875,7 @@ impl LingmoMapped {
                 &mut |elem| push_above(elem.into()),
                 &mut |elem| push_below(elem.into()),
             ),
-            LingmoMappedInternal::Window(w) => w.push_render_elements(
+            LINGMOMappedInternal::Window(w) => w.push_render_elements(
                 renderer,
                 location,
                 max_size,
@@ -890,37 +890,37 @@ impl LingmoMapped {
         }
     }
 
-    pub(crate) fn update_theme(&self, theme: Lingmo::Theme) {
+    pub(crate) fn update_theme(&self, theme: LINGMO::Theme) {
         match &self.element {
-            LingmoMappedInternal::Window(w) => w.set_theme(theme),
-            LingmoMappedInternal::Stack(s) => s.set_theme(theme),
-            LingmoMappedInternal::_GenericCatcher(_) => {}
+            LINGMOMappedInternal::Window(w) => w.set_theme(theme),
+            LINGMOMappedInternal::Stack(s) => s.set_theme(theme),
+            LINGMOMappedInternal::_GenericCatcher(_) => {}
         }
     }
 
     pub(crate) fn update_appearance_conf(&self, appearance: &AppearanceConfig) {
         match &self.element {
-            LingmoMappedInternal::Window(w) => w.update_appearance_conf(appearance),
-            LingmoMappedInternal::Stack(s) => s.update_appearance_conf(appearance),
-            LingmoMappedInternal::_GenericCatcher(_) => {}
+            LINGMOMappedInternal::Window(w) => w.update_appearance_conf(appearance),
+            LINGMOMappedInternal::Stack(s) => s.update_appearance_conf(appearance),
+            LINGMOMappedInternal::_GenericCatcher(_) => {}
         }
     }
 
     pub(crate) fn force_redraw(&self) {
         match &self.element {
-            LingmoMappedInternal::Window(w) => w.force_redraw(),
-            LingmoMappedInternal::Stack(s) => s.force_redraw(),
-            LingmoMappedInternal::_GenericCatcher(_) => {}
+            LINGMOMappedInternal::Window(w) => w.force_redraw(),
+            LINGMOMappedInternal::Stack(s) => s.force_redraw(),
+            LINGMOMappedInternal::_GenericCatcher(_) => {}
         }
     }
 
-    pub fn key(&self) -> LingmoMappedKey {
-        LingmoMappedKey(match &self.element {
-            LingmoMappedInternal::Stack(stack) => {
-                LingmoMappedKeyInner::Stack(Arc::downgrade(&stack.0.0))
+    pub fn key(&self) -> LINGMOMappedKey {
+        LINGMOMappedKey(match &self.element {
+            LINGMOMappedInternal::Stack(stack) => {
+                LINGMOMappedKeyInner::Stack(Arc::downgrade(&stack.0.0))
             }
-            LingmoMappedInternal::Window(window) => {
-                LingmoMappedKeyInner::Window(Arc::downgrade(&window.0.0))
+            LINGMOMappedInternal::Window(window) => {
+                LINGMOMappedKeyInner::Window(Arc::downgrade(&window.0.0))
             }
             _ => unreachable!(),
         })
@@ -928,29 +928,29 @@ impl LingmoMapped {
 
     pub fn ssd_height(&self, pending: bool) -> Option<i32> {
         match &self.element {
-            LingmoMappedInternal::Window(w) => (!w.surface().is_decorated(pending))
+            LINGMOMappedInternal::Window(w) => (!w.surface().is_decorated(pending))
                 .then_some(crate::shell::element::window::SSD_HEIGHT),
-            LingmoMappedInternal::Stack(_) => Some(crate::shell::element::stack::TAB_HEIGHT),
+            LINGMOMappedInternal::Stack(_) => Some(crate::shell::element::stack::TAB_HEIGHT),
             _ => unreachable!(),
         }
     }
 
     pub fn corner_radius(&self, geometry_size: Size<i32, Logical>, default_radius: u8) -> [u8; 4] {
         match &self.element {
-            LingmoMappedInternal::Window(w) => w.corner_radius(geometry_size, default_radius),
-            LingmoMappedInternal::Stack(s) => s.corner_radius(geometry_size, default_radius),
+            LINGMOMappedInternal::Window(w) => w.corner_radius(geometry_size, default_radius),
+            LINGMOMappedInternal::Stack(s) => s.corner_radius(geometry_size, default_radius),
             _ => unreachable!(),
         }
     }
 }
 
-impl IsAlive for LingmoMapped {
+impl IsAlive for LINGMOMapped {
     fn alive(&self) -> bool {
         self.element.alive()
     }
 }
 
-impl SpaceElement for LingmoMapped {
+impl SpaceElement for LINGMOMapped {
     fn bbox(&self) -> Rectangle<i32, Logical> {
         SpaceElement::bbox(&self.element)
     }
@@ -978,13 +978,13 @@ impl SpaceElement for LingmoMapped {
     }
 }
 
-impl X11Relatable for LingmoMapped {
+impl X11Relatable for LINGMOMapped {
     fn is_window(&self, window: &X11Surface) -> bool {
         self.active_window().x11_surface() == Some(window)
     }
 }
 
-impl KeyboardTarget<State> for LingmoMapped {
+impl KeyboardTarget<State> for LINGMOMapped {
     fn enter(
         &self,
         seat: &Seat<State>,
@@ -993,15 +993,15 @@ impl KeyboardTarget<State> for LingmoMapped {
         serial: Serial,
     ) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => KeyboardTarget::enter(s, seat, data, keys, serial),
-            LingmoMappedInternal::Window(w) => KeyboardTarget::enter(w, seat, data, keys, serial),
+            LINGMOMappedInternal::Stack(s) => KeyboardTarget::enter(s, seat, data, keys, serial),
+            LINGMOMappedInternal::Window(w) => KeyboardTarget::enter(w, seat, data, keys, serial),
             _ => {}
         }
     }
     fn leave(&self, seat: &Seat<State>, data: &mut State, serial: Serial) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => KeyboardTarget::leave(s, seat, data, serial),
-            LingmoMappedInternal::Window(w) => KeyboardTarget::leave(w, seat, data, serial),
+            LINGMOMappedInternal::Stack(s) => KeyboardTarget::leave(s, seat, data, serial),
+            LINGMOMappedInternal::Window(w) => KeyboardTarget::leave(w, seat, data, serial),
             _ => {}
         }
     }
@@ -1015,10 +1015,10 @@ impl KeyboardTarget<State> for LingmoMapped {
         time: u32,
     ) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => {
+            LINGMOMappedInternal::Stack(s) => {
                 KeyboardTarget::key(s, seat, data, key, state, serial, time)
             }
-            LingmoMappedInternal::Window(w) => {
+            LINGMOMappedInternal::Window(w) => {
                 KeyboardTarget::key(w, seat, data, key, state, serial, time)
             }
             _ => {}
@@ -1032,10 +1032,10 @@ impl KeyboardTarget<State> for LingmoMapped {
         serial: Serial,
     ) {
         match &self.element {
-            LingmoMappedInternal::Stack(s) => {
+            LINGMOMappedInternal::Stack(s) => {
                 KeyboardTarget::modifiers(s, seat, data, modifiers, serial)
             }
-            LingmoMappedInternal::Window(w) => {
+            LINGMOMappedInternal::Window(w) => {
                 KeyboardTarget::modifiers(w, seat, data, modifiers, serial)
             }
             _ => {}
@@ -1043,13 +1043,13 @@ impl KeyboardTarget<State> for LingmoMapped {
     }
 }
 
-impl WaylandFocus for LingmoMapped {
+impl WaylandFocus for LINGMOMapped {
     fn wl_surface(&self) -> Option<Cow<'_, WlSurface>> {
         match &self.element {
-            LingmoMappedInternal::Window(w) => {
+            LINGMOMappedInternal::Window(w) => {
                 w.surface().wl_surface().map(|s| Cow::Owned(s.into_owned()))
             }
-            LingmoMappedInternal::Stack(s) => {
+            LINGMOMappedInternal::Stack(s) => {
                 s.active().wl_surface().map(|s| Cow::Owned(s.into_owned()))
             }
             _ => None,
@@ -1058,17 +1058,17 @@ impl WaylandFocus for LingmoMapped {
 
     fn same_client_as(&self, object_id: &ObjectId) -> bool {
         match &self.element {
-            LingmoMappedInternal::Window(w) => w.surface().same_client_as(object_id),
-            LingmoMappedInternal::Stack(s) => s.active().same_client_as(object_id),
+            LINGMOMappedInternal::Window(w) => w.surface().same_client_as(object_id),
+            LINGMOMappedInternal::Stack(s) => s.active().same_client_as(object_id),
             _ => false,
         }
     }
 }
 
-impl From<LingmoWindow> for LingmoMapped {
-    fn from(w: LingmoWindow) -> Self {
-        LingmoMapped {
-            element: LingmoMappedInternal::Window(w),
+impl From<LINGMOWindow> for LINGMOMapped {
+    fn from(w: LINGMOWindow) -> Self {
+        LINGMOMapped {
+            element: LINGMOMappedInternal::Window(w),
             maximized_state: Arc::new(Mutex::new(None)),
             tiling_node_id: Arc::new(Mutex::new(None)),
             resize_state: Arc::new(Mutex::new(None)),
@@ -1082,10 +1082,10 @@ impl From<LingmoWindow> for LingmoMapped {
     }
 }
 
-impl From<LingmoStack> for LingmoMapped {
-    fn from(s: LingmoStack) -> Self {
-        LingmoMapped {
-            element: LingmoMappedInternal::Stack(s),
+impl From<LINGMOStack> for LINGMOMapped {
+    fn from(s: LINGMOStack) -> Self {
+        LINGMOMapped {
+            element: LINGMOMappedInternal::Stack(s),
             maximized_state: Arc::new(Mutex::new(None)),
             tiling_node_id: Arc::new(Mutex::new(None)),
             resize_state: Arc::new(Mutex::new(None)),
@@ -1099,34 +1099,34 @@ impl From<LingmoStack> for LingmoMapped {
     }
 }
 
-pub enum LingmoMappedRenderElement<R>
+pub enum LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: 'static,
 {
-    Stack(self::stack::LingmoStackRenderElement<R>),
-    Window(self::window::LingmoWindowRenderElement<R>),
+    Stack(self::stack::LINGMOStackRenderElement<R>),
+    Window(self::window::LINGMOWindowRenderElement<R>),
     TiledStack(
         CropRenderElement<
-            RelocateRenderElement<RescaleRenderElement<self::stack::LingmoStackRenderElement<R>>>,
+            RelocateRenderElement<RescaleRenderElement<self::stack::LINGMOStackRenderElement<R>>>,
         >,
     ),
     TiledWindow(
         CropRenderElement<
-            RelocateRenderElement<RescaleRenderElement<self::window::LingmoWindowRenderElement<R>>>,
+            RelocateRenderElement<RescaleRenderElement<self::window::LINGMOWindowRenderElement<R>>>,
         >,
     ),
     TiledOverlay(
         CropRenderElement<RelocateRenderElement<RescaleRenderElement<PixelShaderElement>>>,
     ),
     MovingStack(
-        RelocateRenderElement<RescaleRenderElement<self::stack::LingmoStackRenderElement<R>>>,
+        RelocateRenderElement<RescaleRenderElement<self::stack::LINGMOStackRenderElement<R>>>,
     ),
     MovingWindow(
-        RelocateRenderElement<RescaleRenderElement<self::window::LingmoWindowRenderElement<R>>>,
+        RelocateRenderElement<RescaleRenderElement<self::window::LINGMOWindowRenderElement<R>>>,
     ),
-    GrabbedStack(RescaleRenderElement<self::stack::LingmoStackRenderElement<R>>),
-    GrabbedWindow(RescaleRenderElement<self::window::LingmoWindowRenderElement<R>>),
+    GrabbedStack(RescaleRenderElement<self::stack::LINGMOStackRenderElement<R>>),
+    GrabbedWindow(RescaleRenderElement<self::window::LINGMOWindowRenderElement<R>>),
     FocusIndicator(PixelShaderElement),
     Overlay(PixelShaderElement),
     StackHoverIndicator(IcedRenderElement<R>),
@@ -1134,122 +1134,122 @@ where
     Egui(TextureRenderElement<GlesTexture>),
 }
 
-impl<R> Element for LingmoMappedRenderElement<R>
+impl<R> Element for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
 {
     fn id(&self) -> &smithay::backend::renderer::element::Id {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.id(),
-            LingmoMappedRenderElement::Window(elem) => elem.id(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.id(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.id(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.id(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.id(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.id(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.id(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.id(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.id(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.id(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.id(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.id(),
+            LINGMOMappedRenderElement::Window(elem) => elem.id(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.id(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.id(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.id(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.id(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.id(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.id(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.id(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.id(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.id(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.id(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.id(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.id(),
         }
     }
 
     fn current_commit(&self) -> smithay::backend::renderer::utils::CommitCounter {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::Window(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.current_commit(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::Window(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.current_commit(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.current_commit(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.current_commit(),
         }
     }
 
     fn src(&self) -> Rectangle<f64, smithay::utils::Buffer> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.src(),
-            LingmoMappedRenderElement::Window(elem) => elem.src(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.src(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.src(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.src(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.src(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.src(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.src(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.src(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.src(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.src(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.src(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.src(),
+            LINGMOMappedRenderElement::Window(elem) => elem.src(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.src(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.src(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.src(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.src(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.src(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.src(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.src(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.src(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.src(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.src(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.src(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.src(),
         }
     }
 
     fn geometry(&self, scale: Scale<f64>) -> Rectangle<i32, Physical> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::Window(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::Overlay(elem) => elem.geometry(scale),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::Stack(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::Window(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.geometry(scale),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.geometry(scale),
+            LINGMOMappedRenderElement::Egui(elem) => elem.geometry(scale),
         }
     }
 
     fn location(&self, scale: Scale<f64>) -> Point<i32, Physical> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.location(scale),
-            LingmoMappedRenderElement::Window(elem) => elem.location(scale),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.location(scale),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.location(scale),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.location(scale),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.location(scale),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.location(scale),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.location(scale),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.location(scale),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.location(scale),
-            LingmoMappedRenderElement::Overlay(elem) => elem.location(scale),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::Stack(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::Window(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.location(scale),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.location(scale),
+            LINGMOMappedRenderElement::Egui(elem) => elem.location(scale),
         }
     }
 
     fn transform(&self) -> smithay::utils::Transform {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.transform(),
-            LingmoMappedRenderElement::Window(elem) => elem.transform(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.transform(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.transform(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.transform(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.transform(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.transform(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.transform(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.transform(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.transform(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.transform(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.transform(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.transform(),
+            LINGMOMappedRenderElement::Window(elem) => elem.transform(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.transform(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.transform(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.transform(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.transform(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.transform(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.transform(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.transform(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.transform(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.transform(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.transform(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.transform(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.transform(),
         }
     }
 
@@ -1259,103 +1259,103 @@ where
         commit: Option<smithay::backend::renderer::utils::CommitCounter>,
     ) -> DamageSet<i32, Physical> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::Window(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::Overlay(elem) => elem.damage_since(scale, commit),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => {
+            LINGMOMappedRenderElement::Stack(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::Window(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => {
                 elem.damage_since(scale, commit)
             }
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.damage_since(scale, commit),
+            LINGMOMappedRenderElement::Egui(elem) => elem.damage_since(scale, commit),
         }
     }
 
     fn opaque_regions(&self, scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::Window(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::Overlay(elem) => elem.opaque_regions(scale),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::Stack(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::Window(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.opaque_regions(scale),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.opaque_regions(scale),
+            LINGMOMappedRenderElement::Egui(elem) => elem.opaque_regions(scale),
         }
     }
 
     fn alpha(&self) -> f32 {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.alpha(),
-            LingmoMappedRenderElement::Window(elem) => elem.alpha(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.alpha(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.alpha(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.alpha(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.alpha(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.alpha(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.alpha(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.alpha(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.alpha(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.alpha(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::Window(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.alpha(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.alpha(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.alpha(),
         }
     }
 
     fn kind(&self) -> Kind {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.kind(),
-            LingmoMappedRenderElement::Window(elem) => elem.kind(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.kind(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.kind(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.kind(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.kind(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.kind(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.kind(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.kind(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.kind(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.kind(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.kind(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.kind(),
+            LINGMOMappedRenderElement::Window(elem) => elem.kind(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.kind(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.kind(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.kind(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.kind(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.kind(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.kind(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.kind(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.kind(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.kind(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.kind(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.kind(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.kind(),
         }
     }
 
     fn is_framebuffer_effect(&self) -> bool {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::Window(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::TiledOverlay(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::MovingStack(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::FocusIndicator(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::Overlay(elem) => elem.is_framebuffer_effect(),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::Stack(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::Window(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::Overlay(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => elem.is_framebuffer_effect(),
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => elem.is_framebuffer_effect(),
+            LINGMOMappedRenderElement::Egui(elem) => elem.is_framebuffer_effect(),
         }
     }
 }
 
-impl<R> RenderElement<R> for LingmoMappedRenderElement<R>
+impl<R> RenderElement<R> for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: Send + 'static,
@@ -1370,19 +1370,19 @@ where
         cache: Option<&UserDataMap>,
     ) -> Result<(), R::Error> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => {
+            LINGMOMappedRenderElement::Stack(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::Window(elem) => {
+            LINGMOMappedRenderElement::Window(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::TiledStack(elem) => {
+            LINGMOMappedRenderElement::TiledStack(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::TiledWindow(elem) => {
+            LINGMOMappedRenderElement::TiledWindow(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::TiledOverlay(elem) => RenderElement::<GlowRenderer>::draw(
+            LINGMOMappedRenderElement::TiledOverlay(elem) => RenderElement::<GlowRenderer>::draw(
                 elem,
                 R::glow_frame_mut(frame),
                 src,
@@ -1392,19 +1392,19 @@ where
                 cache,
             )
             .map_err(R::from_gles_error),
-            LingmoMappedRenderElement::MovingStack(elem) => {
+            LINGMOMappedRenderElement::MovingStack(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::MovingWindow(elem) => {
+            LINGMOMappedRenderElement::MovingWindow(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::GrabbedStack(elem) => {
+            LINGMOMappedRenderElement::GrabbedStack(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::GrabbedWindow(elem) => {
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
-            LingmoMappedRenderElement::FocusIndicator(elem) => RenderElement::<GlowRenderer>::draw(
+            LINGMOMappedRenderElement::FocusIndicator(elem) => RenderElement::<GlowRenderer>::draw(
                 elem,
                 R::glow_frame_mut(frame),
                 src,
@@ -1414,7 +1414,7 @@ where
                 cache,
             )
             .map_err(R::from_gles_error),
-            LingmoMappedRenderElement::Overlay(elem) => RenderElement::<GlowRenderer>::draw(
+            LINGMOMappedRenderElement::Overlay(elem) => RenderElement::<GlowRenderer>::draw(
                 elem,
                 R::glow_frame_mut(frame),
                 src,
@@ -1424,11 +1424,11 @@ where
                 cache,
             )
             .map_err(R::from_gles_error),
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => {
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => {
                 elem.draw(frame, src, dst, damage, opaque_regions, cache)
             }
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => {
+            LINGMOMappedRenderElement::Egui(elem) => {
                 let glow_frame = R::glow_frame_mut(frame);
                 RenderElement::<GlowRenderer>::draw(
                     elem,
@@ -1446,28 +1446,28 @@ where
 
     fn underlying_storage(&self, renderer: &mut R) -> Option<UnderlyingStorage<'_>> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::Window(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::TiledStack(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::TiledWindow(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::TiledOverlay(elem) => {
+            LINGMOMappedRenderElement::Stack(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::Window(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::TiledStack(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::TiledWindow(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::TiledOverlay(elem) => {
                 elem.underlying_storage(renderer.glow_renderer_mut())
             }
-            LingmoMappedRenderElement::MovingStack(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::MovingWindow(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::GrabbedStack(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::GrabbedWindow(elem) => elem.underlying_storage(renderer),
-            LingmoMappedRenderElement::FocusIndicator(elem) => {
+            LINGMOMappedRenderElement::MovingStack(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::MovingWindow(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::GrabbedStack(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => elem.underlying_storage(renderer),
+            LINGMOMappedRenderElement::FocusIndicator(elem) => {
                 elem.underlying_storage(renderer.glow_renderer_mut())
             }
-            LingmoMappedRenderElement::Overlay(elem) => {
+            LINGMOMappedRenderElement::Overlay(elem) => {
                 elem.underlying_storage(renderer.glow_renderer_mut())
             }
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => {
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => {
                 elem.underlying_storage(renderer)
             }
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => {
+            LINGMOMappedRenderElement::Egui(elem) => {
                 let glow_renderer = renderer.glow_renderer_mut();
                 elem.underlying_storage(glow_renderer)
             }
@@ -1482,19 +1482,19 @@ where
         cache: &UserDataMap,
     ) -> Result<(), R::Error> {
         match self {
-            LingmoMappedRenderElement::Stack(elem) => {
+            LINGMOMappedRenderElement::Stack(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::Window(elem) => {
+            LINGMOMappedRenderElement::Window(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::TiledStack(elem) => {
+            LINGMOMappedRenderElement::TiledStack(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::TiledWindow(elem) => {
+            LINGMOMappedRenderElement::TiledWindow(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::TiledOverlay(elem) => {
+            LINGMOMappedRenderElement::TiledOverlay(elem) => {
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem,
                     R::glow_frame_mut(frame),
@@ -1504,19 +1504,19 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            LingmoMappedRenderElement::MovingStack(elem) => {
+            LINGMOMappedRenderElement::MovingStack(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::MovingWindow(elem) => {
+            LINGMOMappedRenderElement::MovingWindow(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::GrabbedStack(elem) => {
+            LINGMOMappedRenderElement::GrabbedStack(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::GrabbedWindow(elem) => {
+            LINGMOMappedRenderElement::GrabbedWindow(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
-            LingmoMappedRenderElement::FocusIndicator(elem) => {
+            LINGMOMappedRenderElement::FocusIndicator(elem) => {
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem,
                     R::glow_frame_mut(frame),
@@ -1526,7 +1526,7 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            LingmoMappedRenderElement::Overlay(elem) => {
+            LINGMOMappedRenderElement::Overlay(elem) => {
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem,
                     R::glow_frame_mut(frame),
@@ -1536,11 +1536,11 @@ where
                 )
                 .map_err(R::from_gles_error)
             }
-            LingmoMappedRenderElement::StackHoverIndicator(elem) => {
+            LINGMOMappedRenderElement::StackHoverIndicator(elem) => {
                 elem.capture_framebuffer(frame, src, dst, cache)
             }
             #[cfg(feature = "debug")]
-            LingmoMappedRenderElement::Egui(elem) => {
+            LINGMOMappedRenderElement::Egui(elem) => {
                 let glow_frame = R::glow_frame_mut(frame);
                 RenderElement::<GlowRenderer>::capture_framebuffer(
                     elem, glow_frame, src, dst, cache,
@@ -1551,59 +1551,57 @@ where
     }
 }
 
-impl<R> From<stack::LingmoStackRenderElement<R>> for LingmoMappedRenderElement<R>
+impl<R> From<stack::LINGMOStackRenderElement<R>> for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LINGMOMappedRenderElement<R>: RenderElement<R>,
 {
-    fn from(elem: stack::LingmoStackRenderElement<R>) -> Self {
-        LingmoMappedRenderElement::Stack(elem)
+    fn from(elem: stack::LINGMOStackRenderElement<R>) -> Self {
+        LINGMOMappedRenderElement::Stack(elem)
     }
 }
-impl<R> From<window::LingmoWindowRenderElement<R>> for LingmoMappedRenderElement<R>
+impl<R> From<window::LINGMOWindowRenderElement<R>> for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LINGMOMappedRenderElement<R>: RenderElement<R>,
 {
-    fn from(elem: window::LingmoWindowRenderElement<R>) -> Self {
-        LingmoMappedRenderElement::Window(elem)
+    fn from(elem: window::LINGMOWindowRenderElement<R>) -> Self {
+        LINGMOMappedRenderElement::Window(elem)
     }
 }
 
-impl<R> From<PixelShaderElement> for LingmoMappedRenderElement<R>
+impl<R> From<PixelShaderElement> for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LINGMOMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: PixelShaderElement) -> Self {
-        LingmoMappedRenderElement::FocusIndicator(elem)
+        LINGMOMappedRenderElement::FocusIndicator(elem)
     }
 }
 
-impl<R> From<IcedRenderElement<R>> for LingmoMappedRenderElement<R>
+impl<R> From<IcedRenderElement<R>> for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LINGMOMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: IcedRenderElement<R>) -> Self {
-        LingmoMappedRenderElement::StackHoverIndicator(elem)
+        LINGMOMappedRenderElement::StackHoverIndicator(elem)
     }
 }
 
 #[cfg(feature = "debug")]
-impl<R> From<TextureRenderElement<GlesTexture>> for LingmoMappedRenderElement<R>
+impl<R> From<TextureRenderElement<GlesTexture>> for LINGMOMappedRenderElement<R>
 where
     R: AsGlowRenderer,
     R::TextureId: 'static,
-    LingmoMappedRenderElement<R>: RenderElement<R>,
+    LINGMOMappedRenderElement<R>: RenderElement<R>,
 {
     fn from(elem: TextureRenderElement<GlesTexture>) -> Self {
-        LingmoMappedRenderElement::Egui(elem)
+        LINGMOMappedRenderElement::Egui(elem)
     }
 }
-
-

@@ -1,5 +1,5 @@
-use Lingmo_settings_config::shortcuts::State as KeyState;
-use Lingmo_settings_config::shortcuts::{self, Modifiers};
+use cosmic_settings_config::shortcuts::State as KeyState;
+use cosmic_settings_config::shortcuts::{self, Modifiers};
 use smithay::input::keyboard::ModifiersState;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -21,7 +21,7 @@ pub enum PrivateAction {
     ),
 }
 
-/// Convert `Lingmo_settings_config::shortcuts::State` to `smithay::backend::input::KeyState`.
+/// Convert `cosmic_settings_config::shortcuts::State` to `smithay::backend::input::KeyState`.
 pub fn Lingmo_keystate_to_smithay(value: KeyState) -> smithay::backend::input::KeyState {
     match value {
         KeyState::Pressed => smithay::backend::input::KeyState::Pressed,
@@ -29,7 +29,7 @@ pub fn Lingmo_keystate_to_smithay(value: KeyState) -> smithay::backend::input::K
     }
 }
 
-/// Convert `smithay::backend::input::KeyState` to `Lingmo_settings_config::shortcuts::State`.
+/// Convert `smithay::backend::input::KeyState` to `cosmic_settings_config::shortcuts::State`.
 pub fn Lingmo_keystate_from_smithay(value: smithay::backend::input::KeyState) -> KeyState {
     match value {
         smithay::backend::input::KeyState::Pressed => KeyState::Pressed,
@@ -37,7 +37,7 @@ pub fn Lingmo_keystate_from_smithay(value: smithay::backend::input::KeyState) ->
     }
 }
 
-/// Compare `Lingmo_settings_config::shortcuts::Modifiers` to `smithay::input::keyboard::ModifiersState`.
+/// Compare `cosmic_settings_config::shortcuts::Modifiers` to `smithay::input::keyboard::ModifiersState`.
 pub fn Lingmo_modifiers_eq_smithay(this: &Modifiers, other: &ModifiersState) -> bool {
     this.ctrl == other.ctrl
         && this.alt == other.alt
@@ -45,7 +45,7 @@ pub fn Lingmo_modifiers_eq_smithay(this: &Modifiers, other: &ModifiersState) -> 
         && this.logo == other.logo
 }
 
-/// Convert `smithay::input::keyboard::ModifiersState` to `Lingmo_settings_config::shortcuts::Modifiers`
+/// Convert `smithay::input::keyboard::ModifiersState` to `cosmic_settings_config::shortcuts::Modifiers`
 pub fn Lingmo_modifiers_from_smithay(value: ModifiersState) -> Modifiers {
     Modifiers {
         ctrl: value.ctrl,

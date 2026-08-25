@@ -10,9 +10,9 @@ use crate::{
     },
 };
 use anyhow::Context;
-use Lingmo_config::{ConfigGet, LingmoConfigEntry};
-use Lingmo_settings_config::window_rules::ApplicationException;
-use Lingmo_settings_config::{Shortcuts, shortcuts, window_rules};
+use cosmic_config::{ConfigGet, LingmoConfigEntry};
+use cosmic_settings_config::window_rules::ApplicationException;
+use cosmic_settings_config::{Shortcuts, shortcuts, window_rules};
 use serde::{Deserialize, Serialize};
 use smithay::utils::{Clock, Monotonic};
 use smithay::wayland::xdg_activation::XdgActivationState;
@@ -60,11 +60,11 @@ use types::WlXkbConfig;
 #[derive(Debug)]
 pub struct Config {
     pub dynamic_conf: DynamicConfig,
-    pub Lingmo_helper: Lingmo_config::Config,
+    pub Lingmo_helper: cosmic_config::Config,
     /// Lingmo-config comp configuration for `com.lingmoos.LingmoComp`
     pub Lingmo_conf: LingmoCompConfig,
     /// Lingmo-config context for `com.lingmoos.LingmoSettings.Shortcuts`
-    pub settings_context: Lingmo_config::Config,
+    pub settings_context: cosmic_config::Config,
     /// Key bindings from `com.lingmoos.LingmoSettings.Shortcuts`
     pub shortcuts: Shortcuts,
     // Tiling exceptions from `com.lingmoos.LingmoSettings.WindowRules`
@@ -170,8 +170,8 @@ pub enum ColorFilter {
 
 impl Config {
     pub fn load(loop_handle: &LoopHandle<'_, State>) -> Config {
-        let config = Lingmo_config::Config::new("com.lingmoos.LingmoComp", 1).unwrap();
-        let source = Lingmo_config::calloop::ConfigWatchSource::new(&config).unwrap();
+        let config = cosmic_config::Config::new("com.lingmoos.LingmoComp", 1).unwrap();
+        let source = cosmic_config::calloop::ConfigWatchSource::new(&config).unwrap();
         loop_handle
             .insert_source(source, |(config, keys), (), state| {
                 config_changed(config, keys, state);
@@ -190,7 +190,7 @@ impl Config {
             });
 
         // Listen for updates to the toolkit config
-        if let Ok(tk_config) = Lingmo_config::Config::new("com.lingmoos.LingmoTk", 1) {
+        if let Ok(tk_config) = cosmic_config::Config::new("com.lingmoos.LingmoTk", 1) {
             fn handle_new_toolkit_config(config: LingmoTk, state: &mut State) {
                 if Lingmo::icon_theme::default() != config.icon_theme {
                     Lingmo::icon_theme::set_default(config.icon_theme.clone());
@@ -217,7 +217,7 @@ impl Config {
                 handle_new_toolkit_config(config, state);
             });
 
-            match Lingmo_config::calloop::ConfigWatchSource::new(&tk_config) {
+            match cosmic_config::calloop::ConfigWatchSource::new(&tk_config) {
                 Ok(source) => {
                     if let Err(err) =
                         loop_handle.insert_source(source, |(config, _keys), (), state| {
@@ -249,7 +249,7 @@ impl Config {
         let shortcuts = shortcuts::shortcuts(&settings_context);
 
         // Listen for updates to the keybindings config.
-        match Lingmo_config::calloop::ConfigWatchSource::new(&settings_context) {
+        match cosmic_config::calloop::ConfigWatchSource::new(&settings_context) {
             Ok(source) => {
                 if let Err(err) = loop_handle.insert_source(source, |(config, keys), (), state| {
                     for key in keys {
@@ -284,7 +284,7 @@ impl Config {
             window_rules::context().expect("Failed to load window rules config");
         let tiling_exceptions = window_rules::tiling_exceptions(&window_rules_context);
 
-        match Lingmo_config::calloop::ConfigWatchSource::new(&window_rules_context) {
+        match cosmic_config::calloop::ConfigWatchSource::new(&window_rules_context) {
             Ok(source) => {
                 if let Err(err) = loop_handle.insert_source(source, |(config, keys), (), state| {
                     for key in keys {
@@ -744,7 +744,7 @@ pub fn xkb_config_to_wl(config: &XkbConfig) -> WlXkbConfig<'_> {
 }
 
 fn get_config<T: Default + serde::de::DeserializeOwned>(
-    config: &Lingmo_config::Config,
+    config: &cosmic_config::Config,
     key: &str,
 ) -> T {
     config.get(key).unwrap_or_else(|err| {
@@ -785,7 +785,7 @@ pub fn change_modifier_state(
     input(smithay_input::KeyState::Released, scan_code);
 }
 
-fn config_changed(config: Lingmo_config::Config, keys: Vec<String>, state: &mut State) {
+fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut State) {
     for key in &keys {
         match key.as_str() {
             "xkb_config" => {

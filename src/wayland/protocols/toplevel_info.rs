@@ -26,7 +26,7 @@ use crate::utils::prelude::{Global, OutputExt, RectGlobalExt};
 
 use super::workspace::{WorkspaceHandle, WorkspaceHandler, WorkspaceState};
 
-use Lingmo_protocols::toplevel_info::v1::server::{
+use cosmic_protocols::toplevel_info::v1::server::{
     zLingmo_toplevel_handle_v1::{self, State as States, ZLingmoToplevelHandleV1},
     zLingmo_toplevel_info_v1::{self, ZLingmoToplevelInfoV1},
 };
@@ -705,13 +705,13 @@ where
 macro_rules! delegate_toplevel_info {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty, $window: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::toplevel_info::v1::server::zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1: $crate::wayland::protocols::toplevel_info::ToplevelInfoGlobalData
+            cosmic_protocols::toplevel_info::v1::server::zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1: $crate::wayland::protocols::toplevel_info::ToplevelInfoGlobalData
         ] => $crate::wayland::protocols::toplevel_info::ToplevelInfoState<Self, $window>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::toplevel_info::v1::server::zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1: ()
+            cosmic_protocols::toplevel_info::v1::server::zLingmo_toplevel_info_v1::ZLingmoToplevelInfoV1: ()
         ] => $crate::wayland::protocols::toplevel_info::ToplevelInfoState<Self, $window>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::toplevel_info::v1::server::zLingmo_toplevel_handle_v1::ZLingmoToplevelHandleV1: $crate::wayland::protocols::toplevel_info::ToplevelHandleState<$window>
+            cosmic_protocols::toplevel_info::v1::server::zLingmo_toplevel_handle_v1::ZLingmoToplevelHandleV1: $crate::wayland::protocols::toplevel_info::ToplevelHandleState<$window>
         ] => $crate::wayland::protocols::toplevel_info::ToplevelInfoState<Self, $window>);
     };
 }

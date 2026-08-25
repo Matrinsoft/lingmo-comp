@@ -7,7 +7,7 @@ use std::{
 };
 
 use lingmo_comp_config::AppearanceConfig;
-use Lingmo_settings_config::shortcuts::action::ResizeDirection;
+use cosmic_settings_config::shortcuts::action::ResizeDirection;
 use keyframe::{ease, functions::EaseInOutCubic};
 use smallvec::SmallVec;
 use smithay::{

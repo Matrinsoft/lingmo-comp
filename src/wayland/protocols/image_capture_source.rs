@@ -2,7 +2,7 @@ use super::{
     workspace::{WorkspaceHandle, WorkspaceHandler},
 };
 use crate::shell::element::surface::WeakLingmoSurface;
-use Lingmo_protocols::image_capture_source::v1::server::{
+use cosmic_protocols::image_capture_source::v1::server::{
     zLingmo_workspace_image_capture_source_manager_v1::{
         Request as LingmoWorkspaceSourceRequest, ZLingmoWorkspaceImageCaptureSourceManagerV1,
     },

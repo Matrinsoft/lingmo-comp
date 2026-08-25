@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use Lingmo_settings_config::{shortcuts::action::Orientation, window_rules::ApplicationException};
+use cosmic_settings_config::{shortcuts::action::Orientation, window_rules::ApplicationException};
 use regex::{Regex, RegexSet};
 use smithay::{
     desktop::WindowSurface,

@@ -19,7 +19,7 @@ use Lingmo::{
     theme,
     widget::{icon::from_name, text},
 };
-use Lingmo_settings_config::shortcuts::action::{Action, ResizeDirection};
+use cosmic_settings_config::shortcuts::action::{Action, ResizeDirection};
 use smithay::{
     backend::renderer::ImportMem,
     desktop::space::SpaceElement,

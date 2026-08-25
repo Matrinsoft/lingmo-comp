@@ -1,5 +1,5 @@
 use calloop::LoopHandle;
-use Lingmo_settings_config::shortcuts;
+use cosmic_settings_config::shortcuts;
 use smithay::{
     input::{
         Seat,

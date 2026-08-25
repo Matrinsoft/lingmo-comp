@@ -1,4 +1,4 @@
-use Lingmo_settings_config::shortcuts;
+use cosmic_settings_config::shortcuts;
 use smithay::{
     backend::input::{KeyState, Keycode},
     input::{

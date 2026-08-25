@@ -26,10 +26,10 @@ use lingmo_comp_config::{
     AppearanceConfig, TileBehavior, ZoomConfig, ZoomMovement,
     workspace::{PinnedWorkspace, WorkspaceLayout, WorkspaceMode},
 };
-use Lingmo_config::ConfigSet;
-use Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::TilingState;
-use Lingmo_settings_config::shortcuts::action::{Direction, FocusDirection, ResizeDirection};
-use Lingmo_settings_config::{shortcuts, window_rules::ApplicationException};
+use cosmic_config::ConfigSet;
+use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
+use cosmic_settings_config::shortcuts::action::{Direction, FocusDirection, ResizeDirection};
+use cosmic_settings_config::{shortcuts, window_rules::ApplicationException};
 use keyframe::{ease, functions::EaseInOutCubic};
 use smithay::{
     backend::{input::TouchSlot, renderer::element::RenderElementStates},

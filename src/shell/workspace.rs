@@ -25,7 +25,7 @@ use lingmo_comp_config::AppearanceConfig;
 use lingmo_comp_config::workspace::{OutputMatch, PinnedWorkspace};
 
 use Lingmo::theme::LingmoTheme;
-use Lingmo_protocols::workspace::v2::server::zLingmo_workspace_handle_v2::TilingState;
+use cosmic_protocols::workspace::v2::server::zcosmic_workspace_handle_v2::TilingState;
 use id_tree::Tree;
 use indexmap::IndexSet;
 use keyframe::{ease, functions::EaseInOutCubic};

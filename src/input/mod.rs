@@ -5,8 +5,8 @@ use crate::{
     config::{
         Action, Config, PrivateAction,
         key_bindings::{
-            Lingmo_keystate_from_smithay, Lingmo_modifiers_eq_smithay,
-            Lingmo_modifiers_from_smithay,
+            LINGMO_keystate_from_smithay, LINGMO_modifiers_eq_smithay,
+            LINGMO_modifiers_from_smithay,
         },
     },
     input::gestures::{GestureState, SwipeAction},
@@ -33,9 +33,9 @@ use calloop::{
     RegistrationToken,
     timer::{TimeoutAction, Timer},
 };
-use lingmo_comp_config::{NumlockState, workspace::WorkspaceLayout};
-use Lingmo_settings_config::shortcuts;
-use Lingmo_settings_config::shortcuts::action::{Direction, ResizeDirection};
+use LINGMO_comp_config::{NumlockState, workspace::WorkspaceLayout};
+use LINGMO_settings_config::shortcuts;
+use LINGMO_settings_config::shortcuts::action::{Direction, ResizeDirection};
 #[cfg(feature = "logind")]
 use smithay::backend::input::{Switch, SwitchState, SwitchToggleEvent};
 use smithay::{
@@ -308,7 +308,7 @@ impl State {
 
                     // If we want to track numlock state so it can be reused on the next boot...
                     if let NumlockState::LastBoot =
-                        self.common.config.Lingmo_conf.keyboard_config.numlock_state
+                        self.common.config.LINGMO_conf.keyboard_config.numlock_state
                     {
                         // .. and the state has been updated ...
                         if self.common.config.dynamic_conf.numlock().last_state
@@ -336,6 +336,21 @@ impl State {
                     self.common.idle_notifier_state.notify_activity(&seat);
                     notify_cursor_activity(self, &seat);
                     let current_output = seat.active_output();
+
+                    if self.common.config.LINGMO_conf.cursor_shake_to_find
+                        && let Some(cursor_state) =
+                            seat.user_data()
+                                .get::<crate::backend::render::cursor::CursorState>()
+                    {
+                        let active = {
+                            let mut cursor = cursor_state.lock().unwrap();
+                            cursor.detect_shake(event.delta(), std::time::Instant::now());
+                            cursor.is_magnifying()
+                        };
+                        if active {
+                            self.backend.schedule_render(&current_output);
+                        }
+                    }
 
                     let mut position = seat.get_pointer().unwrap().current_location().as_global();
 
@@ -413,7 +428,7 @@ impl State {
                     // We constrain the position with:
                     // - output_geometry.size so that we don't send leave events to a fullscreen app
                     // - logical size so that the position doesn't end up outside the actual size of the output
-                    // See https://github.com/Matrinsoft/lingmo-comp/pull/2568
+                    // See https://github.com/pop-os/lingmo-comp/pull/2568
                     let max_x = (output_geometry_loc.x
                         + logical.w.min(output_geometry.size.w as f64))
                     .next_down();
@@ -435,7 +450,7 @@ impl State {
                             return;
                         }
                         //If the pointer isn't grabbed, we should check if the focused element should be updated
-                    } else if self.common.config.Lingmo_conf.focus_follows_cursor {
+                    } else if self.common.config.LINGMO_conf.focus_follows_cursor {
                         let shell = self.common.shell.read();
                         let old_keyboard_target =
                             State::element_under(original_position, &current_output, &shell, &seat);
@@ -475,7 +490,7 @@ impl State {
                                 let delay = calloop::timer::Timer::from_duration(
                                     //default to 250ms
                                     std::time::Duration::from_millis(
-                                        self.common.config.Lingmo_conf.focus_follows_cursor_delay,
+                                        self.common.config.LINGMO_conf.focus_follows_cursor_delay,
                                     ),
                                 );
                                 let seat = seat.clone();
@@ -661,7 +676,7 @@ impl State {
                     shell.update_focal_point(
                         &seat,
                         original_position,
-                        self.common.config.Lingmo_conf.accessibility_zoom.view_moves,
+                        self.common.config.LINGMO_conf.accessibility_zoom.view_moves,
                     );
 
                     if output != current_output {
@@ -948,7 +963,7 @@ impl State {
                                                         state
                                                             .common
                                                             .config
-                                                            .Lingmo_conf
+                                                            .LINGMO_conf
                                                             .edge_snap_threshold,
                                                         false,
                                                     );
@@ -1033,7 +1048,7 @@ impl State {
                         && self
                             .common
                             .config
-                            .Lingmo_conf
+                            .LINGMO_conf
                             .accessibility_zoom
                             .enable_mouse_zoom_shortcuts
                     {
@@ -1154,7 +1169,7 @@ impl State {
                         if first_update {
                             let mut natural_scroll = false;
                             if let Some(scroll_config) =
-                                &self.common.config.Lingmo_conf.input_touchpad.scroll_config
+                                &self.common.config.LINGMO_conf.input_touchpad.scroll_config
                                 && let Some(natural) = scroll_config.natural_scroll
                             {
                                 natural_scroll = natural;
@@ -1162,7 +1177,7 @@ impl State {
                             activate_action = match gesture_state.fingers {
                                 3 => None, // TODO: 3 finger gestures
                                 4 => {
-                                    if self.common.config.Lingmo_conf.workspaces.workspace_layout
+                                    if self.common.config.LINGMO_conf.workspaces.workspace_layout
                                         == WorkspaceLayout::Horizontal
                                     {
                                         match gesture_state.direction {
@@ -1250,7 +1265,7 @@ impl State {
                             Some(SwipeAction::NextWorkspace) | Some(SwipeAction::PrevWorkspace) => {
                                 let velocity = gesture_state.velocity();
                                 let norm_velocity =
-                                    if self.common.config.Lingmo_conf.workspaces.workspace_layout
+                                    if self.common.config.LINGMO_conf.workspaces.workspace_layout
                                         == WorkspaceLayout::Horizontal
                                     {
                                         velocity / seat.active_output().geometry().size.w as f64
@@ -1797,7 +1812,7 @@ impl State {
                         if !closed {
                             tracing::warn!(?err, "Failed to re-enable internal connector");
                             if let Some(output) = output {
-                                use lingmo_comp_config::output::comp::OutputState;
+                                use LINGMO_comp_config::output::comp::OutputState;
 
                                 output.config_mut().enabled = OutputState::Disabled;
                                 if let Err(err) = self.refresh_output_config() {
@@ -2099,7 +2114,7 @@ impl State {
                 return;
             }
             // No keycode for this keysym in the seat keymap (out-of-layout / Unicode), so fall
-            // through to the text paths below. Any held modifier is lost best effort.
+            // through to the text paths below. Any held modifier is lost — best effort.
             tracing::warn!(
                 "[ei-text]   -> keysym not in seat keymap; falling back (modifier not applied)"
             );
@@ -2229,9 +2244,9 @@ impl State {
                     &self.common.config,
                     self.common.event_loop_handle.clone(),
                 );
-            } else if !Lingmo_modifiers_eq_smithay(&action_pattern.modifiers, modifiers) {
+            } else if !LINGMO_modifiers_eq_smithay(&action_pattern.modifiers, modifiers) {
                 let mut new_pattern = action_pattern.clone();
-                new_pattern.modifiers = Lingmo_modifiers_from_smithay(*modifiers);
+                new_pattern.modifiers = LINGMO_modifiers_from_smithay(*modifiers);
                 let enabled =
                     self.common
                         .config
@@ -2274,10 +2289,10 @@ impl State {
                 let action = Action::Private(PrivateAction::Resizing(
                     direction,
                     edge.into(),
-                    Lingmo_keystate_from_smithay(key_state),
+                    LINGMO_keystate_from_smithay(key_state),
                 ));
                 let key_pattern = shortcuts::Binding {
-                    modifiers: Lingmo_modifiers_from_smithay(*modifiers),
+                    modifiers: LINGMO_modifiers_from_smithay(*modifiers),
                     keycode: None,
                     key: Some(handle.modified_sym()),
                     description: None,
@@ -2443,7 +2458,7 @@ impl State {
                 // is this a released (triggered) modifier-only binding?
                 if binding.key.is_none()
                     && key_state == KeyState::Released
-                    && !Lingmo_modifiers_eq_smithay(&binding.modifiers, modifiers)
+                    && !LINGMO_modifiers_eq_smithay(&binding.modifiers, modifiers)
                     && modifiers_queue.take(backend_id, binding)
                 {
                     modifiers_queue.clear(backend_id);
@@ -2456,7 +2471,7 @@ impl State {
                 // could this potentially become a modifier-only binding?
                 if binding.key.is_none()
                     && key_state == KeyState::Pressed
-                    && Lingmo_modifiers_eq_smithay(&binding.modifiers, modifiers)
+                    && LINGMO_modifiers_eq_smithay(&binding.modifiers, modifiers)
                 {
                     modifiers_queue.set(backend_id, binding.clone());
                     clear_queue = false;
@@ -2466,7 +2481,7 @@ impl State {
                 if binding.key.is_some()
                     && key_state == KeyState::Pressed
                     && key_matches(binding.key.unwrap())
-                    && Lingmo_modifiers_eq_smithay(&binding.modifiers, modifiers)
+                    && LINGMO_modifiers_eq_smithay(&binding.modifiers, modifiers)
                 {
                     modifiers_queue.clear(backend_id);
                     seat.supressed_keys().add(backend_id, &handle, None);
@@ -2975,7 +2990,7 @@ impl State {
                 shell.update_focal_point(
                     &seat,
                     original_position.as_global(),
-                    self.common.config.Lingmo_conf.accessibility_zoom.view_moves,
+                    self.common.config.LINGMO_conf.accessibility_zoom.view_moves,
                 );
 
                 update_output_image_copy_cursor_position(
@@ -3078,5 +3093,3 @@ pub fn update_output_image_copy_cursor_position(
         }
     }
 }
-
-

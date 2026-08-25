@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, sync::Mutex};
 
-use Lingmo_protocols::{
+use cosmic_protocols::{
     overlap_notify::v1::server::{
         zLingmo_overlap_notification_v1::ZLingmoOverlapNotificationV1,
         zLingmo_overlap_notify_v1::{self, ZLingmoOverlapNotifyV1},
@@ -470,13 +470,13 @@ where
 macro_rules! delegate_overlap_notify {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::overlap_notify::v1::server::zLingmo_overlap_notify_v1::ZLingmoOverlapNotifyV1: $crate::wayland::protocols::overlap_notify::OverlapNotifyGlobalData
+            cosmic_protocols::overlap_notify::v1::server::zLingmo_overlap_notify_v1::ZLingmoOverlapNotifyV1: $crate::wayland::protocols::overlap_notify::OverlapNotifyGlobalData
         ] => $crate::wayland::protocols::overlap_notify::OverlapNotifyState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::overlap_notify::v1::server::zLingmo_overlap_notify_v1::ZLingmoOverlapNotifyV1: ()
+            cosmic_protocols::overlap_notify::v1::server::zLingmo_overlap_notify_v1::ZLingmoOverlapNotifyV1: ()
         ] => $crate::wayland::protocols::overlap_notify::OverlapNotifyState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::overlap_notify::v1::server::zLingmo_overlap_notification_v1::ZLingmoOverlapNotificationV1: ()
+            cosmic_protocols::overlap_notify::v1::server::zLingmo_overlap_notification_v1::ZLingmoOverlapNotificationV1: ()
         ] => $crate::wayland::protocols::overlap_notify::OverlapNotifyState);
     };
 }

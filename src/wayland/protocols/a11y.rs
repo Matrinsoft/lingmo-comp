@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use Lingmo_protocols::a11y::v1::server::Lingmo_a11y_manager_v1;
+use cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1;
 use smithay::reexports::wayland_server::{
     Client, DataInit, Dispatch, DisplayHandle, GlobalDispatch, New, Resource,
 };
@@ -17,7 +17,7 @@ pub trait A11yHandler {
 #[derive(Debug)]
 pub struct A11yState {
     global: GlobalId,
-    instances: Vec<Lingmo_a11y_manager_v1::LingmoA11yManagerV1>,
+    instances: Vec<cosmic_a11y_manager_v1::LingmoA11yManagerV1>,
 
     magnifier_state: bool,
     screen_inverted: bool,
@@ -27,41 +27,41 @@ pub struct A11yState {
 struct Unknown;
 
 fn protocol_to_color_filter(
-    protocol: WEnum<Lingmo_a11y_manager_v1::Filter>,
+    protocol: WEnum<cosmic_a11y_manager_v1::Filter>,
 ) -> Result<Option<ColorFilter>, Unknown> {
     match protocol {
-        WEnum::Value(Lingmo_a11y_manager_v1::Filter::Disabled) => Ok(None),
-        WEnum::Value(Lingmo_a11y_manager_v1::Filter::Greyscale) => Ok(Some(ColorFilter::Greyscale)),
-        WEnum::Value(Lingmo_a11y_manager_v1::Filter::DaltonizeProtanopia) => {
+        WEnum::Value(cosmic_a11y_manager_v1::Filter::Disabled) => Ok(None),
+        WEnum::Value(cosmic_a11y_manager_v1::Filter::Greyscale) => Ok(Some(ColorFilter::Greyscale)),
+        WEnum::Value(cosmic_a11y_manager_v1::Filter::DaltonizeProtanopia) => {
             Ok(Some(ColorFilter::Protanopia))
         }
-        WEnum::Value(Lingmo_a11y_manager_v1::Filter::DaltonizeDeuteranopia) => {
+        WEnum::Value(cosmic_a11y_manager_v1::Filter::DaltonizeDeuteranopia) => {
             Ok(Some(ColorFilter::Deuteranopia))
         }
-        WEnum::Value(Lingmo_a11y_manager_v1::Filter::DaltonizeTritanopia) => {
+        WEnum::Value(cosmic_a11y_manager_v1::Filter::DaltonizeTritanopia) => {
             Ok(Some(ColorFilter::Tritanopia))
         }
         WEnum::Unknown(_) | WEnum::Value(_) => Err(Unknown),
     }
 }
 
-fn color_filter_to_protocol(filter: Option<ColorFilter>) -> Lingmo_a11y_manager_v1::Filter {
+fn color_filter_to_protocol(filter: Option<ColorFilter>) -> cosmic_a11y_manager_v1::Filter {
     match filter {
-        None => Lingmo_a11y_manager_v1::Filter::Disabled,
-        Some(ColorFilter::Greyscale) => Lingmo_a11y_manager_v1::Filter::Greyscale,
-        Some(ColorFilter::Protanopia) => Lingmo_a11y_manager_v1::Filter::DaltonizeProtanopia,
-        Some(ColorFilter::Deuteranopia) => Lingmo_a11y_manager_v1::Filter::DaltonizeDeuteranopia,
-        Some(ColorFilter::Tritanopia) => Lingmo_a11y_manager_v1::Filter::DaltonizeTritanopia,
+        None => cosmic_a11y_manager_v1::Filter::Disabled,
+        Some(ColorFilter::Greyscale) => cosmic_a11y_manager_v1::Filter::Greyscale,
+        Some(ColorFilter::Protanopia) => cosmic_a11y_manager_v1::Filter::DaltonizeProtanopia,
+        Some(ColorFilter::Deuteranopia) => cosmic_a11y_manager_v1::Filter::DaltonizeDeuteranopia,
+        Some(ColorFilter::Tritanopia) => cosmic_a11y_manager_v1::Filter::DaltonizeTritanopia,
     }
 }
 
 impl A11yState {
     pub fn new<D, F>(dh: &DisplayHandle, client_filter: F) -> A11yState
     where
-        D: GlobalDispatch<Lingmo_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData> + 'static,
+        D: GlobalDispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData> + 'static,
         F: for<'a> Fn(&'a Client) -> bool + Send + Sync + 'static,
     {
-        let global = dh.create_global::<D, Lingmo_a11y_manager_v1::LingmoA11yManagerV1, _>(
+        let global = dh.create_global::<D, cosmic_a11y_manager_v1::LingmoA11yManagerV1, _>(
             2,
             A11yGlobalData {
                 filter: Box::new(client_filter),
@@ -90,9 +90,9 @@ impl A11yState {
 
         for instance in &self.instances {
             instance.magnifier(if enabled {
-                Lingmo_a11y_manager_v1::ActiveState::Enabled
+                cosmic_a11y_manager_v1::ActiveState::Enabled
             } else {
-                Lingmo_a11y_manager_v1::ActiveState::Disabled
+                cosmic_a11y_manager_v1::ActiveState::Disabled
             });
         }
     }
@@ -109,12 +109,12 @@ impl A11yState {
 
     fn send_screen_filter(&self) {
         for instance in &self.instances {
-            if instance.version() >= Lingmo_a11y_manager_v1::EVT_SCREEN_FILTER_SINCE {
+            if instance.version() >= cosmic_a11y_manager_v1::EVT_SCREEN_FILTER_SINCE {
                 instance.screen_filter(
                     if self.screen_inverted {
-                        Lingmo_a11y_manager_v1::ActiveState::Enabled
+                        cosmic_a11y_manager_v1::ActiveState::Enabled
                     } else {
-                        Lingmo_a11y_manager_v1::ActiveState::Disabled
+                        cosmic_a11y_manager_v1::ActiveState::Disabled
                     },
                     color_filter_to_protocol(self.screen_filter),
                 );
@@ -127,10 +127,10 @@ pub struct A11yGlobalData {
     filter: Box<dyn for<'a> Fn(&'a Client) -> bool + Send + Sync>,
 }
 
-impl<D> GlobalDispatch<Lingmo_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData, D> for A11yState
+impl<D> GlobalDispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData, D> for A11yState
 where
-    D: GlobalDispatch<Lingmo_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData>
-        + Dispatch<Lingmo_a11y_manager_v1::LingmoA11yManagerV1, ()>
+    D: GlobalDispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, A11yGlobalData>
+        + Dispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, ()>
         + A11yHandler
         + 'static,
 {
@@ -138,7 +138,7 @@ where
         state: &mut D,
         _handle: &DisplayHandle,
         _client: &Client,
-        resource: New<Lingmo_a11y_manager_v1::LingmoA11yManagerV1>,
+        resource: New<cosmic_a11y_manager_v1::LingmoA11yManagerV1>,
         _global_data: &A11yGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -146,17 +146,17 @@ where
         let state = state.a11y_state();
 
         instance.magnifier(if state.magnifier_state {
-            Lingmo_a11y_manager_v1::ActiveState::Enabled
+            cosmic_a11y_manager_v1::ActiveState::Enabled
         } else {
-            Lingmo_a11y_manager_v1::ActiveState::Disabled
+            cosmic_a11y_manager_v1::ActiveState::Disabled
         });
 
-        if instance.version() >= Lingmo_a11y_manager_v1::EVT_SCREEN_FILTER_SINCE {
+        if instance.version() >= cosmic_a11y_manager_v1::EVT_SCREEN_FILTER_SINCE {
             instance.screen_filter(
                 if state.screen_inverted {
-                    Lingmo_a11y_manager_v1::ActiveState::Enabled
+                    cosmic_a11y_manager_v1::ActiveState::Enabled
                 } else {
-                    Lingmo_a11y_manager_v1::ActiveState::Disabled
+                    cosmic_a11y_manager_v1::ActiveState::Disabled
                 },
                 color_filter_to_protocol(state.screen_filter),
             );
@@ -170,34 +170,34 @@ where
     }
 }
 
-impl<D> Dispatch<Lingmo_a11y_manager_v1::LingmoA11yManagerV1, (), D> for A11yState
+impl<D> Dispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, (), D> for A11yState
 where
-    D: Dispatch<Lingmo_a11y_manager_v1::LingmoA11yManagerV1, ()> + A11yHandler + 'static,
+    D: Dispatch<cosmic_a11y_manager_v1::LingmoA11yManagerV1, ()> + A11yHandler + 'static,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _resource: &Lingmo_a11y_manager_v1::LingmoA11yManagerV1,
-        request: <Lingmo_a11y_manager_v1::LingmoA11yManagerV1 as smithay::reexports::wayland_server::Resource>::Request,
+        _resource: &cosmic_a11y_manager_v1::LingmoA11yManagerV1,
+        request: <cosmic_a11y_manager_v1::LingmoA11yManagerV1 as smithay::reexports::wayland_server::Resource>::Request,
         _data: &(),
         _dhandle: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            Lingmo_a11y_manager_v1::Request::SetMagnifier { active } => {
+            cosmic_a11y_manager_v1::Request::SetMagnifier { active } => {
                 let enabled = active
                     .into_result()
-                    .unwrap_or(Lingmo_a11y_manager_v1::ActiveState::Disabled)
-                    == Lingmo_a11y_manager_v1::ActiveState::Enabled;
+                    .unwrap_or(cosmic_a11y_manager_v1::ActiveState::Disabled)
+                    == cosmic_a11y_manager_v1::ActiveState::Enabled;
                 if enabled != state.a11y_state().magnifier_state {
                     state.request_screen_magnifier(enabled);
                 }
             }
-            Lingmo_a11y_manager_v1::Request::SetScreenFilter { inverted, filter } => {
+            cosmic_a11y_manager_v1::Request::SetScreenFilter { inverted, filter } => {
                 let inverted = inverted
                     .into_result()
-                    .unwrap_or(Lingmo_a11y_manager_v1::ActiveState::Disabled)
-                    == Lingmo_a11y_manager_v1::ActiveState::Enabled;
+                    .unwrap_or(cosmic_a11y_manager_v1::ActiveState::Disabled)
+                    == cosmic_a11y_manager_v1::ActiveState::Enabled;
                 let filter = protocol_to_color_filter(filter);
 
                 if inverted != state.a11y_state().screen_inverted {
@@ -217,7 +217,7 @@ where
     fn destroyed(
         state: &mut D,
         _client: wayland_backend::server::ClientId,
-        resource: &Lingmo_a11y_manager_v1::LingmoA11yManagerV1,
+        resource: &cosmic_a11y_manager_v1::LingmoA11yManagerV1,
         _data: &(),
     ) {
         state.a11y_state().instances.retain(|i| i != resource);
@@ -227,10 +227,10 @@ where
 macro_rules! delegate_a11y {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::a11y::v1::server::Lingmo_a11y_manager_v1::LingmoA11yManagerV1: $crate::wayland::protocols::a11y::A11yGlobalData
+            cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1::LingmoA11yManagerV1: $crate::wayland::protocols::a11y::A11yGlobalData
         ] => $crate::wayland::protocols::a11y::A11yState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::a11y::v1::server::Lingmo_a11y_manager_v1::LingmoA11yManagerV1: ()
+            cosmic_protocols::a11y::v1::server::cosmic_a11y_manager_v1::LingmoA11yManagerV1: ()
         ] => $crate::wayland::protocols::a11y::A11yState);
     };
 }

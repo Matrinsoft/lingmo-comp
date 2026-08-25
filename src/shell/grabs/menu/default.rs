@@ -1,4 +1,4 @@
-use Lingmo_settings_config::shortcuts::Action;
+use cosmic_settings_config::shortcuts::Action;
 use smithay::{
     input::pointer::MotionEvent, reexports::wayland_server::protocol::wl_surface::WlSurface,
     utils::SERIAL_COUNTER, wayland::seat::WaylandFocus,

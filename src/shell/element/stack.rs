@@ -33,7 +33,7 @@ use Lingmo::{
     theme, widget as Lingmo_widget,
 };
 use lingmo_comp_config::AppearanceConfig;
-use Lingmo_settings_config::shortcuts;
+use cosmic_settings_config::shortcuts;
 use shortcuts::action::{Direction, FocusDirection};
 use smithay::{
     backend::{

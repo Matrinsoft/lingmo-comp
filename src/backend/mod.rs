@@ -4,8 +4,8 @@ use crate::state::State;
 use crate::wayland::protocols::a11y::A11yHandler;
 use anyhow::{Context, Result, anyhow};
 use lingmo_comp_config::NumlockState;
-use Lingmo_config::LingmoConfigEntry;
-use Lingmo_settings_daemon_config::greeter;
+use cosmic_config::LingmoConfigEntry;
+use cosmic_settings_daemon_config::greeter;
 use smithay::reexports::{calloop::EventLoop, wayland_server::DisplayHandle};
 use tracing::{info, warn};
 

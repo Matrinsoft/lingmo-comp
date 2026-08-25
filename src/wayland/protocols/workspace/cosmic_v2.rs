@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use Lingmo_protocols::workspace::v2::server::{
-    zLingmo_workspace_handle_v2::{self, ZLingmoWorkspaceHandleV2},
-    zLingmo_workspace_manager_v2::{self, ZLingmoWorkspaceManagerV2},
+use cosmic_protocols::workspace::v2::server::{
+    zcosmic_workspace_handle_v2::{self, ZCosmicWorkspaceHandleV2},
+    zcosmic_workspace_manager_v2::{self, ZCosmicWorkspaceManagerV2},
 };
 use smithay::reexports::{
     wayland_protocols::ext::workspace::v1::server::ext_workspace_handle_v1::ExtWorkspaceHandleV1,
@@ -19,9 +19,9 @@ use super::{
 
 #[derive(Default)]
 pub struct LingmoWorkspaceV2DataInner {
-    capabilities: Option<zLingmo_workspace_handle_v2::WorkspaceCapabilities>,
-    tiling: Option<zLingmo_workspace_handle_v2::TilingState>,
-    states: Option<zLingmo_workspace_handle_v2::State>,
+    capabilities: Option<zcosmic_workspace_handle_v2::WorkspaceCapabilities>,
+    tiling: Option<zcosmic_workspace_handle_v2::TilingState>,
+    states: Option<zcosmic_workspace_handle_v2::State>,
 }
 
 pub struct LingmoWorkspaceV2Data {
@@ -29,7 +29,7 @@ pub struct LingmoWorkspaceV2Data {
     inner: Mutex<LingmoWorkspaceV2DataInner>,
 }
 
-impl<D> GlobalDispatch<ZLingmoWorkspaceManagerV2, WorkspaceGlobalData, D> for WorkspaceState<D>
+impl<D> GlobalDispatch<ZCosmicWorkspaceManagerV2, WorkspaceGlobalData, D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
@@ -37,7 +37,7 @@ where
         _state: &mut D,
         _dh: &DisplayHandle,
         _client: &Client,
-        resource: New<ZLingmoWorkspaceManagerV2>,
+        resource: New<ZCosmicWorkspaceManagerV2>,
         _global_data: &WorkspaceGlobalData,
         data_init: &mut DataInit<'_, D>,
     ) {
@@ -49,21 +49,21 @@ where
     }
 }
 
-impl<D> Dispatch<ZLingmoWorkspaceManagerV2, (), D> for WorkspaceState<D>
+impl<D> Dispatch<ZCosmicWorkspaceManagerV2, (), D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        obj: &ZLingmoWorkspaceManagerV2,
-        request: zLingmo_workspace_manager_v2::Request,
+        obj: &ZCosmicWorkspaceManagerV2,
+        request: zcosmic_workspace_manager_v2::Request,
         _data: &(),
         _dh: &DisplayHandle,
         data_init: &mut DataInit<'_, D>,
     ) {
         match request {
-            zLingmo_workspace_manager_v2::Request::GetLingmoWorkspace {
+            zcosmic_workspace_manager_v2::Request::GetLingmoWorkspace {
                 Lingmo_workspace,
                 workspace,
             } => {
@@ -77,17 +77,17 @@ where
                 if let Some(data) = workspace.data::<WorkspaceData>() {
                     let mut inner = data.inner.lock().unwrap();
                     if inner
-                        .Lingmo_v2_handle
+                        .cosmic_v2_handle
                         .as_ref()
                         .is_some_and(|x| x.is_alive())
                     {
                         obj.post_error(
-                            zLingmo_workspace_manager_v2::Error::WorkspaceExists,
-                            "zLingmo_workspace_handle_v2 already exists for ext_workspace_handle_v1",
+                            zcosmic_workspace_manager_v2::Error::WorkspaceExists,
+                            "zcosmic_workspace_handle_v2 already exists for ext_workspace_handle_v1",
                         );
                         return;
                     }
-                    inner.Lingmo_v2_handle = Some(Lingmo_workspace.downgrade());
+                    inner.cosmic_v2_handle = Some(Lingmo_workspace.downgrade());
                     if let Some(workspace) = state
                         .workspace_state()
                         .groups
@@ -101,21 +101,21 @@ where
                     }
                 }
             }
-            zLingmo_workspace_manager_v2::Request::Destroy => {}
+            zcosmic_workspace_manager_v2::Request::Destroy => {}
             _ => unreachable!(),
         }
     }
 }
 
-impl<D> Dispatch<ZLingmoWorkspaceHandleV2, LingmoWorkspaceV2Data, D> for WorkspaceState<D>
+impl<D> Dispatch<ZCosmicWorkspaceHandleV2, LingmoWorkspaceV2Data, D> for WorkspaceState<D>
 where
     D: WorkspaceHandler,
 {
     fn request(
         state: &mut D,
         _client: &Client,
-        _obj: &ZLingmoWorkspaceHandleV2,
-        request: zLingmo_workspace_handle_v2::Request,
+        _obj: &ZCosmicWorkspaceHandleV2,
+        request: zcosmic_workspace_handle_v2::Request,
         data: &LingmoWorkspaceV2Data,
         _dh: &DisplayHandle,
         _data_init: &mut DataInit<'_, D>,
@@ -124,7 +124,7 @@ where
             return;
         };
         match request {
-            zLingmo_workspace_handle_v2::Request::Rename { name } => {
+            zcosmic_workspace_handle_v2::Request::Rename { name } => {
                 if let Some(workspace_handle) =
                     state.workspace_state().get_ext_workspace_handle(&workspace)
                     && let Ok(manager) =
@@ -141,7 +141,7 @@ where
                     });
                 }
             }
-            zLingmo_workspace_handle_v2::Request::SetTilingState {
+            zcosmic_workspace_handle_v2::Request::SetTilingState {
                 state: tiling_state,
             } => {
                 if let Some(workspace_handle) =
@@ -160,7 +160,7 @@ where
                     });
                 }
             }
-            zLingmo_workspace_handle_v2::Request::Pin => {
+            zcosmic_workspace_handle_v2::Request::Pin => {
                 if let Some(workspace_handle) =
                     state.workspace_state().get_ext_workspace_handle(&workspace)
                     && let Ok(manager) =
@@ -177,7 +177,7 @@ where
                     });
                 }
             }
-            zLingmo_workspace_handle_v2::Request::Unpin => {
+            zcosmic_workspace_handle_v2::Request::Unpin => {
                 if let Some(workspace_handle) =
                     state.workspace_state().get_ext_workspace_handle(&workspace)
                     && let Ok(manager) =
@@ -194,7 +194,7 @@ where
                     });
                 }
             }
-            zLingmo_workspace_handle_v2::Request::MoveBefore {
+            zcosmic_workspace_handle_v2::Request::MoveBefore {
                 other_workspace,
                 axis,
             } => {
@@ -218,7 +218,7 @@ where
                     });
                 }
             }
-            zLingmo_workspace_handle_v2::Request::MoveAfter {
+            zcosmic_workspace_handle_v2::Request::MoveAfter {
                 other_workspace,
                 axis,
             } => {
@@ -242,14 +242,14 @@ where
                     });
                 }
             }
-            zLingmo_workspace_handle_v2::Request::Destroy => {}
+            zcosmic_workspace_handle_v2::Request::Destroy => {}
             _ => unreachable!(),
         }
     }
 }
 
 pub fn send_workspace_to_client(
-    instance: &ZLingmoWorkspaceHandleV2,
+    instance: &ZCosmicWorkspaceHandleV2,
     workspace: &Workspace,
 ) -> bool {
     let mut changed = false;
@@ -266,20 +266,20 @@ pub fn send_workspace_to_client(
         .iter()
         .filter_map(|cap| match cap {
             WorkspaceCapabilities::Rename => {
-                Some(zLingmo_workspace_handle_v2::WorkspaceCapabilities::Rename)
+                Some(zcosmic_workspace_handle_v2::WorkspaceCapabilities::Rename)
             }
             WorkspaceCapabilities::SetTilingState => {
-                Some(zLingmo_workspace_handle_v2::WorkspaceCapabilities::SetTilingState)
+                Some(zcosmic_workspace_handle_v2::WorkspaceCapabilities::SetTilingState)
             }
             WorkspaceCapabilities::Pin => {
-                Some(zLingmo_workspace_handle_v2::WorkspaceCapabilities::Pin)
+                Some(zcosmic_workspace_handle_v2::WorkspaceCapabilities::Pin)
             }
             WorkspaceCapabilities::Move => {
-                Some(zLingmo_workspace_handle_v2::WorkspaceCapabilities::Move)
+                Some(zcosmic_workspace_handle_v2::WorkspaceCapabilities::Move)
             }
             _ => None,
         })
-        .collect::<zLingmo_workspace_handle_v2::WorkspaceCapabilities>();
+        .collect::<zcosmic_workspace_handle_v2::WorkspaceCapabilities>();
     if handle_state.capabilities != Some(capabilities) {
         instance.capabilities(capabilities);
         handle_state.capabilities = Some(capabilities);
@@ -296,15 +296,15 @@ pub fn send_workspace_to_client(
         changed = true;
     }
 
-    if instance.version() >= zLingmo_workspace_handle_v2::EVT_STATE_SINCE {
+    if instance.version() >= zcosmic_workspace_handle_v2::EVT_STATE_SINCE {
         let states = workspace
             .states
             .iter()
             .filter_map(|state| match state {
-                State::Pinned => Some(zLingmo_workspace_handle_v2::State::Pinned),
+                State::Pinned => Some(zcosmic_workspace_handle_v2::State::Pinned),
                 _ => None,
             })
-            .collect::<zLingmo_workspace_handle_v2::State>();
+            .collect::<zcosmic_workspace_handle_v2::State>();
         if handle_state.states != Some(states) {
             instance.state(states);
             handle_state.states = Some(states);

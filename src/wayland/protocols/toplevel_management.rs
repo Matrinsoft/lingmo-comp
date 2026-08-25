@@ -11,8 +11,8 @@ use smithay::{
     utils::{Logical, Rectangle},
 };
 
-pub use Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplelevelManagementCapabilitiesV1 as ManagementCapabilities;
-use Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::{
+pub use cosmic_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZCosmicToplevelManagementCapabilitiesV1 as ManagementCapabilities;
+use cosmic_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::{
     self, ZLingmoToplevelManagerV1,
 };
 
@@ -292,10 +292,10 @@ where
 macro_rules! delegate_toplevel_management {
     ($(@<$( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+>)? $ty: ty) => {
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplevelManagerV1: $crate::wayland::protocols::toplevel_management::ToplevelManagerGlobalData
+            cosmic_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplevelManagerV1: $crate::wayland::protocols::toplevel_management::ToplevelManagerGlobalData
         ] => $crate::wayland::protocols::toplevel_management::ToplevelManagementState);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplevelManagerV1: ()
+            cosmic_protocols::toplevel_management::v1::server::zLingmo_toplevel_manager_v1::ZLingmoToplevelManagerV1: ()
         ] => $crate::wayland::protocols::toplevel_management::ToplevelManagementState);
     };
 }

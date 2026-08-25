@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use Lingmo_protocols::keyboard_layout::v1::server::{
+use cosmic_protocols::keyboard_layout::v1::server::{
     zLingmo_keyboard_layout_manager_v1::{self, ZLingmoKeyboardLayoutManagerV1},
     zLingmo_keyboard_layout_v1::{self, ZLingmoKeyboardLayoutV1},
 };

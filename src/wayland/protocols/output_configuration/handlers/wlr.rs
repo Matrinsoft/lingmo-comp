@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use Lingmo_protocols::output_management::v1::server::zLingmo_output_configuration_v1;
+use cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_v1;
 use smithay::{
     output::{Mode, Output, WeakOutput},
     reexports::{
@@ -236,7 +236,7 @@ where
                 }) {
                     if let Some(extension_obj) = pending.extension_obj.as_ref() {
                         extension_obj.post_error(
-                            zLingmo_output_configuration_v1::Error::MirroredHeadBusy,
+                            zcosmic_output_configuration_v1::Error::MirroredHeadBusy,
                             format!("{:?} is disabled and mirrored", head),
                         );
                     } else {

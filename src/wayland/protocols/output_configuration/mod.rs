@@ -2,9 +2,9 @@
 
 use calloop::LoopHandle;
 use lingmo_comp_config::output::comp::AdaptiveSync;
-use Lingmo_protocols::output_management::v1::server::{
+use cosmic_protocols::output_management::v1::server::{
     zLingmo_output_configuration_head_v1::ZLingmoOutputConfigurationHeadV1,
-    zLingmo_output_configuration_v1::ZLingmoOutputConfigurationV1,
+    zcosmic_output_configuration_v1::ZLingmoOutputConfigurationV1,
     zLingmo_output_head_v1::{self, ZLingmoOutputHeadV1},
     zLingmo_output_manager_v1::ZLingmoOutputManagerV1,
 };
@@ -537,19 +537,19 @@ macro_rules! delegate_output_configuration {
             smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1: $crate::wayland::protocols::output_configuration::PendingOutputConfiguration
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_global_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::output_management::v1::server::zLingmo_output_manager_v1::ZLingmoOutputManagerV1: $crate::wayland::protocols::output_configuration::OutputMngrGlobalData
+            cosmic_protocols::output_management::v1::server::zLingmo_output_manager_v1::ZLingmoOutputManagerV1: $crate::wayland::protocols::output_configuration::OutputMngrGlobalData
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::output_management::v1::server::zLingmo_output_manager_v1::ZLingmoOutputManagerV1: ()
+            cosmic_protocols::output_management::v1::server::zLingmo_output_manager_v1::ZLingmoOutputManagerV1: ()
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::output_management::v1::server::zLingmo_output_head_v1::ZLingmoOutputHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_head_v1::ZwlrOutputHeadV1>
+            cosmic_protocols::output_management::v1::server::zLingmo_output_head_v1::ZLingmoOutputHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_head_v1::ZwlrOutputHeadV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::output_management::v1::server::zLingmo_output_configuration_v1::ZLingmoOutputConfigurationV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_v1::ZwlrOutputConfigurationV1>
+            cosmic_protocols::output_management::v1::server::zcosmic_output_configuration_v1::ZLingmoOutputConfigurationV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_v1::ZwlrOutputConfigurationV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
         smithay::reexports::wayland_server::delegate_dispatch!($(@< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? $ty: [
-            Lingmo_protocols::output_management::v1::server::zLingmo_output_configuration_head_v1::ZLingmoOutputConfigurationHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1>
+            cosmic_protocols::output_management::v1::server::zLingmo_output_configuration_head_v1::ZLingmoOutputConfigurationHeadV1: smithay::reexports::wayland_server::Weak<smithay::reexports::wayland_protocols_wlr::output_management::v1::server::zwlr_output_configuration_head_v1::ZwlrOutputConfigurationHeadV1>
         ] => $crate::wayland::protocols::output_configuration::OutputConfigurationState<Self>);
     };
 }
